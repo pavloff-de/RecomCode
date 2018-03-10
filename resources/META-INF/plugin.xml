@@ -24,7 +24,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
