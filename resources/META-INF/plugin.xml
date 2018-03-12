@@ -24,7 +24,8 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode_right.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode_orig.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
