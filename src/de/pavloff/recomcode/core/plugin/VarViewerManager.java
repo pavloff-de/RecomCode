@@ -1,58 +1,76 @@
 package de.pavloff.recomcode.core.plugin;
 
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.components.JBScrollPane;
-import de.pavloff.recomcode.core.ipnb.Ipnb;
+import de.pavloff.recomcode.core.ipnb.ConnectionManager;
 
 import javax.swing.*;
+import java.util.List;
 
 public class VarViewerManager {
 
-    private JSplitPane mainPane;
     private JPanel varViewer;
-    private JTextArea logPane;
-    private Ipnb ipnb;
+    private Project openedProject;
+    private ConnectionManager ipnb;
 
     public VarViewerManager(Project project) {
-        ipnb = new Ipnb(project);
+        openedProject = project;
+        ipnb = new ConnectionManager(project);
         initPane();
-        initConn(project);
+        initConn();
     }
 
-    private void log(String text) {
-        logPane.append(text);
+    public static VarViewerManager getInstance(Project project) {
+        return project.getComponent(VarViewerManager.class);
     }
 
     private void initPane() {
         varViewer = new JPanel();
-        logPane = new JTextArea();
-        logPane.setFocusable(false);
 
-        mainPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, varViewer, new JBScrollPane(logPane));
-        mainPane.setOneTouchExpandable(true);
-        mainPane.setResizeWeight(0.8);
+        ActionManager actionManager = ActionManager.getInstance();
+        ActionGroup actionGroup = (ActionGroup) actionManager.getAction("VarViewer.Toolbar");
+        ActionToolbar actionToolbar = actionManager.createActionToolbar("", actionGroup, true);
+        varViewer.add(actionToolbar.getComponent());
     }
 
     public JComponent getView() {
-        return mainPane;
+        return varViewer;
     }
 
-    public void initConn(Project project, VirtualFile openedFile) {
+    public void initConn(VirtualFile openedFile) {
         if (openedFile == null) {
             return;
         }
-        log("Init Connection ..");
-        ipnb.initConnection(project, openedFile.getPath());
+        ipnb.initConnection(openedFile);
     }
 
-    public void initConn(Project project) {
-        FileEditor[] editors = FileEditorManager.getInstance(project).getSelectedEditors();
+    public void initConn() {
+        initConn(getOpenedFile());
+    }
 
+    private VirtualFile getOpenedFile() {
+        VirtualFile openedFile = null;
+        FileEditor[] editors = FileEditorManager.getInstance(openedProject).getSelectedEditors();
         for (FileEditor e : editors) {
-            initConn(project, e.getFile());
+            openedFile = e.getFile();
+        }
+        return openedFile;
+    }
+
+    public void getVarsFromCode(String code) {
+        VirtualFile openedFile = getOpenedFile();
+        if (openedFile != null) {
+            List<String> out = ipnb.execute(openedFile, code);
+            for (String o : out) {
+                varViewer.add(new JLabel(o));
+            }
+            varViewer.revalidate();
+            varViewer.repaint();
         }
     }
 }

@@ -22,14 +22,25 @@
   <depends>com.intellij.modules.python</depends>
   <depends>org.jetbrains.plugins.ipnb</depends>
 
+    <project-components>
+        <component>
+            <implementation-class>de.pavloff.recomcode.core.plugin.VarViewerManager</implementation-class>
+        </component>
+    </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode_right.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode_orig.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
-    <!-- Add your actions here -->
+      <group id="VarViewer.Toolbar">
+          <action id="VarViewer.RunCodeAction"
+                  class="de.pavloff.recomcode.core.plugin.RunCodeAction"
+                  text="Run"
+                  description="Run code until cursor"
+                  icon="/img/play.png"/>
+      </group>
   </actions>
 
 </idea-plugin>
