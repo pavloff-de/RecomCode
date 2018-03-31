@@ -23,6 +23,7 @@ import com.jetbrains.python.run.PyRunConfigurationFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.ipnb.IpnbUtils;
+import org.jetbrains.plugins.ipnb.format.cells.output.IpnbOutputCell;
 import org.jetbrains.plugins.ipnb.protocol.IpnbConnection;
 import org.jetbrains.plugins.ipnb.protocol.IpnbConnectionListenerBase;
 import org.jetbrains.plugins.ipnb.protocol.IpnbConnectionV3;
@@ -90,7 +91,7 @@ public class ConnectionManager {
                 return false;
             }
 
-            final IpnbConnection connection = new IpnbConnectionV3(conf.first, listener, conf.second, openedProject, file.getPath());
+            final IpnbConnection connection = new IpnbConnectionV3(conf.getFirst(), listener, conf.getSecond(), openedProject, file.getPath());
 
             int countAttempt = 0;
             while (!connectionOpened.get() && countAttempt < 10) {
@@ -203,6 +204,19 @@ public class ConnectionManager {
                 return Collections.singletonList("Connection closed!");
             }
             conn.execute(code);
+
+            int countAttempt = 0;
+            IpnbOutputCell out = conn.getOutput();
+
+            while (out == null && countAttempt < 10) {
+                out = conn.getOutput();
+                countAttempt += 1;
+                TimeoutUtil.sleep(1000);
+            }
+
+            if (out != null) {
+                return out.getText();
+            }
         }
         return new LinkedList<>();
     }

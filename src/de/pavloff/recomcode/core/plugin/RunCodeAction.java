@@ -9,6 +9,6 @@ public class RunCodeAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         VarViewerManager manager = VarViewerManager.getInstance(project);
-        manager.getVarsFromCode("print 'Hello World!'");
+        manager.getVarsFromCode();
     }
 }

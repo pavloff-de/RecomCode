@@ -5,12 +5,13 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditorLocation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.pavloff.recomcode.core.ipnb.ConnectionManager;
 
 import javax.swing.*;
-import java.util.List;
+import java.io.*;
 
 public class VarViewerManager {
 
@@ -53,24 +54,69 @@ public class VarViewerManager {
         initConn(getOpenedFile());
     }
 
-    private VirtualFile getOpenedFile() {
-        VirtualFile openedFile = null;
+    private FileEditor getOpenedEditor() {
         FileEditor[] editors = FileEditorManager.getInstance(openedProject).getSelectedEditors();
-        for (FileEditor e : editors) {
-            openedFile = e.getFile();
+
+        if (editors.length == 1) {
+            return editors[0];
         }
-        return openedFile;
+
+        return null;
     }
 
-    public void getVarsFromCode(String code) {
-        VirtualFile openedFile = getOpenedFile();
-        if (openedFile != null) {
-            List<String> out = ipnb.execute(openedFile, code);
-            for (String o : out) {
-                varViewer.add(new JLabel(o));
-            }
-            varViewer.revalidate();
-            varViewer.repaint();
+    private VirtualFile getOpenedFile() {
+        FileEditor editor = getOpenedEditor();
+
+        if (editor == null) {
+            return null;
         }
+
+        return editor.getFile();
+    }
+
+    private int getCursorPosition() {
+        FileEditor editor = getOpenedEditor();
+        if (editor == null) {
+            return -1;
+        }
+
+        TextEditorLocation location = (TextEditorLocation) editor.getCurrentLocation();
+        if (location == null) {
+            return -1;
+        }
+
+        return location.getPosition().line;
+    }
+
+    public void getVarsFromCode() {
+        VirtualFile openedFile = getOpenedFile();
+
+        if (openedFile == null) {
+            return;
+        }
+
+        int cursorPosition = getCursorPosition() + 1;
+        if (cursorPosition == 0) {
+            return;
+        }
+
+        String code = "";
+        try {
+            LineNumberReader reader = new LineNumberReader(
+                    new BufferedReader(new InputStreamReader(openedFile.getInputStream())));
+            StringBuilder codeContent = new StringBuilder();
+
+            while (reader.getLineNumber() < cursorPosition) {
+                String line = reader.readLine();
+                codeContent.append(line).append(openedFile.getDetectedLineSeparator());
+            }
+            code = codeContent.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ipnb.execute(openedFile, code);
+        //TODO: variable inspector ?
     }
 }
