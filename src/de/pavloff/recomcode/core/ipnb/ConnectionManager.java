@@ -20,7 +20,6 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.TimeoutUtil;
 import com.jetbrains.python.run.PyRunConfigurationFactory;
-import de.pavloff.recomcode.core.plugin.VarViewerManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.ipnb.IpnbUtils;
@@ -44,10 +43,15 @@ public class ConnectionManager {
     private static final Logger LOG = Logger.getInstance(ConnectionManager.class);
 
     private final Map<String, IpnbConnection> kernels = new HashMap<>();
+    private final Map<String, OutputCell> outputs = new HashMap<>();
     private Project openedProject;
 
     public ConnectionManager(Project project) {
         openedProject = project;
+    }
+
+    public static ConnectionManager getInstance(Project project) {
+        return project.getComponent(ConnectionManager.class);
     }
 
     public void initConnection(VirtualFile file) {
@@ -57,6 +61,19 @@ public class ConnectionManager {
         } else if (!kernels.containsKey(file.getPath())) {
             IpnbUtils.runCancellableProcessUnderProgress(openedProject, () -> setupConnection(file),
                     "Connecting to Jupyter Notebook Server");
+        }
+    }
+
+    public void execute(VirtualFile file, String code, OutputCell outputCell) {
+        initConnection(file);
+
+        if (kernels.containsKey(file.getPath())) {
+            IpnbConnection conn = kernels.get(file.getPath());
+
+            if (conn.isAlive()) {
+                String messageId = conn.execute(code);
+                outputs.put(messageId, outputCell);
+            }
         }
     }
 
@@ -74,22 +91,48 @@ public class ConnectionManager {
                 }
 
                 @Override
-                public void onOutput(@NotNull IpnbConnection c,
-                                     @NotNull String parentMessageId) {
-                    IpnbOutputCell out = c.getOutput();
-                    VarViewerManager varViewer = VarViewerManager.getInstance(openedProject);
-
-                    if (out != null) {
-                        varViewer.setVars(out.getText());
+                public void onOutput(@NotNull IpnbConnection c, @NotNull String m) {
+                    if (!outputs.containsKey(m)) {
+                        return;
                     }
+
+                    IpnbOutputCell out = c.getOutput();
+                    if (out == null) {
+                        return;
+                    }
+
+                    List<String> output = out.getText();
+                    if (output == null) {
+                        return;
+                    }
+                    if (output.size() != 1) {
+                        return;
+                    }
+
+                    outputs.get(m).onOutput(output.get(0));
                 }
 
                 @Override
                 public void onPayload(@Nullable String p, @NotNull String m) {
+                    if (!outputs.containsKey(m)) {
+                        return;
+                    }
+
+                    if (p == null) {
+                        return;
+                    }
+
+                    outputs.get(m).onPayload(p);
+                    outputs.remove(m);
                 }
 
                 @Override
                 public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {
+                    if (!outputs.containsKey(m)) {
+                        return;
+                    }
+
+                    outputs.remove(m);
                 }
             };
 
@@ -200,17 +243,5 @@ public class ConnectionManager {
         }
 
         return conn;
-    }
-
-    public void execute(VirtualFile file, String code) {
-        initConnection(file);
-
-        if (kernels.containsKey(file.getPath())) {
-            IpnbConnection conn = kernels.get(file.getPath());
-
-            if (conn.isAlive()) {
-                conn.execute(code);
-            }
-        }
     }
 }

@@ -24,19 +24,25 @@
 
     <project-components>
         <component>
+            <implementation-class>de.pavloff.recomcode.core.ipnb.ConnectionManager</implementation-class>
+        </component>
+    </project-components>
+
+    <project-components>
+        <component>
             <implementation-class>de.pavloff.recomcode.core.plugin.VarViewerManager</implementation-class>
         </component>
     </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.components.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.components.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
       <group id="VarViewer.Toolbar">
           <action id="VarViewer.RunCodeAction"
-                  class="de.pavloff.recomcode.core.plugin.RunCodeAction"
+                  class="de.pavloff.recomcode.core.plugin.actions.RunCodeAction"
                   text="Run"
                   description="Run code until cursor"
                   icon="/img/play.png"/>
