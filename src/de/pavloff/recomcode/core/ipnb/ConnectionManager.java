@@ -20,6 +20,7 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.TimeoutUtil;
 import com.jetbrains.python.run.PyRunConfigurationFactory;
+import de.pavloff.recomcode.core.plugin.VarViewerManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.ipnb.IpnbUtils;
@@ -68,21 +69,27 @@ public class ConnectionManager {
             Ref<Boolean> connectionOpened = new Ref<>(false);
             final IpnbConnectionListenerBase listener = new IpnbConnectionListenerBase() {
                 @Override
-                public void onOpen(@NotNull IpnbConnection connection) {
+                public void onOpen(@NotNull IpnbConnection c) {
                     connectionOpened.set(true);
                 }
 
                 @Override
-                public void onOutput(@NotNull IpnbConnection connection,
+                public void onOutput(@NotNull IpnbConnection c,
                                      @NotNull String parentMessageId) {
+                    IpnbOutputCell out = c.getOutput();
+                    VarViewerManager varViewer = VarViewerManager.getInstance(openedProject);
+
+                    if (out != null) {
+                        varViewer.setVars(out.getText());
+                    }
                 }
 
                 @Override
-                public void onPayload(@Nullable String payload, @NotNull String parentMessageId) {
+                public void onPayload(@Nullable String p, @NotNull String m) {
                 }
 
                 @Override
-                public void onFinished(@NotNull IpnbConnection connection, @NotNull String parentMessageId) {
+                public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {
                 }
             };
 
@@ -195,29 +202,15 @@ public class ConnectionManager {
         return conn;
     }
 
-    public List<String> execute(VirtualFile file, String code) {
+    public void execute(VirtualFile file, String code) {
         initConnection(file);
 
         if (kernels.containsKey(file.getPath())) {
             IpnbConnection conn = kernels.get(file.getPath());
-            if (!conn.isAlive()) {
-                return Collections.singletonList("Connection closed!");
-            }
-            conn.execute(code);
 
-            int countAttempt = 0;
-            IpnbOutputCell out = conn.getOutput();
-
-            while (out == null && countAttempt < 10) {
-                out = conn.getOutput();
-                countAttempt += 1;
-                TimeoutUtil.sleep(1000);
-            }
-
-            if (out != null) {
-                return out.getText();
+            if (conn.isAlive()) {
+                conn.execute(code);
             }
         }
-        return new LinkedList<>();
     }
 }

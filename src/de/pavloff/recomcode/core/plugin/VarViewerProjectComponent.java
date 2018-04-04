@@ -9,7 +9,7 @@ public class VarViewerProjectComponent implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        VarViewerManager manager = new VarViewerManager(project);
+        VarViewerManager manager = VarViewerManager.getInstance(project);
         toolWindow.getComponent().add(manager.getView());
     }
 }
