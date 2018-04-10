@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.core.plugin.components;
+package de.pavloff.recomcode.core.plugin.recommender;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;

@@ -30,13 +30,13 @@
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.plugin.VarViewerManager</implementation-class>
+            <implementation-class>de.pavloff.recomcode.core.plugin.varviewer.VarViewerManager</implementation-class>
         </component>
     </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.components.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.components.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.varviewer.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.recommender.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>

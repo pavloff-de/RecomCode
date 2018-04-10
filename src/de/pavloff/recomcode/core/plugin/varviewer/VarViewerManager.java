@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.core.plugin;
+package de.pavloff.recomcode.core.plugin.varviewer;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -38,7 +38,7 @@ public class VarViewerManager {
         return project.getComponent(VarViewerManager.class);
     }
 
-    public JComponent initView(Project project) {
+    JComponent initView(Project project) {
         openedProject = project;
 
         varViewer = new JPanel();
@@ -174,10 +174,8 @@ public class VarViewerManager {
         } catch (NumberFormatException ignored) {
         }
 
-        try {
-            Boolean.valueOf(value);
+        if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
             return Boolean.class;
-        } catch (NumberFormatException ignored) {
         }
 
         return null;
