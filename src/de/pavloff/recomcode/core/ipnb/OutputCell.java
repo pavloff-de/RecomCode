@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface OutputCell {
 
-    void onOutput(String output);
+    void onOutput(List<String> output);
     void onPayload(String payload);
 }

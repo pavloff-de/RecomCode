@@ -73,6 +73,10 @@ public class ConnectionManager {
             if (conn.isAlive()) {
                 String messageId = conn.execute(code);
                 outputs.put(messageId, outputCell);
+
+            } else {
+                kernels.remove(file.getPath());
+                initConnection(file);
             }
         }
     }
@@ -102,14 +106,11 @@ public class ConnectionManager {
                     }
 
                     List<String> output = out.getText();
-                    if (output == null) {
-                        return;
-                    }
-                    if (output.size() != 1) {
+                    if (output == null || output.size() == 0) {
                         return;
                     }
 
-                    outputs.get(m).onOutput(output.get(0));
+                    outputs.get(m).onOutput(output);
                 }
 
                 @Override
