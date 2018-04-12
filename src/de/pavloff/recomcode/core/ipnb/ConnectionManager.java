@@ -23,6 +23,7 @@ import com.jetbrains.python.run.PyRunConfigurationFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.ipnb.IpnbUtils;
+import org.jetbrains.plugins.ipnb.format.cells.output.IpnbErrorOutputCell;
 import org.jetbrains.plugins.ipnb.format.cells.output.IpnbOutputCell;
 import org.jetbrains.plugins.ipnb.protocol.IpnbConnection;
 import org.jetbrains.plugins.ipnb.protocol.IpnbConnectionListenerBase;
@@ -102,6 +103,12 @@ public class ConnectionManager {
 
                     IpnbOutputCell out = c.getOutput();
                     if (out == null) {
+                        return;
+                    }
+
+                    if (out instanceof IpnbErrorOutputCell) {
+                        IpnbErrorOutputCell errOut = (IpnbErrorOutputCell) out;
+                        outputs.get(m).onError(errOut.getEname(), errOut.getEvalue(), errOut.getText());
                         return;
                     }
 

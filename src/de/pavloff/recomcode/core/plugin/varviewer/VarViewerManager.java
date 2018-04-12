@@ -13,13 +13,14 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.recomcode.core.ipnb.ConnectionManager;
 import de.pavloff.recomcode.core.ipnb.OutputCell;
+import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 public class VarViewerManager {
@@ -115,6 +116,12 @@ public class VarViewerManager {
                 // ???
                 createTabs(Collections.singletonList(payload));
             }
+
+            @Override
+            public void onError(String eName, String eValue, List<String> traceback) {
+                tabbedPane.removeAll();
+                createErrorOutputTab(IpnbErrorPanel.createColoredPanel(traceback));
+            }
         });
     }
 
@@ -143,7 +150,6 @@ public class VarViewerManager {
         if (editor == null) {
             return null;
         }
-
         return editor.getFile();
     }
 
@@ -188,8 +194,8 @@ public class VarViewerManager {
             return 0;
         }
 
-        String[] vals1 = lines[0].split(LINE_SEP);
-        String[] vals2 = lines[1].split(LINE_SEP);
+        String[] vals1 = lines[0].split(DELIMITER);
+        String[] vals2 = lines[1].split(DELIMITER);
 
         if (vals1.length != vals2.length) {
             return -1;
@@ -248,6 +254,8 @@ public class VarViewerManager {
                     for (int i = 0; i < header.length; i++) {
                         header[i] = "column" + i;
                     }
+                } else {
+                    outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
                 }
 
                 String[][] data = new String[outputLines.length][header.length];
@@ -256,9 +264,8 @@ public class VarViewerManager {
                 }
 
                 try {
-                    JBTable table = (JBTable) tabbedPane.getComponentAt(tabIdx);
-                    DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-                    tableModel.setDataVector(data, header);
+                    DefaultTableModel tableModel = new DefaultTableModel(data, header);
+                    tabbedPane.setComponentAt(tabIdx, createTabPanel(new JBTable(tableModel)));
                     tabbedPane.revalidate();
                 } catch (ClassCastException ignored) {
                     // run again
@@ -272,26 +279,38 @@ public class VarViewerManager {
                 // ???
                 createTabs(Collections.singletonList(payload));
             }
+
+            @Override
+            public void onError(String eName, String eValue, List<String> traceback) {
+                tabbedPane.remove(tabbedPane.getComponentAt(tabIdx));
+                tabbedPane.setComponentAt(tabIdx, IpnbErrorPanel.createColoredPanel(traceback));
+                tabbedPane.revalidate();
+
+            }
         });
     }
 
-    private void onDataFrame(String dfName) {
-        JComponent dfTab = new JBTable(new DefaultTableModel());
-        tabbedPane.addTab(dfName, dfTab);
-    }
-
-    private void onOutput(String output) {
-        JComponent outputPanel = new JPanel(false);
-        outputPanel.setLayout(new BorderLayout());
-
+    private JComponent createTabPanel(String output) {
         JTextArea textArea = new JTextArea(output);
         textArea.setEditable(false);
+        return createTabPanel(textArea);
+    }
 
-        JScrollPane scrollPane = new JBScrollPane(textArea);
-        outputPanel.add(scrollPane);
+    private JComponent createTabPanel(JComponent panel) {
+        panel.setLayout(new BorderLayout());
+        return new JBScrollPane(panel);
+    }
 
-        tabbedPane.insertTab(OUTPUT_TAB, null, outputPanel, null, 0);
-        tabbedPane.setSelectedIndex(0);
+    private void createErrorOutputTab(JComponent tracebackPanel) {
+        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(tracebackPanel), null, 0);
+    }
+
+    private void createOutputTab(String output) {
+        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(output), null, 0);
+    }
+
+    private void createDataframeTab(String dfName) {
+        tabbedPane.addTab(dfName, new JPanel());
     }
 
     private void createTabs(List<String> fromIpnb) {
@@ -302,10 +321,9 @@ public class VarViewerManager {
             output = fromIpnb.get(0);
         }
 
-        tabbedPane.removeAll();
-
         String[] outputLines = output.split(LINE_SEP);
         StringBuilder mainOutput = new StringBuilder();
+        LinkedList<String> dfOutput = new LinkedList<>();
         boolean varViewerOutputFound = false;
 
         for (String s : outputLines) {
@@ -314,14 +332,30 @@ public class VarViewerManager {
 
             } else if (varViewerOutputFound) {
                 if (s.startsWith("DataFrame ")) {
-                    onDataFrame(s);
+                    dfOutput.add(s);
                 }
-
             } else {
                 mainOutput.append(s).append(LINE_SEP);
             }
         }
-        onOutput(mainOutput.toString());
+
+        int openedTab = tabbedPane.getSelectedIndex();
+        if (openedTab < 0) {
+            openedTab = 0;
+        }
+
+        tabbedPane.removeAll();
+
+        createOutputTab(mainOutput.toString());
+        for (String s : dfOutput) {
+            createDataframeTab(s);
+        }
+
+        try {
+            tabbedPane.setSelectedIndex(openedTab);
+        } catch (IndexOutOfBoundsException ignored) {
+            tabbedPane.setSelectedIndex(0);
+        }
 
         tabbedPane.revalidate();
         varViewer.revalidate();
