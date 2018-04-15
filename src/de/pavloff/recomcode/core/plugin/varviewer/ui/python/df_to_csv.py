@@ -1,0 +1,1 @@
+print %s.to_csv(index=False, sep='%s', header=True, line_terminator='%s')

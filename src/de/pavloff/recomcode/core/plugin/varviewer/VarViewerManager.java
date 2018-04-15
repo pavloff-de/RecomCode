@@ -10,30 +10,27 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.table.JBTable;
 import de.pavloff.recomcode.core.ipnb.ConnectionManager;
 import de.pavloff.recomcode.core.ipnb.OutputCell;
+import de.pavloff.recomcode.core.plugin.BaseConstants;
+import de.pavloff.recomcode.core.plugin.varviewer.ui.DataframeTab;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
 
-public class VarViewerManager {
+public class VarViewerManager implements BaseConstants {
 
-    private JPanel varViewer;
     private JBTabbedPane tabbedPane;
     private Project openedProject;
-
-    private String VAR_VIEWER_SEP = "### var viewer output ###";
-    private String LINE_SEP = "\n";
-    private String LINE_SEP_ESC = "\\n";
-    private String DELIMITER = ",";
-    private String OUTPUT_TAB = "Output";
 
     public static VarViewerManager getInstance(Project project) {
         return project.getComponent(VarViewerManager.class);
@@ -42,10 +39,23 @@ public class VarViewerManager {
     JComponent initView(Project project) {
         openedProject = project;
 
-        varViewer = new JPanel();
-        varViewer.setLayout(new BoxLayout(varViewer, BoxLayout.Y_AXIS));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         tabbedPane = new JBTabbedPane();
         tabbedPane.addChangeListener(e -> onTabOpen());
+        tabbedPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    int tabIdx = tabbedPane.indexAtLocation(evt.getX(), evt.getY());
+                    Component comp = tabbedPane.getComponentAt(tabIdx);
+
+                    if (comp instanceof DataframeTab) {
+                        decouple((DataframeTab) comp, tabIdx);
+                    }
+                }
+            }
+        });
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionGroup actionGroup = (ActionGroup) actionManager.getAction("VarViewer.Toolbar");
@@ -53,18 +63,25 @@ public class VarViewerManager {
         Component t = actionToolbar.getComponent();
         t.setMaximumSize(new Dimension(200, 20));
 
-        varViewer.add(t);
-        varViewer.add(tabbedPane);
+        mainPanel.add(t);
+        mainPanel.add(tabbedPane);
 
         initConn();
 
-        return varViewer;
+        return mainPanel;
     }
 
     public void executeCode() {
         VirtualFile openedFile = getOpenedFile();
 
         if (openedFile == null) {
+            return;
+        }
+
+        FileDocumentManager fileManager = FileDocumentManager.getInstance();
+        Document doc = fileManager.getDocument(openedFile);
+
+        if (doc == null) {
             return;
         }
 
@@ -75,8 +92,6 @@ public class VarViewerManager {
 
         StringBuilder codeContent = new StringBuilder();
 
-        FileDocumentManager fileManager = FileDocumentManager.getInstance();
-        Document doc = fileManager.getDocument(openedFile);
         codeContent.append(doc.getText(new TextRange(0, doc.getLineEndOffset(cursorPosition))));
         codeContent.append(LINE_SEP);
         codeContent.append(String.format("print '%s'", VAR_VIEWER_SEP)).append(LINE_SEP);
@@ -113,7 +128,7 @@ public class VarViewerManager {
             @Override
             public void onError(String eName, String eValue, List<String> traceback) {
                 tabbedPane.removeAll();
-                createErrorOutputTab(IpnbErrorPanel.createColoredPanel(traceback));
+                tabbedPane.addTab(OUTPUT_TAB, createTabPanel(IpnbErrorPanel.createColoredPanel(traceback)));
             }
         });
     }
@@ -168,56 +183,6 @@ public class VarViewerManager {
         return location.getPosition().line;
     }
 
-    private Class guessValueType(String value) {
-        try {
-            Integer.valueOf(value);
-            return Integer.class;
-        } catch (NumberFormatException ignored) {
-        }
-
-        try {
-            Float.valueOf(value);
-            return Float.class;
-        } catch (NumberFormatException ignored) {
-        }
-
-        if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-            return Boolean.class;
-        }
-
-        return null;
-    }
-
-    private int hasHeader(String[] lines) {
-        // -1 if not found
-        // 0 if names in the first line
-        if (lines.length == 1) {
-            return 0;
-        }
-
-        String[] vals1 = lines[0].split(DELIMITER);
-        String[] vals2 = lines[1].split(DELIMITER);
-
-        if (vals1.length != vals2.length) {
-            return -1;
-        }
-
-        int numOfMatches = 0;
-        for (int i = 0; i < vals1.length; i++) {
-            if (guessValueType(vals1[i]) == guessValueType(vals2[i])) {
-                numOfMatches += 1;
-            }
-        }
-
-        if (numOfMatches != vals1.length) {
-            // different values in first two lines
-            // points at a header in first line
-            return 0;
-        }
-
-        return -1;
-    }
-
     private void onTabOpen() {
         int tabIdx = tabbedPane.getSelectedIndex();
         if (tabIdx < 0) {
@@ -229,66 +194,10 @@ public class VarViewerManager {
             return;
         }
 
-        String dfName = tabName.split(" ")[1];
-        String code = String.format("print %s.to_csv(index=False, sep='%s', header=True, line_terminator='%s')", dfName, DELIMITER, LINE_SEP_ESC);
-
-        ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
-        ipnb.execute(getOpenedFile(), code, new OutputCell() {
-            @Override
-            public void onOutput(List<String> fromIpnb) {
-                String output;
-                if (fromIpnb.size() != 1) {
-                    output = String.join(LINE_SEP, fromIpnb);
-                } else {
-                    output = fromIpnb.get(0);
-                }
-
-                String[] outputLines = output.split(LINE_SEP);
-                if (outputLines.length == 0) {
-                    return;
-                }
-
-                String[] header = outputLines[0].split(DELIMITER);
-
-                if (hasHeader(outputLines) < 0) {
-                    header = new String[header.length];
-                    for (int i = 0; i < header.length; i++) {
-                        header[i] = "column" + i;
-                    }
-                } else {
-                    outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
-                }
-
-                String[][] data = new String[outputLines.length][header.length];
-                for (int i = 0; i < outputLines.length; i++) {
-                    data[i] = outputLines[i].split(DELIMITER);
-                }
-
-                try {
-                    DefaultTableModel tableModel = new DefaultTableModel(data, header);
-                    tabbedPane.setComponentAt(tabIdx, createTabPanel(new JBTable(tableModel)));
-                    tabbedPane.revalidate();
-                } catch (ClassCastException ignored) {
-                    // run again
-                    tabbedPane.setSelectedIndex(tabIdx);
-                }
-
-            }
-
-            @Override
-            public void onPayload(String payload) {
-                // ???
-                createTabs(Collections.singletonList(payload));
-            }
-
-            @Override
-            public void onError(String eName, String eValue, List<String> traceback) {
-                tabbedPane.remove(tabbedPane.getComponentAt(tabIdx));
-                tabbedPane.setComponentAt(tabIdx, IpnbErrorPanel.createColoredPanel(traceback));
-                tabbedPane.revalidate();
-
-            }
-        });
+        Component comp = tabbedPane.getComponentAt(tabIdx);
+        if (comp instanceof DataframeTab) {
+            ((DataframeTab) comp).open(openedProject, getOpenedFile(), tabName);
+        }
     }
 
     private JComponent createTabPanel(String output) {
@@ -300,18 +209,6 @@ public class VarViewerManager {
     private JComponent createTabPanel(JComponent panel) {
         panel.setLayout(new BorderLayout());
         return new JBScrollPane(panel);
-    }
-
-    private void createErrorOutputTab(JComponent tracebackPanel) {
-        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(tracebackPanel), null, 0);
-    }
-
-    private void createOutputTab(String output) {
-        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(output), null, 0);
-    }
-
-    private void createDataframeTab(String dfName) {
-        tabbedPane.addTab(dfName, new JPanel());
     }
 
     private void createTabs(List<String> fromIpnb) {
@@ -346,10 +243,9 @@ public class VarViewerManager {
         }
 
         tabbedPane.removeAll();
-
-        createOutputTab(mainOutput.toString());
+        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(mainOutput.toString()), null, 0);
         for (String s : dfOutput) {
-            createDataframeTab(s);
+            tabbedPane.addTab(s, new DataframeTab());
         }
 
         try {
@@ -358,7 +254,45 @@ public class VarViewerManager {
             tabbedPane.setSelectedIndex(0);
         }
 
-        tabbedPane.revalidate();
-        varViewer.revalidate();
+        tabbedPane.getParent().revalidate();
+    }
+
+    private void decouple(DataframeTab tab, int tabIdx) {
+        String tabName = tabbedPane.getTitleAt(tabIdx);
+
+        final JFrame popup = new JFrame();
+        popup.add(tab);
+        popup.setSize(800, 500);
+        popup.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                tabbedPane.insertTab(tabName, null, tab, null, Math.min(tabIdx, tabbedPane.getTabCount()));
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+        });
+        popup.setVisible(true);
     }
 }
