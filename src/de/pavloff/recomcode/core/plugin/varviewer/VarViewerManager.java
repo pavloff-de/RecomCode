@@ -3,10 +3,10 @@ package de.pavloff.recomcode.core.plugin.varviewer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditorLocation;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
@@ -68,26 +68,19 @@ public class VarViewerManager {
             return;
         }
 
-        int cursorPosition = getCursorPosition() + 1;
+        int cursorPosition = getCursorPosition();
         if (cursorPosition == 0) {
             return;
         }
 
         StringBuilder codeContent = new StringBuilder();
-        try {
-            LineNumberReader reader = new LineNumberReader(
-                    new BufferedReader(new InputStreamReader(openedFile.getInputStream())));
 
-            while (reader.getLineNumber() < cursorPosition) {
-                String line = reader.readLine();
-                codeContent.append(line).append(LINE_SEP);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        FileDocumentManager fileManager = FileDocumentManager.getInstance();
+        Document doc = fileManager.getDocument(openedFile);
+        codeContent.append(doc.getText(new TextRange(0, doc.getLineEndOffset(cursorPosition))));
+        codeContent.append(LINE_SEP);
         codeContent.append(String.format("print '%s'", VAR_VIEWER_SEP)).append(LINE_SEP);
+
         URL resources = VarViewerManager.class.getResource("python/var_viewer.py");
         try {
             StringBuilder content = new StringBuilder();
@@ -127,6 +120,14 @@ public class VarViewerManager {
 
     private void initConn() {
         VirtualFile openedFile = getOpenedFile();
+
+        // FileEditorManagerListener
+        // fileClosed
+        // selectionChanged
+
+        // DocumentListener
+        // documentChanged
+
         if (openedFile == null) {
             return;
         }
