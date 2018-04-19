@@ -9,5 +9,7 @@ public class RecomCodeProjectComponent implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        RecomCodeManager manager = RecomCodeManager.getInstance(project);
+        toolWindow.getComponent().add(manager.initView(project));
     }
 }
