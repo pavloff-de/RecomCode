@@ -40,7 +40,7 @@ public class VarViewerManager implements BaseConstants {
         openedProject = project;
 
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
         tabbedPane = new JBTabbedPane();
         tabbedPane.addChangeListener(e -> onTabOpen());
         tabbedPane.addMouseListener(new MouseAdapter() {
@@ -60,11 +60,29 @@ public class VarViewerManager implements BaseConstants {
         ActionManager actionManager = ActionManager.getInstance();
         ActionGroup actionGroup = (ActionGroup) actionManager.getAction("VarViewer.Toolbar");
         ActionToolbar actionToolbar = actionManager.createActionToolbar("VarViewer.Toolbar.ID", actionGroup, true);
-        Component t = actionToolbar.getComponent();
-        t.setMaximumSize(new Dimension(200, 20));
 
-        mainPanel.add(t);
-        mainPanel.add(tabbedPane);
+        GroupLayout layout = new GroupLayout(mainPanel);
+        mainPanel.setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(tabbedPane)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(actionToolbar.getComponent(), 40, 40, Short.MAX_VALUE)
+                                                .addGap(0, 100, Short.MAX_VALUE)))
+                                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(actionToolbar.getComponent(), 40, 40, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tabbedPane, 230, 230, Short.MAX_VALUE)
+                                .addContainerGap())
+        );
 
         initConn();
 

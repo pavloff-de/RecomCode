@@ -22,6 +22,10 @@ public class DataframeTab extends JPanel implements BaseConstants {
 
     private Boolean isOpened = false;
 
+    public DataframeTab() {
+        setLayout(new BorderLayout());
+    }
+
     public void open(Project openedProject, VirtualFile openedFile, String name) {
         if (isOpened) {
             return;
@@ -75,8 +79,9 @@ public class DataframeTab extends JPanel implements BaseConstants {
                 for (int i = 0; i < outputLines.length; i++) {
                     data[i] = outputLines[i].split(DELIMITER);
                 }
-
-                show(new JBTable(new DefaultTableModel(data, header)));
+                JBTable tableView = new JBTable(new DefaultTableModel(data, header));
+                tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                show(tableView);
             }
 
             @Override
@@ -92,8 +97,8 @@ public class DataframeTab extends JPanel implements BaseConstants {
 
     private void show(JComponent panel) {
         removeAll();
-        panel.setLayout(new BorderLayout());
         add(new JBScrollPane(panel));
+        revalidate();
     }
 
     private Class guessValueType(String value) {
