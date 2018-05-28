@@ -24,31 +24,31 @@
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.ipnb.ConnectionManager</implementation-class>
+            <implementation-class>de.pavloff.recomcode.ipnb.ConnectionManager</implementation-class>
         </component>
     </project-components>
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.plugin.varviewer.VarViewerManager</implementation-class>
+            <implementation-class>de.pavloff.recomcode.plugin.varviewer.VarViewerManager</implementation-class>
         </component>
     </project-components>
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.plugin.recommender.RecomCodeManager</implementation-class>
+            <implementation-class>de.pavloff.recomcode.core.RecomCodeManager</implementation-class>
         </component>
     </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.core.plugin.varviewer.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.core.plugin.recommender.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.plugin.varviewer.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.plugin.recommender.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
       <group id="VarViewer.Toolbar">
           <action id="VarViewer.RunCodeAction"
-                  class="de.pavloff.recomcode.core.plugin.actions.RunCodeAction"
+                  class="de.pavloff.recomcode.plugin.actions.RunCodeAction"
                   text="Run"
                   description="Run code until cursor"
                   icon="/img/play.png"/>

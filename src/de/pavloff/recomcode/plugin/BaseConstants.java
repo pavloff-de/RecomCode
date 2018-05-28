@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.core.plugin;
+package de.pavloff.recomcode.plugin;
 
 public interface BaseConstants {
     String VAR_VIEWER_SEP = "### var viewer output ###";

@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.core.ipnb;
+package de.pavloff.recomcode.ipnb;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;

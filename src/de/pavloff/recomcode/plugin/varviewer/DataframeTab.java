@@ -1,12 +1,12 @@
-package de.pavloff.recomcode.core.plugin.varviewer.ui;
+package de.pavloff.recomcode.plugin.varviewer;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
-import de.pavloff.recomcode.core.ipnb.ConnectionManager;
-import de.pavloff.recomcode.core.ipnb.OutputCell;
-import de.pavloff.recomcode.core.plugin.BaseConstants;
+import de.pavloff.recomcode.ipnb.ConnectionManager;
+import de.pavloff.recomcode.ipnb.OutputCell;
+import de.pavloff.recomcode.plugin.BaseConstants;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;

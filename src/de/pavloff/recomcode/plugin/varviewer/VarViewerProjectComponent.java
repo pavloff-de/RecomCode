@@ -1,9 +1,8 @@
-package de.pavloff.recomcode.core.plugin.varviewer;
+package de.pavloff.recomcode.plugin.varviewer;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import de.pavloff.recomcode.core.plugin.varviewer.VarViewerManager;
 import org.jetbrains.annotations.NotNull;
 
 public class VarViewerProjectComponent implements ToolWindowFactory {
