@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.plugin.actions;
+package de.pavloff.recomcode.plugin.varviewer.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
