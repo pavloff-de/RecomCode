@@ -36,7 +36,13 @@
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.RecomCodeManager</implementation-class>
+            <implementation-class>de.pavloff.recomcode.plugin.recommender.RecomCodeManager</implementation-class>
+        </component>
+    </project-components>
+
+    <project-components>
+        <component>
+            <implementation-class>de.pavloff.recomcode.core.CodeFragmentManager</implementation-class>
         </component>
     </project-components>
 
@@ -48,7 +54,7 @@
   <actions>
       <group id="VarViewer.Toolbar">
           <action id="VarViewer.RunCodeAction"
-                  class="de.pavloff.recomcode.plugin.actions.RunCodeAction"
+                  class="de.pavloff.recomcode.plugin.varviewer.actions.RunCodeAction"
                   text="Run"
                   description="Run code until cursor"
                   icon="/img/play.png"/>
