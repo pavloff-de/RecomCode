@@ -1,0 +1,59 @@
+---
+recType: params
+recID: par.01
+group: pandas
+name: dataframe
+type: DataFrame
+names: [dataframe, df, frame]
+parameterType: var # optional list of related records, to show more options
+---
+recType: params
+recID: par.02
+group: pandas
+name: row-index-num
+# maybe later: introduce sets of types like [string, list<string>]
+type: Integer
+names: [i, row, position, x]
+---
+recType: code
+recID: py.pd.003
+parent:
+group: pandas
+textkey:
+  - "rearrange|change order of columns in a dataframe"
+code: |
+      columnNamesList = §dataframe§.columns.tolist()
+      # todo: change order of elements in columnNamesList as desired
+      # e.g. swap 1st and last via columnNamesList = columnNamesList[-1:] + columnNamesList[:-1]
+      §dataframe§ = §dataframe§[columnNamesList]
+
+commentTemplate: rearrange order of columns in dataframe §dataframe§
+sources: ["https://stackoverflow.com/questions/13148429/how-to-change-the-order-of-dataframe-columns"]
+documentation:
+---
+recType: code
+recID: py.pd.004
+parent:
+group: pandas
+textkey:
+ - "rename columns in a dataframe via list"
+code: |
+    §dataframe§.columns = §list_columnNames§
+commentTemplate: rename columns in the dataframe §dataframe§
+sources: https://stackoverflow.com/questions/11346283/renaming-columns-in-pandas
+documentation:
+---
+recType: code
+recID: py.pd.004.b
+parent: py.pd.004
+group: pandas
+textkey:
+ - "rename columns in a dataframe via dictionary"
+code: |
+    # todo: setup the dictionary
+    §dataframe§ = §dataframe§.rename(columns=§dictionaryOfColumnNames§)
+    # df = df.rename(columns={'oldName1': 'newName1', 'oldName2': 'newName2'})
+parameters: |
+  dictionaryOfColumnNames:
+    type: dict
+    example: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"
