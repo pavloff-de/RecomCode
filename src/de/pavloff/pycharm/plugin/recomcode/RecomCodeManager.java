@@ -1,9 +1,9 @@
-package de.pavloff.recomcode.plugin.recommender;
+package de.pavloff.pycharm.plugin.recomcode;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBTextField;
-import de.pavloff.recomcode.core.CodeFragment;
-import de.pavloff.recomcode.core.CodeFragmentManager;
+import de.pavloff.pycharm.core.CodeFragment;
+import de.pavloff.pycharm.core.CodeFragmentManager;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -24,19 +24,8 @@ public class RecomCodeManager {
         openedProject = project;
 
         recomCodePanel = new JPanel();
-        recomCodePanel.setPreferredSize(new Dimension(0, 300));
-
-        GroupLayout recomCodePanelLayout = new GroupLayout(recomCodePanel);
-        recomCodePanel.setLayout(recomCodePanelLayout);
-        recomCodePanelLayout.setHorizontalGroup(
-                recomCodePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
-        );
-        recomCodePanelLayout.setVerticalGroup(
-                recomCodePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGap(0, 243, Short.MAX_VALUE)
-        );
-
+        recomCodePanel.setPreferredSize(new Dimension(500, 300));
+        recomCodePanel.setLayout(new FlowLayout());
 
         JPanel mainPanel = new JPanel();
         searchField = new JBTextField();
@@ -47,10 +36,10 @@ public class RecomCodeManager {
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
+                                        .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(searchField, GroupLayout.PREFERRED_SIZE, 494, GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 282, Short.MAX_VALUE)))
+                                                .addComponent(searchField, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                                                .addGap(76, 76, 76)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -59,7 +48,7 @@ public class RecomCodeManager {
                                 .addContainerGap()
                                 .addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                                .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addContainerGap())
         );
 
@@ -93,9 +82,13 @@ public class RecomCodeManager {
     private void setCodeFragmentHandler() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         recommender.addCodeFragmentListener(fragments -> {
+            for (Component c : recomCodePanel.getComponents()) {
+                recomCodePanel.remove(c);
+            }
             for (CodeFragment fragment : fragments) {
                 recomCodePanel.add(new RecomCode(fragment));
             }
+            recomCodePanel.revalidate();
         });
     }
 }

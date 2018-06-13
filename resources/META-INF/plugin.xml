@@ -24,40 +24,42 @@
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.ipnb.ConnectionManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.ipnb.ConnectionManager</implementation-class>
         </component>
     </project-components>
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.plugin.varviewer.VarViewerManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerManager</implementation-class>
         </component>
     </project-components>
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.plugin.recommender.RecomCodeManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.plugin.recomcode.RecomCodeManager</implementation-class>
         </component>
     </project-components>
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.recomcode.core.CodeFragmentManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.core.CodeFragmentManager</implementation-class>
         </component>
     </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.recomcode.plugin.varviewer.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.recomcode.plugin.recommender.RecomCodeProjectComponent"/>
+    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.pycharm.plugin.varviewer.VarViewerProjectComponent"/>
+    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.pycharm.plugin.recomcode.RecomCodeProjectComponent"/>
   </extensions>
 
   <actions>
       <group id="VarViewer.Toolbar">
           <action id="VarViewer.RunCodeAction"
-                  class="de.pavloff.recomcode.plugin.varviewer.actions.RunCodeAction"
+                  class="de.pavloff.pycharm.plugin.varviewer.actions.RunVarViewerAction"
                   text="Run"
                   description="Run code until cursor"
                   icon="/img/play.png"/>
+      </group>
+      <group id="RecomCode.Toolbar">
       </group>
   </actions>
 

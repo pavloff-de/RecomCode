@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.plugin.varviewer;
+package de.pavloff.pycharm.plugin.varviewer;
 
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -10,9 +10,9 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
-import de.pavloff.recomcode.ipnb.ConnectionManager;
-import de.pavloff.recomcode.ipnb.OutputCell;
-import de.pavloff.recomcode.plugin.BaseConstants;
+import de.pavloff.pycharm.ipnb.ConnectionManager;
+import de.pavloff.pycharm.ipnb.OutputCell;
+import de.pavloff.pycharm.plugin.BaseConstants;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;

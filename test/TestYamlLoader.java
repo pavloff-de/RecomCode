@@ -1,6 +1,6 @@
-import de.pavloff.recomcode.core.CodeFragment;
-import de.pavloff.recomcode.core.CodeParam;
-import de.pavloff.recomcode.yaml.YamlLoader;
+import de.pavloff.pycharm.core.CodeFragment;
+import de.pavloff.pycharm.core.CodeParam;
+import de.pavloff.pycharm.yaml.YamlLoader;
 import org.junit.Test;
 
 import java.io.File;

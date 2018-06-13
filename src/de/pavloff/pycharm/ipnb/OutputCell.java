@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.ipnb;
+package de.pavloff.pycharm.ipnb;
 
 import java.util.List;
 

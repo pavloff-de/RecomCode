@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.plugin;
+package de.pavloff.pycharm.plugin;
 
 public interface BaseConstants {
     String VAR_VIEWER_SEP = "### var viewer output ###";

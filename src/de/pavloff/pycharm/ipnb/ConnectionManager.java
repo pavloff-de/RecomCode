@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.ipnb;
+package de.pavloff.pycharm.ipnb;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;

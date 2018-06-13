@@ -1,4 +1,4 @@
-package de.pavloff.recomcode.core;
+package de.pavloff.pycharm.core;
 
 public interface CodeParamListener {
 

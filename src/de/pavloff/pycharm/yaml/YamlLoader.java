@@ -1,8 +1,8 @@
-package de.pavloff.recomcode.yaml;
+package de.pavloff.pycharm.yaml;
 
-import de.pavloff.recomcode.core.CodeFragment;
-import de.pavloff.recomcode.core.CodeFragmentLoader;
-import de.pavloff.recomcode.core.CodeParam;
+import de.pavloff.pycharm.core.CodeFragment;
+import de.pavloff.pycharm.core.CodeFragmentLoader;
+import de.pavloff.pycharm.core.CodeParam;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -117,7 +117,7 @@ public class YamlLoader implements CodeFragmentLoader {
     private ArrayList<String> castToStrings(Object list) {
         try {
             return (ArrayList<String>) list;
-        } catch (ClassCastException e) {}
+        } catch (ClassCastException ignored) {}
 
         ArrayList<String> castedList = new ArrayList<>();
         try {
