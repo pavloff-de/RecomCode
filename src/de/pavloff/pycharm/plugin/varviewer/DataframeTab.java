@@ -1,32 +1,38 @@
 package de.pavloff.pycharm.plugin.varviewer;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import de.pavloff.pycharm.BaseUtils;
+import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.ipnb.ConnectionManager;
 import de.pavloff.pycharm.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-public class DataframeTab extends JPanel implements BaseConstants {
+class DataframeTab extends JPanel implements BaseConstants {
 
     private Boolean isOpened = false;
 
-    public DataframeTab() {
+    DataframeTab() {
         setLayout(new BorderLayout());
     }
 
-    public void open(Project openedProject, VirtualFile openedFile, String name) {
+    void open(Project openedProject, VirtualFile openedFile, String name) {
         if (isOpened) {
             return;
         }
@@ -37,7 +43,7 @@ public class DataframeTab extends JPanel implements BaseConstants {
             BufferedInputStream in = (BufferedInputStream) resources.getContent();
             int bytesRead;
             byte[] bytes = new byte[128];
-            while((bytesRead = in.read(bytes)) != -1) {
+            while ((bytesRead = in.read(bytes)) != -1) {
                 toCSV = String.format(new String(bytes, 0, bytesRead),
                         name.split(" ")[1], DELIMITER, LINE_SEP_ESC);
             }
@@ -66,7 +72,7 @@ public class DataframeTab extends JPanel implements BaseConstants {
 
                 String[] header = outputLines[0].split(DELIMITER);
 
-                if (hasHeader(outputLines) < 0) {
+                if (BaseUtils.hasHeader(outputLines) < 0) {
                     header = new String[header.length];
                     for (int i = 0; i < header.length; i++) {
                         header[i] = "column" + i;
@@ -81,6 +87,8 @@ public class DataframeTab extends JPanel implements BaseConstants {
                 }
                 JBTable tableView = new JBTable(new DefaultTableModel(data, header));
                 tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tableView.setCellSelectionEnabled(true);
+                tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
             }
 
@@ -95,59 +103,48 @@ public class DataframeTab extends JPanel implements BaseConstants {
         });
     }
 
+    private static class SelectionListener implements ListSelectionListener {
+
+        private Project project;
+        private JBTable table;
+
+        SelectionListener(Project openedProject, JBTable tableView) {
+            project = openedProject;
+            table = tableView;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (!e.getValueIsAdjusting()) {
+                return;
+            }
+
+            CodeFragmentManager manager = CodeFragmentManager.getInstance(project);
+            List<Pair<Integer, Integer>> cells = new LinkedList<>();
+
+            int rowIndexEnd = table.getSelectionModel().getMaxSelectionIndex();
+            int colIndexEnd = table.getColumnModel().getSelectionModel().getMaxSelectionIndex();
+
+            for (int i = table.getSelectedRow(); i <= rowIndexEnd; i++) {
+                for (int j = table.getSelectedColumn(); j <= colIndexEnd; j++) {
+                    if (table.isCellSelected(i, j)) {
+                        Pair<Integer, Integer> cell = new Pair<>(i, j);
+                        cells.add(cell);
+                    }
+                }
+            }
+
+            if (cells.size() == 1) {
+                manager.cellSelected(cells.get(0).first, cells.get(0).second);
+            } else {
+                manager.cellsSelected(cells);
+            }
+        }
+    }
+
     private void show(JComponent panel) {
         removeAll();
         add(new JBScrollPane(panel));
         revalidate();
-    }
-
-    private Class guessValueType(String value) {
-        try {
-            Integer.valueOf(value);
-            return Integer.class;
-        } catch (NumberFormatException ignored) {
-        }
-
-        try {
-            Float.valueOf(value);
-            return Float.class;
-        } catch (NumberFormatException ignored) {
-        }
-
-        if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-            return Boolean.class;
-        }
-
-        return null;
-    }
-
-    private int hasHeader(String[] lines) {
-        // -1 if not found
-        // 0 if names in the first line
-        if (lines.length == 1) {
-            return 0;
-        }
-
-        String[] vals1 = lines[0].split(DELIMITER);
-        String[] vals2 = lines[1].split(DELIMITER);
-
-        if (vals1.length != vals2.length) {
-            return -1;
-        }
-
-        int numOfMatches = 0;
-        for (int i = 0; i < vals1.length; i++) {
-            if (guessValueType(vals1[i]) == guessValueType(vals2[i])) {
-                numOfMatches += 1;
-            }
-        }
-
-        if (numOfMatches != vals1.length) {
-            // different values in first two lines
-            // points at a header in first line
-            return 0;
-        }
-
-        return -1;
     }
 }
