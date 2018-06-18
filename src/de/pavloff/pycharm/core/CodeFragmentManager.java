@@ -1,16 +1,20 @@
 package de.pavloff.pycharm.core;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
+import de.pavloff.pycharm.core.worker.SimpleWorker;
+import de.pavloff.pycharm.core.worker.Worker;
 import de.pavloff.pycharm.yaml.YamlLoader;
 
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
+import javax.swing.table.TableModel;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CodeFragmentManager {
+public class CodeFragmentManager implements Worker {
 
+    //TODO: make configurable
     private CodeFragmentLoader loader = new YamlLoader();
+    private Worker worker = new SimpleWorker(loader);
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
     private List<CodeParamListener> codeParamListeners = new LinkedList<>();
@@ -27,34 +31,65 @@ public class CodeFragmentManager {
         codeParamListeners.add(listener);
     }
 
-    public void handleDocumentEvent(DocumentEvent e) {
-        String input = "";
-        try {
-            input = e.getDocument().getText(0, e.getOffset());
-        } catch (BadLocationException e1) {
-            e1.printStackTrace();
-        }
-
-        List<CodeFragment> recommendation = new LinkedList<>();
-        String[] keywords = getKeywordsFrom(input);
-        for (CodeFragment fragment : loader.getCodeFragments(null)) {
-            for (String keyword : keywords) {
-                if (fragment.containsKeyword(keyword)) {
-                    recommendation.add(fragment);
-                }
-            }
-        }
-
-        returnRecommendations(recommendation);
-    }
-
-    private String[] getKeywordsFrom(String input) {
-        return input.split(" ");
-    }
-
     private void returnRecommendations(List<CodeFragment> recommendation) {
         for (CodeFragmentListener listener : codeFragmentListeners) {
             listener.onOutput(recommendation);
         }
+    }
+
+    @Override
+    public String workerName() {
+        return "Worker manager";
+    }
+
+    @Override
+    public String description() {
+        return "Just a proxy. Do not use.";
+    }
+
+    @Override
+    public void onInput(String input) {
+        worker.onInput(input);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public void dataframeSelected(TableModel table) {
+        worker.dataframeSelected(table);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public void cellSelected(int row, int column) {
+        worker.cellSelected(row, column);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
+        worker.cellsSelected(cells);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public void rowSelected(int row) {
+        worker.rowSelected(row);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public void columnSelected(int column) {
+        worker.columnSelected(column);
+        returnRecommendations(worker.getRecommendation());
+    }
+
+    @Override
+    public List<CodeFragment> getRecommendation() {
+        return null;
+    }
+
+    @Override
+    public void selectedCodeFragment(CodeFragment fragment) {
+        worker.selectedCodeFragment(fragment);
     }
 }

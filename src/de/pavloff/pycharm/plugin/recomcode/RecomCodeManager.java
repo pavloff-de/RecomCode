@@ -8,6 +8,7 @@ import de.pavloff.pycharm.core.CodeFragmentManager;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 
 public class RecomCodeManager {
@@ -76,7 +77,13 @@ public class RecomCodeManager {
 
     private void handleDocumentEvent(DocumentEvent e) {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-        recommender.handleDocumentEvent(e);
+        try {
+            String input = e.getDocument().getText(0, e.getOffset());
+            recommender.onInput(input);
+        } catch (BadLocationException e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     private void setCodeFragmentHandler() {
