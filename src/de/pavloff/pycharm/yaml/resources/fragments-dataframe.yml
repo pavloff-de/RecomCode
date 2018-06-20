@@ -1,0 +1,57 @@
+---
+recType: code
+group: pandas
+recID: py.pd.df.001
+keywords: [iterator, columns, items]
+textkey:
+  - "iterate over columns of a dataframe"
+code: |
+    §dataframe§.iteritems()
+commentTemplate: "Iterator over (column name, Series) pairs"
+---
+recType: code
+group: pandas
+recID: py.pd.df.002
+keywords: [iterator, rows]
+textkey:
+  - "iterate over rows of a dataframe"
+code: |
+    §dataframe§.iterrows()
+parameters: dataframe
+commentTemplate: "Iterate over (rowindex, Series) pairs"
+---
+recType: code
+group: pandas
+recID: py.pd.df.003
+keywords: [iterator, rows, tuples, namedtuples]
+textkey:
+  - "iterate over rows as namedtuples"
+code: |
+    §dataframe§.itertuples(§index§, §name§)
+parameters:
+  - index: True;False
+  - name: "Pandas"
+commentTemplate: "Iterate over DataFrame rows as namedtuples, with index value as first element of the tuple"
+---
+recType: code
+group: pandas
+recID: py.pd.df.004
+keywords: [dot, product, matrix, multiplication]
+textkey:
+  - "dot product with other dataframe|series object"
+  - "matrix multiplication with dataframe|Series objects"
+code: |
+    §dataframe§.dot(§dataframe§)
+parameters: dataframe
+commentTemplate: "Matrix multiplication with DataFrame or Series objects"
+---
+recType: code
+group: pandas
+recID: py.pd.df.005
+keywords: [transpose, matrix, diagonal]
+textkey:
+  - "transpose index and columns of a dataframe"
+  - "flip|reflect a matrix over its diagonal"
+code: |
+    §dataframe§.transpose()
+commentTemplate: "Transpose index and columns"
