@@ -27,12 +27,17 @@ import java.util.List;
 class DataframeTab extends JPanel implements BaseConstants {
 
     private Boolean isOpened = false;
+    private JBTable tableView;
 
     DataframeTab() {
         setLayout(new BorderLayout());
     }
 
     void open(Project openedProject, VirtualFile openedFile, String name) {
+        if (tableView != null) {
+            CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
+            manager.dataframeSelected(tableView.getModel());
+        }
         if (isOpened) {
             return;
         }
@@ -85,7 +90,8 @@ class DataframeTab extends JPanel implements BaseConstants {
                 for (int i = 0; i < outputLines.length; i++) {
                     data[i] = outputLines[i].split(DELIMITER);
                 }
-                JBTable tableView = new JBTable(new DefaultTableModel(data, header));
+
+                tableView = new JBTable(new DefaultTableModel(data, header));
                 tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tableView.setCellSelectionEnabled(true);
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
@@ -120,6 +126,7 @@ class DataframeTab extends JPanel implements BaseConstants {
             }
 
             CodeFragmentManager manager = CodeFragmentManager.getInstance(project);
+            manager.dataframeSelected(table.getModel());
             List<Pair<Integer, Integer>> cells = new LinkedList<>();
 
             int rowIndexEnd = table.getSelectionModel().getMaxSelectionIndex();
