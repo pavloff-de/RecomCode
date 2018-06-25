@@ -12,6 +12,7 @@ public class SimpleWorker implements Worker {
 
     private CodeFragmentLoader loader;
     private List<CodeFragment> recommendations;
+    private String[] lastkeywords;
     private TableModel currentDataframe;
 
     public SimpleWorker(CodeFragmentLoader loader) {
@@ -20,16 +21,8 @@ public class SimpleWorker implements Worker {
 
     public void onInput(String input) {
         // TODO: implement a delay for input
-        recommendations = new LinkedList<>();
-        String[] keywords = input.split(" ");
-
-        for (CodeFragment fragment : loader.getCodeFragments(null)) {
-            for (String keyword : keywords) {
-                if (fragment.containsKeyword(keyword)) {
-                    recommendations.add(fragment);
-                }
-            }
-        }
+        lastkeywords = input.split(" ");
+        searchForFragments(lastkeywords);
     }
 
     @Override
@@ -56,7 +49,11 @@ public class SimpleWorker implements Worker {
 
     @Override
     public void cellsSelected(List<Pair<Integer, Integer>> cells) {
-        // get important informations about cells, rows, columns
+        // get important information about cells, rows, columns
+        // TODO:
+        //  less rows ? row by row
+        //  less columns ? column by column
+        //  ? cell by cell
         recommendationForCells();
     }
 
@@ -79,22 +76,38 @@ public class SimpleWorker implements Worker {
 
     @Override
     public void selectedCodeFragment(CodeFragment fragment) {
-
+        // TODO: ?
     }
 
     private void recommendationForDataframe() {
-
+        searchForFragments("dataframe");
     }
 
     private void recommendationForRows() {
-
+        searchForFragments("row");
     }
 
     private void recommendationForColumns() {
-
+        searchForFragments("column");
     }
 
     private void recommendationForCells() {
+        // TODO: ?
+    }
 
+    private void searchForFragments(String keyword) {
+        searchForFragments(new String[] {keyword});
+    }
+
+    private void searchForFragments(String[] keywords) {
+        recommendations = new LinkedList<>();
+
+        for (CodeFragment fragment : loader.getCodeFragments(null)) {
+            for (String keyword : keywords) {
+                if (keyword.length() != 0 && fragment.containsKeyword(keyword)) {
+                    recommendations.add(fragment);
+                }
+            }
+        }
     }
 }

@@ -96,6 +96,7 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.setCellSelectionEnabled(true);
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
+                // TODO: setSelectedDataframe
             }
 
             @Override
@@ -110,13 +111,14 @@ class DataframeTab extends JPanel implements BaseConstants {
     }
 
     private static class SelectionListener implements ListSelectionListener {
-
+        private CodeFragmentManager manager;
         private Project project;
         private JBTable table;
 
         SelectionListener(Project openedProject, JBTable tableView) {
             project = openedProject;
             table = tableView;
+            manager = CodeFragmentManager.getInstance(project);
         }
 
         @Override
@@ -125,8 +127,6 @@ class DataframeTab extends JPanel implements BaseConstants {
                 return;
             }
 
-            CodeFragmentManager manager = CodeFragmentManager.getInstance(project);
-            manager.dataframeSelected(table.getModel());
             List<Pair<Integer, Integer>> cells = new LinkedList<>();
 
             int rowIndexEnd = table.getSelectionModel().getMaxSelectionIndex();
