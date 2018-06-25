@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class RecomCodeManager {
@@ -77,8 +78,10 @@ public class RecomCodeManager {
 
     private void handleDocumentEvent(DocumentEvent e) {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+        Document doc = e.getDocument();
         try {
-            String input = e.getDocument().getText(0, e.getOffset());
+            // read always full text
+            String input = doc.getText(0, doc.getLength());
             recommender.onInput(input);
         } catch (BadLocationException e1) {
             e1.printStackTrace();
@@ -89,13 +92,11 @@ public class RecomCodeManager {
     private void setCodeFragmentHandler() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         recommender.addCodeFragmentListener(fragments -> {
-            for (Component c : recomCodePanel.getComponents()) {
-                recomCodePanel.remove(c);
-            }
+            recomCodePanel.removeAll();
             for (CodeFragment fragment : fragments) {
                 recomCodePanel.add(new RecomCode(fragment));
             }
-            recomCodePanel.revalidate();
+            recomCodePanel.repaint();
         });
     }
 }
