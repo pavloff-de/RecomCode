@@ -49,6 +49,9 @@ public class YamlLoader implements CodeFragmentLoader {
     }
 
     private void loadDefault() {
+        params = new ArrayList<>();
+        fragments = new ArrayList<>();
+
         URL resources = YamlLoader.class.getResource("resources");
         FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
         File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
@@ -68,9 +71,6 @@ public class YamlLoader implements CodeFragmentLoader {
 
     private void loadFrom(File path) throws FileNotFoundException {
         InputStream yamlFile = new FileInputStream(path);
-
-        params = new ArrayList<>();
-        fragments = new ArrayList<>();
 
         Iterable<Object> jamlSections = yamlReader.loadAll(yamlFile);
         for (Object yamlSection : jamlSections) {
