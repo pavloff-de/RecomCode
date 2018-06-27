@@ -47,7 +47,12 @@ public class CodeFragment {
         if (this.textkey.size() == 0) {
             return "";
         }
-        return this.textkey.get(0);
+        String[] split = this.textkey.get(0).split(" ");
+        for (int i = 0; i < split.length; i++) {
+            split[i] = split[i].split("\\|")[0];
+        }
+
+        return String.join(" ", split);
     }
 
     public static class Builder {
