@@ -14,6 +14,8 @@ public class SimpleWorker implements Worker {
     private List<CodeFragment> recommendations;
     private String[] lastkeywords;
     private TableModel currentDataframe;
+    private int currentRow = -1;
+    private int currentColumn = -1;
 
     public SimpleWorker(CodeFragmentLoader loader) {
         this.loader = loader;
@@ -38,12 +40,16 @@ public class SimpleWorker implements Worker {
     @Override
     public void dataframeSelected(TableModel table) {
         currentDataframe = table;
+        currentRow = -1;
+        currentColumn = -1;
         recommendationForDataframe();
     }
 
     @Override
     public void cellSelected(int row, int column) {
         // get important informations about cell, row, column
+        currentRow = row;
+        currentColumn = column;
         recommendationForCells();
     }
 
@@ -59,13 +65,17 @@ public class SimpleWorker implements Worker {
 
     @Override
     public void rowSelected(int row) {
-    // get important informations about row
+        // get important information about row
+        currentRow = row;
+        currentColumn = -1;
         recommendationForRows();
     }
 
     @Override
     public void columnSelected(int column) {
         // get important informations about column
+        currentRow = -1;
+        currentColumn = column;
         recommendationForColumns();
     }
 

@@ -2,7 +2,7 @@ package de.pavloff.pycharm;
 
 import de.pavloff.pycharm.plugin.BaseConstants;
 
-public class BaseUtils implements BaseConstants{
+public class BaseUtils implements BaseConstants {
 
     public static Class guessValueType(String value) {
         try {

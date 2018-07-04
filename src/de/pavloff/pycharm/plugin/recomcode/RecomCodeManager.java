@@ -1,6 +1,11 @@
 package de.pavloff.pycharm.plugin.recomcode;
 
+import com.intellij.codeInsight.template.TemplateManager;
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentManager;
@@ -11,6 +16,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class RecomCodeManager {
 
@@ -26,8 +33,7 @@ public class RecomCodeManager {
         openedProject = project;
 
         recomCodePanel = new JPanel();
-        recomCodePanel.setPreferredSize(new Dimension(500, 300));
-        recomCodePanel.setLayout(new FlowLayout());
+        recomCodePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         JPanel mainPanel = new JPanel();
         searchField = new JBTextField();
@@ -93,8 +99,28 @@ public class RecomCodeManager {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         recommender.addCodeFragmentListener(fragments -> {
             recomCodePanel.removeAll();
+
+            if (fragments == null) {
+                return;
+            }
+
             for (CodeFragment fragment : fragments) {
-                recomCodePanel.add(new RecomCode(fragment));
+                RecomCode r = new RecomCode(fragment);
+
+                r.addListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
+
+                        if (editor != null) {
+                            TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
+                            templateManager.startTemplate(editor, fragment.getTemplate(templateManager), true, fragment.predefinedParameterValues(), null);
+                            IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
+                        }
+                    }
+                });
+
+                recomCodePanel.add(r);
             }
             recomCodePanel.repaint();
         });
