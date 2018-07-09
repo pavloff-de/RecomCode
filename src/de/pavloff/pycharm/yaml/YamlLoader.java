@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class YamlLoader implements CodeFragmentLoader {
 
@@ -35,6 +37,13 @@ public class YamlLoader implements CodeFragmentLoader {
     }
 
     private void load(File[] files) {
+        if (params == null) {
+            params = new ArrayList<>();
+        }
+        if (fragments == null) {
+            fragments = new ArrayList<>();
+        }
+
         if (files == null) {
             loadDefault();
         } else {
@@ -49,9 +58,6 @@ public class YamlLoader implements CodeFragmentLoader {
     }
 
     private void loadDefault() {
-        params = new ArrayList<>();
-        fragments = new ArrayList<>();
-
         URL resources = YamlLoader.class.getResource("resources");
         FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
         File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
@@ -99,7 +105,7 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
                         .setCode(castToString(record.get("code")))
-                        .setParameters(castToStrings(record.get("parameters")))
+                        .setParameterValues(castToParameter(record.get("parameter")))
                         .build();
                 fragments.add(c);
             }
@@ -126,5 +132,31 @@ public class YamlLoader implements CodeFragmentLoader {
         } catch (ClassCastException ignored) {}
 
         return castedList;
+    }
+
+    private Map<String,String> castToParameter(Object list) {
+        Map<String,String> params = new LinkedHashMap<>();
+        if (list == null) {
+            return params;
+        }
+
+        ArrayList<Map> paramList;
+        try {
+            paramList = (ArrayList) list;
+        } catch (ClassCastException ignored) {
+            paramList = new ArrayList<>();
+        }
+
+        try {
+            for (Map param : paramList) {
+                if (param.containsKey("vars")) {
+                    params.put((String) param.get("name"), ((String) param.get("vars")).split(";")[0]);
+                } else {
+                    params.put((String) param.get("name"), "");
+                }
+            }
+        } catch (ClassCastException ignored) {}
+
+        return params;
     }
 }

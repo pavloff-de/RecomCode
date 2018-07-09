@@ -6,7 +6,7 @@ keywords: [dataframe, iterator, columns, items]
 textkey:
   - "iterate over columns of a dataframe"
 code: |
-    §dataframe§.iteritems()
+    $dataframe$.iteritems()
 commentTemplate: "Iterator over (column name, Series) pairs"
 ---
 recType: code
@@ -16,7 +16,7 @@ keywords: [dataframe, iterator, rows]
 textkey:
   - "iterate over rows of a dataframe"
 code: |
-    §dataframe§.iterrows()
+    $dataframe$.iterrows()
 parameters: dataframe
 commentTemplate: "Iterate over (rowindex, Series) pairs"
 ---
@@ -27,10 +27,13 @@ keywords: [dataframe, iterator, rows, tuples, namedtuples]
 textkey:
   - "iterate over rows as namedtuples"
 code: |
-    §dataframe§.itertuples(§index§, §name§)
-parameters:
-  - index: True;False
-  - name: "Pandas"
+    $dataframe$.itertuples($index$, $name$)
+parameter:
+  - name: dataframe
+  - name: index
+    vars: True;False
+  - name: name
+    vars: "Pandas"
 commentTemplate: "Iterate over DataFrame rows as namedtuples, with index value as first element of the tuple"
 ---
 recType: code
@@ -41,8 +44,10 @@ textkey:
   - "dot product with other dataframe|series object"
   - "matrix multiplication with dataframe|Series objects"
 code: |
-    §dataframe§.dot(§dataframe§)
+    $dataframe$.dot($dataframe$)
 parameters: dataframe
+parameter:
+  - name: dataframe
 commentTemplate: "Matrix multiplication with DataFrame or Series objects"
 ---
 recType: code
@@ -53,5 +58,5 @@ textkey:
   - "transpose index and columns of a dataframe"
   - "flip|reflect a matrix over its diagonal"
 code: |
-    §dataframe§.transpose()
+    $dataframe$.transpose()
 commentTemplate: "Transpose index and columns"
