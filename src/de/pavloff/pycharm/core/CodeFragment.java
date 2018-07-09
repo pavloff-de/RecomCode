@@ -20,8 +20,7 @@ public class CodeFragment {
     private final String sources;
     private final String documentation;
     private final String code;
-    private final ArrayList<String> parameters;
-    private final ArrayList<Map<String,String>> parameterValues;
+    private final Map<String,String> parameterValues;
 
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
@@ -34,7 +33,6 @@ public class CodeFragment {
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
-        this.parameters = builder.parameters;
         this.parameterValues = builder.parameterValues;
     }
 
@@ -55,26 +53,12 @@ public class CodeFragment {
     }
 
     public Template getTemplate(TemplateManager templateManager) {
-        Template t = templateManager.createTemplate(getRecID(), getGroup());
-
-        int last = 0;
-        Boolean isVar = false;
-        for (int i = 0; i < code.length(); i++) {
-            char current = code.charAt(i);
-            if (current == '§' || i == code.length() - 1) {
-                if (isVar) {
-                    t.addVariable(new VariableNode(code.substring(last, i), new TextExpression(code.substring(last, i))), true);
-                    isVar = false;
-                } else {
-                    t.addTextSegment(code.substring(last, i));
-                    isVar = true;
-                }
-                last = i + 1;
-            }
+        Template t = templateManager.createTemplate(getRecID(), getGroup(), code);
+        t.setToReformat(false);
+        t.setToIndent(false);
+        for (String paramName: parameterValues.keySet()) {
+            t.addVariable(paramName, new VariableNode(paramName, new TextExpression(paramName)), true);
         }
-
-        t.addEndVariable();
-
         return t;
     }
 
@@ -115,8 +99,7 @@ public class CodeFragment {
         private String sources;
         private String documentation;
         private String code;
-        private ArrayList<String> parameters;
-        private ArrayList<Map<String,String>> parameterValues;
+        private Map<String,String> parameterValues;
 
         public Builder setRecId(String recID) {
             this.recID = recID;
@@ -168,12 +151,7 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setParameters(ArrayList<String> parameters) {
-            this.parameters = parameters;
-            return this;
-        }
-
-        public Builder setParameterValues(ArrayList<Map<String,String>> parameterValues) {
+        public Builder setParameterValues(Map<String,String> parameterValues) {
             this.parameterValues = parameterValues;
             return this;
         }
