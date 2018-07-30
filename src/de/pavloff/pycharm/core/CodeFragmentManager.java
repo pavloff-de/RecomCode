@@ -2,7 +2,7 @@ package de.pavloff.pycharm.core;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import de.pavloff.pycharm.core.worker.SimpleWorker;
+import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.Worker;
 import de.pavloff.pycharm.yaml.YamlLoader;
 
@@ -15,7 +15,8 @@ public class CodeFragmentManager implements Worker {
 
     //TODO: make configurable
     private CodeFragmentLoader loader = new YamlLoader();
-    private Worker worker = new SimpleWorker(loader);
+    //private Worker worker = new SimpleWorker(loader);
+    private Worker worker = new AprioriWorker(loader);
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
     private List<CodeParamListener> codeParamListeners = new LinkedList<>();
