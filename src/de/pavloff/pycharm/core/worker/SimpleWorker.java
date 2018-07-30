@@ -5,13 +5,13 @@ import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 
 import javax.swing.table.TableModel;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class SimpleWorker implements Worker {
 
     private CodeFragmentLoader loader;
-    private List<CodeFragment> recommendations;
+    private LinkedHashSet<CodeFragment> recommendations;
     private String[] lastkeywords;
     private TableModel currentDataframe;
     private int currentRow = -1;
@@ -80,7 +80,7 @@ public class SimpleWorker implements Worker {
     }
 
     @Override
-    public List<CodeFragment> getRecommendation() {
+    public LinkedHashSet<CodeFragment> getRecommendation() {
         return recommendations;
     }
 
@@ -110,7 +110,7 @@ public class SimpleWorker implements Worker {
     }
 
     private void searchForFragments(String[] keywords) {
-        recommendations = new LinkedList<>();
+        recommendations = new LinkedHashSet<>();
 
         for (CodeFragment fragment : loader.getCodeFragments(null)) {
             for (String keyword : keywords) {

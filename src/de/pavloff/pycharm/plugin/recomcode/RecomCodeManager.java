@@ -116,6 +116,7 @@ public class RecomCodeManager {
                             TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
                             templateManager.startTemplate(editor, fragment.getTemplate(templateManager), true, fragment.predefinedParameterValues(), null);
                             IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
+                            recommender.selectedCodeFragment(fragment);
                         }
                     }
                 });

@@ -4,6 +4,7 @@ import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
 
 import javax.swing.table.TableModel;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public interface Worker {
@@ -23,7 +24,7 @@ public interface Worker {
 
     void columnSelected(int column);
 
-    List<CodeFragment> getRecommendation();
+    LinkedHashSet<CodeFragment> getRecommendation();
 
     void selectedCodeFragment(CodeFragment fragment);
 }

@@ -9,6 +9,7 @@ import de.pavloff.pycharm.yaml.YamlLoader;
 import javax.swing.table.TableModel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.LinkedHashSet ;
 
 public class CodeFragmentManager implements Worker {
 
@@ -31,7 +32,7 @@ public class CodeFragmentManager implements Worker {
         codeParamListeners.add(listener);
     }
 
-    private void returnRecommendations(List<CodeFragment> recommendation) {
+    private void returnRecommendations(LinkedHashSet<CodeFragment> recommendation) {
         for (CodeFragmentListener listener : codeFragmentListeners) {
             listener.onOutput(recommendation);
         }
@@ -84,7 +85,7 @@ public class CodeFragmentManager implements Worker {
     }
 
     @Override
-    public List<CodeFragment> getRecommendation() {
+    public LinkedHashSet<CodeFragment> getRecommendation() {
         return null;
     }
 

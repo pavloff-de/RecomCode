@@ -1,8 +1,8 @@
 package de.pavloff.pycharm.core;
 
-import java.util.List;
+import java.util.LinkedHashSet;
 
 public interface CodeFragmentListener {
 
-    void onOutput(List<CodeFragment> fragments);
+    void onOutput(LinkedHashSet<CodeFragment> fragments);
 }
