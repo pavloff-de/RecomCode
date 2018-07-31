@@ -2,6 +2,7 @@ package de.pavloff.pycharm.core.worker;
 
 import com.intellij.openapi.util.Pair;
 import de.mrapp.apriori.*;
+import de.mrapp.apriori.metrics.Confidence;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 import org.jetbrains.annotations.NotNull;
@@ -180,7 +181,12 @@ public class AprioriWorker implements Worker {
         RuleSet<MyItem> ruleSet = output.getRuleSet();
 
         if (ruleSet != null && newItems.size() != 0) {
-            for (AssociationRule<MyItem> rule : ruleSet) {
+            RuleSet<MyItem> filteredRuleSet = ruleSet.filter(
+                    Filter.forAssociationRules().byOperator(new RuleFilter(), 0.5));
+            RuleSet<MyItem> sortedRuleSet = filteredRuleSet.sort(
+                    Sorting.forAssociationRules().withOrder(Sorting.Order.DESCENDING).byOperator(new Confidence()));
+
+            for (AssociationRule<MyItem> rule : sortedRuleSet) {
                 if (rule.covers(newItems.get(newItems.size() - 1))) {
                     ItemSet<MyItem> head = rule.getHead();
 
@@ -212,6 +218,23 @@ public class AprioriWorker implements Worker {
             if (recommendations.size() < maxRecommendations && keyword.length() != 0 && fragment.containsKeyword(keyword)) {
                 recommendations.add(fragment);
             }
+        }
+    }
+
+    private class RuleFilter implements Operator {
+
+        @Override
+        public double evaluate(@NotNull AssociationRule rule) {
+            ItemSet<MyItem> target = rule.getHead();
+            if (target.size() != 1) {
+                return 0;
+            }
+
+            MyItem item = target.first();
+            if (item.isCodeFragment) {
+                return 1;
+            }
+            return 0;
         }
     }
 
