@@ -105,7 +105,7 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
                         .setCode(castToString(record.get("code")))
-                        .setParameterValues(castToParameter(record.get("parameter")))
+                        .setParameters(castToParameter(record.get("parameter")))
                         .build();
                 fragments.add(c);
             }
@@ -134,8 +134,8 @@ public class YamlLoader implements CodeFragmentLoader {
         return castedList;
     }
 
-    private Map<String,String> castToParameter(Object list) {
-        Map<String,String> params = new LinkedHashMap<>();
+    private Map<String,String[]> castToParameter(Object list) {
+        Map<String,String[]> params = new LinkedHashMap<>();
         if (list == null) {
             return params;
         }
@@ -149,11 +149,14 @@ public class YamlLoader implements CodeFragmentLoader {
 
         try {
             for (Map param : paramList) {
-                if (param.containsKey("vars")) {
-                    params.put((String) param.get("name"), ((String) param.get("vars")).split(";")[0]);
-                } else {
-                    params.put((String) param.get("name"), "");
+                if (!param.containsKey("name")) {
+                    continue;
                 }
+
+                String name = (String) param.get("name");
+                String vars = (String) param.getOrDefault("vars", "");
+                String expr = (String) param.getOrDefault("expr", "");
+                params.put(name, new String[] {vars, expr});
             }
         } catch (ClassCastException ignored) {}
 

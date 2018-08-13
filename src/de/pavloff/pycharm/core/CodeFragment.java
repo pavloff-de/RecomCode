@@ -1,11 +1,10 @@
 package de.pavloff.pycharm.core;
 
 import com.intellij.codeInsight.template.*;
-import com.intellij.codeInsight.template.impl.TextExpression;
-import com.intellij.codeInsight.template.impl.VariableNode;
+import com.intellij.codeInsight.template.impl.MacroCallNode;
+import de.pavloff.pycharm.core.macros.PyVariableMacro;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class CodeFragment {
@@ -20,7 +19,7 @@ public class CodeFragment {
     private final String sources;
     private final String documentation;
     private final String code;
-    private final Map<String,String> parameterValues;
+    private final Map<String,String[]> parameters;
 
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
@@ -33,7 +32,7 @@ public class CodeFragment {
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
-        this.parameterValues = builder.parameterValues;
+        this.parameters = builder.parameters;
     }
 
     public String getRecID() {
@@ -48,16 +47,19 @@ public class CodeFragment {
         return code;
     }
     
-    public Map<String, String> predefinedParameterValues() {
-        return new HashMap<>();
-    }
-
     public Template getTemplate(TemplateManager templateManager) {
         Template t = templateManager.createTemplate(getRecID(), getGroup(), code);
         t.setToReformat(false);
         t.setToIndent(false);
-        for (String paramName: parameterValues.keySet()) {
-            t.addVariable(paramName, new VariableNode(paramName, new TextExpression(paramName)), true);
+        for (String paramName: parameters.keySet()) {
+            String[] p = parameters.get(paramName);
+            if (p[1].length() != 0) {
+                t.addVariable(paramName, p[1], p[0], true);
+            } else {
+                MacroCallNode macro = new MacroCallNode(new PyVariableMacro(p[0].split("\\|")));
+                t.addVariable(paramName, macro, true);
+            }
+
         }
         return t;
     }
@@ -99,7 +101,7 @@ public class CodeFragment {
         private String sources;
         private String documentation;
         private String code;
-        private Map<String,String> parameterValues;
+        private Map<String,String[]> parameters;
 
         public Builder setRecId(String recID) {
             this.recID = recID;
@@ -151,8 +153,8 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setParameterValues(Map<String,String> parameterValues) {
-            this.parameterValues = parameterValues;
+        public Builder setParameters(Map<String,String[]> parameterValues) {
+            this.parameters = parameterValues;
             return this;
         }
 

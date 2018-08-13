@@ -110,13 +110,14 @@ public class RecomCodeManager {
                 r.addListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        recommender.selectedCodeFragment(fragment);
+
                         Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
                         if (editor != null) {
                             TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                            templateManager.startTemplate(editor, fragment.getTemplate(templateManager), true, fragment.predefinedParameterValues(), null);
+                            templateManager.startTemplate(editor, fragment.getTemplate(templateManager));
                             IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
-                            recommender.selectedCodeFragment(fragment);
                         }
                     }
                 });

@@ -5,10 +5,12 @@ recID: py.pd.df.001
 keywords: [dataframe, iterator, columns, items]
 textkey:
   - "iterate over columns of a dataframe"
-code: "for $i$ in $dataframe$.iteritems():"
+code: "for $i$ in $dataframe$.iteritems():\n    $END$"
 parameter:
   - name: dataframe
+    expr: "pyIterableVariable"
   - name: i
+    expr: "collectionElementName"
 commentTemplate: "Iterator over (column name, Series) pairs"
 ---
 recType: code
@@ -17,10 +19,12 @@ recID: py.pd.df.002
 keywords: [dataframe, iterator, rows]
 textkey:
   - "iterate over rows of a dataframe"
-code: "for $i$ in $dataframe$.iterrows():"
+code: "for $i$ in $dataframe$.iterrows():\n    $END$"
 parameter:
   - name: dataframe
+    expr: "pyIterableVariable"
   - name: i
+    expr: "collectionElementName"
 commentTemplate: "Iterate over (rowindex, Series) pairs"
 ---
 recType: code
@@ -29,14 +33,16 @@ recID: py.pd.df.003
 keywords: [dataframe, iterator, rows, tuples, namedtuples]
 textkey:
   - "iterate over rows as namedtuples"
-code: "for $i$ in $dataframe$.itertuples($index$, $name$):"
+code: "for $i$ in $dataframe$.itertuples(index=$index$, name=\"$name$\"):\n    $END$"
 parameter:
   - name: i
+    expr: "collectionElementName"
   - name: dataframe
+    expr: "pyIterableVariable"
   - name: index
-    vars: True;False
+    vars: True|False
   - name: name
-    vars: "Pandas"
+    vars: Pandas
 commentTemplate: "Iterate over DataFrame rows as namedtuples, with index value as first element of the tuple"
 ---
 recType: code
@@ -50,6 +56,7 @@ code: |
     $dataframe$.dot($dataframe$)
 parameter:
   - name: dataframe
+    expr: "pyIterableVariable"
 commentTemplate: "Matrix multiplication with DataFrame or Series objects"
 ---
 recType: code
@@ -63,4 +70,5 @@ code: |
     $dataframe$.transpose()
 parameter:
   - name: dataframe
+    expr: "pyIterableVariable"
 commentTemplate: "Transpose index and columns"
