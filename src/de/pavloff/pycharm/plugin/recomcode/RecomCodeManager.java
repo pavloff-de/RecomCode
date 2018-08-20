@@ -116,7 +116,7 @@ public class RecomCodeManager {
 
                         if (editor != null) {
                             TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                            templateManager.startTemplate(editor, fragment.getTemplate(templateManager));
+                            templateManager.startTemplate(editor, fragment.getTemplate(templateManager, openedProject));
                             IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
                         }
                     }

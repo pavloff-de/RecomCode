@@ -1,134 +1,64 @@
 ---
-# Record containing description of a fragment group 
-recType: group
-groupName: pandas
-domain: data processing
-lang: python
-requiredPackages:
- - pandas: 0.20
-keywords: [pandas, dataframe, series]
-
-
----
-# Records with parameter types
-recType: params
-recID: par.01
-group: pandas
-name: dataframe
-type: DataFrame
-names: [dataframe, df, frame]
-# type: vars; can be also expressions (expr), examples (exem), ...
-parameterType: var
----
-recType: params
-recID: par.02
-group: pandas
-name: row-index-num
-type: Integer
-names: [i, row, position, x]
----
-recType: params
-recID: par.03
-group: pandas
-name: columnName
-type: String
-names: [col, column, columnname, name]
----
-recType: params
-recID: par.04
-group: pandas
-name: list_columnNames
-# maybe later: introduce sets of types like [string, list<string>]
-type: List<String>
-names: [col, column, columnname, name, col_list, column_list]
----
-recType: params
-recID: par.05
-group: pandas
-name: dictionaryOfColumnNames
-# maybe later: introduce sets of types like [string, list<string>]
-type: dict<String,String>
-names: [dictionary, col2col]
----
 recType: code
-recID: py.pd.001
-parent:
+recID: py.pd.rw.001
 group: pandas
-keywords: [row]
-related: # optional list of related records, to show more options
+keywords: [select, row]
 textkey:
   - "select|get single row by position|integer|number"
-  - "retrieve row in dataframe" # alternative description
-code: |
-    §dataframe§.ix[§row-index-num§]
-parameters: # optional, overwrites settings from default vars
-# to synthesize optional comment with used var names
-commentTemplate: retrieve row at position §row-index-num§ from dataframe §dataframe§
-sources: # optional link to stack-overflow issue (or issues)
-documentation: # optional link to documentation
+  - "retrieve row in dataframe"
+code: $dataframe$.ix[$row-index-num$]
+parameter:
+  - name: row-index-num
 ---
-
 recType: code
-recID: py.pd.002
-parent:
+recID: py.pd.col.001
 group: pandas
-keywords: [column]
+keywords: [drop, remove, delete column]
 textkey:
   - "drop|remove|delete|kill|purge single column from dataframe"
-code: |
-    §dataframe§.drop(§columnName§, axis =1)
-commentTemplate: delete column §columnName§ from dataframe §dataframe§
-sources: # optional link to stack-overflow issue
-documentation: # optional link to documentation
+code: $dataframe$.drop($columnName$, axis=1)
+parameter:
+  - name: columnName
 ---
 recType: code
-recID: py.pd.002.b
-parent: py.pd.002
+recID: py.pd.col.002
+keywords: [drop, remove, delete, multipe, columns]
 textkey:
   - "drop|remove|delete|kill|purge multiple columns from dataframe"
-code: |
-    §dataframe§.drop([§list_columnNames§], axis =1)
-commentTemplate: delete columns §list_columnNames§ from dataframe §dataframe§
+code: $dataframe$.drop([$list_columnNames$], axis=1)
 ---
 recType: code
-recID: py.pd.003
-parent:
+recID: py.pd.col.003
 group: pandas
+keywords: [change, rearrange, order, columns]
 textkey:
   - "rearrange|change order of columns in a dataframe"
 code: |
-      columnNamesList = §dataframe§.columns.tolist()
+      columnNamesList = $dataframe$.columns.tolist()
       # todo: change order of elements in columnNamesList as desired
-      # e.g. swap 1st and last via columnNamesList = columnNamesList[-1:] + columnNamesList[:-1]
-      §dataframe§ = §dataframe§[columnNamesList]
-
-commentTemplate: rearrange order of columns in dataframe §dataframe§
-sources: ["https://stackoverflow.com/questions/13148429/how-to-change-the-order-of-dataframe-columns"]
-documentation:
+      # e.g. swap 1st and last via
+      $END$# columnNamesList = columnNamesList[-1:] + columnNamesList[:-1]
+      $dataframe$ = $dataframe$[columnNamesList]
 ---
 recType: code
-recID: py.pd.004
-parent:
+recID: py.pd.col.004
 group: pandas
+keywords: [rename, columns, list]
 textkey:
  - "rename columns in a dataframe via list"
-code: |
-    §dataframe§.columns = §list_columnNames§
-commentTemplate: rename columns in the dataframe §dataframe§
-sources: https://stackoverflow.com/questions/11346283/renaming-columns-in-pandas
-documentation:
+code: $dataframe$.columns = $columnNames$
 ---
 recType: code
-recID: py.pd.004.b
+recID: py.pd.col.005
 parent: py.pd.004
 group: pandas
+keywords: [rename, columns, dictionary]
 textkey:
  - "rename columns in a dataframe via dictionary"
 code: |
     # todo: setup the dictionary
-    §dataframe§ = §dataframe§.rename(columns=§dictionaryOfColumnNames§)
     # df = df.rename(columns={'oldName1': 'newName1', 'oldName2': 'newName2'})
-parameters: |
-  dictionaryOfColumnNames:
-    type: dict
-    example: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"
+    $dataframe$ = $dataframe$.rename(columns=$dictionaryOfColumnNames$)
+parameter:
+  - name: dictionaryOfColumnNames
+    vars: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"

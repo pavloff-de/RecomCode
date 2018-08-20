@@ -2,10 +2,12 @@ package de.pavloff.pycharm.core;
 
 import com.intellij.codeInsight.template.*;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
+import com.intellij.openapi.project.Project;
 import de.pavloff.pycharm.core.macros.PyVariableMacro;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CodeFragment {
 
@@ -15,11 +17,10 @@ public class CodeFragment {
     private final ArrayList<String> related;
     private final ArrayList<String> textkey;
     private final ArrayList<String> keywords;
-    private final String commentTemplate;
     private final String sources;
     private final String documentation;
     private final String code;
-    private final Map<String,String[]> parameters;
+    private final Map<String, CodeParam> parameters;
 
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
@@ -28,7 +29,6 @@ public class CodeFragment {
         this.related = builder.related;
         this.textkey = builder.textkey;
         this.keywords = builder.keywords;
-        this.commentTemplate = builder.commentTemplate;
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
@@ -46,21 +46,54 @@ public class CodeFragment {
     public String getCode() {
         return code;
     }
+
+    private Map<String, CodeParam> getGlobalParams(Project openedProject) {
+        Map<String, CodeParam> params = new HashMap<>();
+
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+        ArrayList<CodeParam> vars = recommender.getLoader().getCodeParams(null);
+
+        for (CodeParam var : vars) {
+            params.put(var.getName(), var);
+        }
+
+        return params;
+    }
     
-    public Template getTemplate(TemplateManager templateManager) {
+    public Template getTemplate(TemplateManager templateManager, Project openedProject) {
         Template t = templateManager.createTemplate(getRecID(), getGroup(), code);
         t.setToReformat(false);
         t.setToIndent(false);
-        for (String paramName: parameters.keySet()) {
-            String[] p = parameters.get(paramName);
-            if (p[1].length() != 0) {
-                t.addVariable(paramName, p[1], p[0], true);
-            } else {
-                MacroCallNode macro = new MacroCallNode(new PyVariableMacro(p[0].split("\\|")));
-                t.addVariable(paramName, macro, true);
+
+        Map<String, CodeParam> globals = getGlobalParams(openedProject);
+
+        Set<String> visitedVaribles = new HashSet<>();
+        Pattern VARS_PATTERN = Pattern.compile("\\$(.*?)\\$");
+        Matcher m = VARS_PATTERN.matcher(code);
+        while (m.find()) {
+            String v = m.group(1);
+            if (visitedVaribles.contains(v)) {
+                continue;
+            }
+            visitedVaribles.add(v);
+
+            CodeParam p = null;
+            if (globals.containsKey(v)) {
+                p = globals.get(v);
+            } else if (parameters.containsKey(v)) {
+                p = parameters.get(v);
             }
 
+            if (p != null) {
+                if (p.hasExpression()) {
+                    t.addVariable(p.getName(), p.getExpr(), p.getVars(), true);
+                } else {
+                    MacroCallNode macro = new MacroCallNode(new PyVariableMacro(p.getVars().split("\\|")));
+                    t.addVariable(p.getName(), macro, true);
+                }
+            }
         }
+
         return t;
     }
 
@@ -97,11 +130,10 @@ public class CodeFragment {
         private ArrayList<String> related;
         private ArrayList<String> textkey;
         private ArrayList<String> keywords;
-        private String commentTemplate;
         private String sources;
         private String documentation;
         private String code;
-        private Map<String,String[]> parameters;
+        private Map<String, CodeParam> parameters;
 
         public Builder setRecId(String recID) {
             this.recID = recID;
@@ -133,11 +165,6 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setCommentTemplate(String commentTemplate) {
-            this.commentTemplate = commentTemplate;
-            return this;
-        }
-
         public Builder setSources(String sources) {
             this.sources = sources;
             return this;
@@ -153,7 +180,7 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setParameters(Map<String,String[]> parameterValues) {
+        public Builder setParameters(Map<String, CodeParam> parameterValues) {
             this.parameters = parameterValues;
             return this;
         }

@@ -7,10 +7,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class YamlLoader implements CodeFragmentLoader {
 
@@ -87,9 +84,9 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setRecId(castToString(record.get("recID")))
                         .setGroup(castToString(record.get("group")))
                         .setName(castToString(record.get("name")))
-                        .setNames(castToStrings(record.get("names")))
                         .setType(castToString(record.get("type")))
-                        .setParameterType(castToString(record.get("parameterType")))
+                        .setVars(castToString(record.get("vars")))
+                        .setExpr(castToString(record.get("expr")))
                         .build();
                 params.add(p);
 
@@ -101,7 +98,6 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setRelated(castToStrings(record.get("related")))
                         .setTextkey(castToStrings(record.get("textkey")))
                         .setKeywords(castToStrings(record.get("keywords")))
-                        .setCommentTemplate(castToString(record.get("commentTemplate")))
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
                         .setCode(castToString(record.get("code")))
@@ -134,8 +130,8 @@ public class YamlLoader implements CodeFragmentLoader {
         return castedList;
     }
 
-    private Map<String,String[]> castToParameter(Object list) {
-        Map<String,String[]> params = new LinkedHashMap<>();
+    private Map<String, CodeParam> castToParameter(Object list) {
+        Map<String, CodeParam> params = new HashMap<>();
         if (list == null) {
             return params;
         }
@@ -156,7 +152,13 @@ public class YamlLoader implements CodeFragmentLoader {
                 String name = (String) param.get("name");
                 String vars = (String) param.getOrDefault("vars", "");
                 String expr = (String) param.getOrDefault("expr", "");
-                params.put(name, new String[] {vars, expr});
+
+
+                params.put(name, new CodeParam.Builder()
+                    .setName(castToString(name))
+                    .setVars(castToString(vars))
+                    .setExpr(castToString(expr))
+                    .build());
             }
         } catch (ClassCastException ignored) {}
 

@@ -7,6 +7,7 @@ import de.pavloff.pycharm.core.worker.Worker;
 import de.pavloff.pycharm.yaml.YamlLoader;
 
 import javax.swing.table.TableModel;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.LinkedHashSet ;
@@ -15,6 +16,7 @@ public class CodeFragmentManager implements Worker {
 
     //TODO: make configurable
     private CodeFragmentLoader loader = new YamlLoader();
+
     //private Worker worker = new SimpleWorker(loader);
     private Worker worker = new AprioriWorker(loader);
 
@@ -31,6 +33,14 @@ public class CodeFragmentManager implements Worker {
 
     public void addCodeParamListener(CodeParamListener listener) {
         codeParamListeners.add(listener);
+    }
+
+    public CodeFragmentLoader getLoader() {
+        return loader;
+    }
+
+    public Worker getWorker() {
+        return worker;
     }
 
     private void returnRecommendations(LinkedHashSet<CodeFragment> recommendation) {

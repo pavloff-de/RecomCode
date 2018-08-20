@@ -1,23 +1,53 @@
 package de.pavloff.pycharm.core;
 
-import java.util.ArrayList;
-
 public class CodeParam {
 
     private final String recID;
     private final String group;
     private final String name;
     private final String type;
-    private final ArrayList<String> names;
-    private final String parameterType;
+    private final String vars;
+    private final String expr;
+
+    public String getRecID() {
+        return recID;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getVars() {
+        return vars;
+    }
+
+    public Boolean hasVars() {
+        return !vars.equals("");
+    }
+
+    public String getExpr() {
+        return expr;
+    }
+
+    public Boolean hasExpression() {
+        return !expr.equals("");
+    }
 
     public CodeParam(Builder builder) {
         this.recID = builder.recID;
         this.group = builder.group;
         this.name = builder.name;
         this.type = builder.type;
-        this.names = builder.names;
-        this.parameterType = builder.parameterType;
+        this.vars = builder.vars;
+        this.expr = builder.expr;
     }
 
     public static class Builder {
@@ -26,8 +56,8 @@ public class CodeParam {
         private String group;
         private String name;
         private String type;
-        private ArrayList<String> names;
-        private String parameterType;
+        private String vars;
+        private String expr;
 
         public Builder setRecId(String recID) {
             this.recID = recID;
@@ -49,13 +79,13 @@ public class CodeParam {
             return this;
         }
 
-        public Builder setNames(ArrayList<String> names) {
-            this.names = names;
+        public Builder setVars(String vars) {
+            this.vars = vars;
             return this;
         }
 
-        public Builder setParameterType(String parameterType) {
-            this.parameterType = parameterType;
+        public Builder setExpr(String expr) {
+            this.expr = expr;
             return this;
         }
 

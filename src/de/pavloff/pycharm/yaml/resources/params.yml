@@ -1,0 +1,24 @@
+---
+recType: params
+recID: py.pd.par.001
+group: pandas
+name: dataframe
+type: DataFrame
+vars: dataframe|df|frame
+expr: "pyIterableVariable"
+---
+recType: params
+recID: py.pd.par.002
+group: pandas
+name: columnNames
+type: List
+vars: columnNames|names|columns
+expr: "pyIterableVariable"
+---
+recType: params
+recID: py.pd.par.003
+group: pandas
+name: i
+type: Integer
+vars: columnNames|names|columns
+expr: "collectionElementName"
