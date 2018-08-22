@@ -5,26 +5,18 @@ import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 
 import javax.swing.table.TableModel;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
-public class SimpleWorker implements Worker {
+public class KeywordWorker implements Worker {
 
     private CodeFragmentLoader loader;
     private LinkedHashSet<CodeFragment> recommendations;
-    private String[] lastkeywords;
+    private List<String> keywords;
     private TableModel currentDataframe;
-    private int currentRow = -1;
-    private int currentColumn = -1;
 
-    public SimpleWorker(CodeFragmentLoader loader) {
+    public KeywordWorker(CodeFragmentLoader loader) {
         this.loader = loader;
-    }
-
-    public void onInput(String input) {
-        // TODO: implement a delay for input
-        lastkeywords = input.split(" ");
-        searchForFragments(lastkeywords);
+        keywords = new LinkedList<>();
     }
 
     @Override
@@ -37,20 +29,41 @@ public class SimpleWorker implements Worker {
         return "Recommendations done based on single event";
     }
 
+    private void addKeyword(String keyword) {
+        if (keyword.length() == 0) {
+            return;
+        }
+        final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
+                .replace("[^A-Za-z0-9]+$", "");
+        keywords.removeIf(k -> k.equals(kw));
+        keywords.add(keyword);
+    }
+
+    private void addKeywords(String[] keywords) {
+        for (String keyword : keywords) {
+            addKeyword(keyword);
+        }
+    }
+
+    public void onInput(String input) {
+        addKeywords(input.split(" "));
+        searchForFragments();
+    }
+
     @Override
     public void dataframeSelected(TableModel table) {
         currentDataframe = table;
-        currentRow = -1;
-        currentColumn = -1;
-        recommendationForDataframe();
+        addKeyword("dataframe");
+        searchForFragments();
     }
 
     @Override
     public void cellSelected(int row, int column) {
         // get important informations about cell, row, column
-        currentRow = row;
-        currentColumn = column;
-        recommendationForCells();
+        addKeyword("cell");
+        addKeyword("row");
+        addKeyword("column");
+        searchForFragments();
     }
 
     @Override
@@ -60,23 +73,24 @@ public class SimpleWorker implements Worker {
         //  less rows ? row by row
         //  less columns ? column by column
         //  ? cell by cell
-        recommendationForCells();
+        addKeyword("cell");
+        addKeyword("row");
+        addKeyword("column");
+        searchForFragments();
     }
 
     @Override
     public void rowSelected(int row) {
         // get important information about row
-        currentRow = row;
-        currentColumn = -1;
-        recommendationForRows();
+        addKeyword("row");
+        searchForFragments();
     }
 
     @Override
     public void columnSelected(int column) {
         // get important informations about column
-        currentRow = -1;
-        currentColumn = column;
-        recommendationForColumns();
+        addKeyword("column");
+        searchForFragments();
     }
 
     @Override
@@ -86,38 +100,20 @@ public class SimpleWorker implements Worker {
 
     @Override
     public void selectedCodeFragment(CodeFragment fragment) {
-        // TODO: ?
+        keywords.clear();
     }
 
-    private void recommendationForDataframe() {
-        searchForFragments("dataframe");
-    }
-
-    private void recommendationForRows() {
-        searchForFragments("row");
-    }
-
-    private void recommendationForColumns() {
-        searchForFragments("column");
-    }
-
-    private void recommendationForCells() {
-        // TODO: ?
-    }
-
-    private void searchForFragments(String keyword) {
-        searchForFragments(new String[] {keyword});
-    }
-
-    private void searchForFragments(String[] keywords) {
-        recommendations = new LinkedHashSet<>();
+    private void searchForFragments() {
+        CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         for (CodeFragment fragment : loader.getCodeFragments(null)) {
             for (String keyword : keywords) {
                 if (keyword.length() != 0 && fragment.containsKeyword(keyword)) {
-                    recommendations.add(fragment);
+                    sorter.add(fragment);
                 }
             }
         }
+
+        recommendations = sorter.sortFragments();
     }
 }

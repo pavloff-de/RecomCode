@@ -83,6 +83,7 @@ public class RecomCodeManager {
     }
 
     private void handleDocumentEvent(DocumentEvent e) {
+        // TODO: implement a delay for input
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         Document doc = e.getDocument();
         try {

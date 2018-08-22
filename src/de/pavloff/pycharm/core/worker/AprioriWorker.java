@@ -14,10 +14,8 @@ public class AprioriWorker implements Worker {
 
     private CodeFragmentLoader loader;
     private LinkedHashSet<CodeFragment> recommendations;
-    private int maxRecommendations = 5;
     private LinkedList<MyItem> items;
     private ArrayList<MyItem> newItems;
-    private LinkedList<String> keywords;
 
     private Apriori<MyItem> apriori;
 
@@ -25,7 +23,6 @@ public class AprioriWorker implements Worker {
         this.loader = loader;
         apriori = new Apriori.Builder<MyItem>(0.01).generateRules(0.02).ruleCount(100).create();
         items = new LinkedList<>();
-        keywords = new LinkedList<>();
     }
 
     @Override
@@ -44,23 +41,18 @@ public class AprioriWorker implements Worker {
             return;
         }
         items.add(new MyItem("Input_" + input));
-        keywords.add(input);
         searchForFragments();
     }
 
     @Override
     public void dataframeSelected(TableModel table) {
         items.add(new MyItem("DataFrame_" + table.toString()));
-        keywords.add("dataframe");
         searchForFragments();
     }
 
     @Override
     public void cellSelected(int row, int column) {
         items.add(new MyItem("Cell_" + String.valueOf(row) + "_" + String.valueOf(column)));
-        keywords.add("cell");
-        keywords.add("row");
-        keywords.add("column");
         searchForFragments();
     }
 
@@ -80,23 +72,18 @@ public class AprioriWorker implements Worker {
         Pair last = cells.get(s - 1);
         items.add(new MyItem("Cell_" + String.valueOf(first.first) + "_" + String.valueOf(first.second)));
         items.add(new MyItem("Cell_" + String.valueOf(last.first) + "_" + String.valueOf(last.second)));
-        keywords.add("cell");
-        keywords.add("row");
-        keywords.add("column");
         searchForFragments();
     }
 
     @Override
     public void rowSelected(int row) {
         items.add(new MyItem("Row_" + String.valueOf(row)));
-        keywords.add("row");
         searchForFragments();
     }
 
     @Override
     public void columnSelected(int column) {
         items.add(new MyItem("Column_" + String.valueOf(column)));
-        keywords.add("column");
         searchForFragments();
     }
 
@@ -108,7 +95,6 @@ public class AprioriWorker implements Worker {
     @Override
     public void selectedCodeFragment(CodeFragment fragment) {
         items.add(new MyItem(fragment));
-        keywords.clear();
     }
 
     private Iterable<Transaction<MyItem>> getLastTransactions() {
@@ -180,43 +166,23 @@ public class AprioriWorker implements Worker {
         Output<MyItem> output = apriori.execute(getLastTransactions());
         RuleSet<MyItem> ruleSet = output.getRuleSet();
 
-        if (ruleSet != null && newItems.size() != 0) {
-            RuleSet<MyItem> filteredRuleSet = ruleSet.filter(
-                    Filter.forAssociationRules().byOperator(new RuleFilter(), 0.5));
-            RuleSet<MyItem> sortedRuleSet = filteredRuleSet.sort(
-                    Sorting.forAssociationRules().withOrder(Sorting.Order.DESCENDING).byOperator(new Confidence()));
+        if (ruleSet == null || newItems.size() == 0) {
+            return;
+        }
 
-            for (AssociationRule<MyItem> rule : sortedRuleSet) {
-                if (rule.covers(newItems.get(newItems.size() - 1))) {
-                    ItemSet<MyItem> head = rule.getHead();
+        RuleSet<MyItem> filteredRuleSet = ruleSet.filter(
+                // TODO: adapt minPerformance to find good results
+                Filter.forAssociationRules().byOperator(new RuleFilter(), 0.5));
+        RuleSet<MyItem> sortedRuleSet = filteredRuleSet.sort(
+                Sorting.forAssociationRules().withOrder(Sorting.Order.DESCENDING).byOperator(new Confidence()));
 
-                    for (MyItem item : head) {
-                        if (item.isCodeFragment && recommendations.size() < maxRecommendations) {
-                            recommendations.add(item.getCodeFragment());
-                        }
-                    }
+        for (AssociationRule<MyItem> rule : sortedRuleSet) {
+            if (rule.covers(newItems.get(newItems.size() - 1))) {
+                ItemSet<MyItem> head = rule.getHead();
+
+                for (MyItem item : head) {
+                    recommendations.add(item.getCodeFragment());
                 }
-            }
-        } else {
-            searchForFragmentsIfNoTransactions();
-            return;
-        }
-        if (recommendations.size() == maxRecommendations) {
-            return;
-        }
-
-        searchForFragmentsIfNoTransactions();
-    }
-
-    private void searchForFragmentsIfNoTransactions() {
-        if (keywords.size() == 0) {
-            return;
-        }
-
-        for (CodeFragment fragment : loader.getCodeFragments(null)) {
-            String keyword = keywords.getLast();
-            if (recommendations.size() < maxRecommendations && keyword.length() != 0 && fragment.containsKeyword(keyword)) {
-                recommendations.add(fragment);
             }
         }
     }
@@ -225,12 +191,12 @@ public class AprioriWorker implements Worker {
 
         @Override
         public double evaluate(@NotNull AssociationRule rule) {
-            ItemSet<MyItem> target = rule.getHead();
+            ItemSet target = rule.getHead();
             if (target.size() != 1) {
                 return 0;
             }
 
-            MyItem item = target.first();
+            MyItem item = (MyItem) target.first();
             if (item.isCodeFragment) {
                 return 1;
             }
@@ -261,8 +227,16 @@ public class AprioriWorker implements Worker {
         }
 
         public ArrayList<MyItem> getList() {
-            ArrayList<MyItem> a = new ArrayList<>(list.size());
-            a.addAll(list);
+            int listSize = list.size();
+            List<MyItem> subList = list;
+
+            if (listSize > 5) {
+                // take just last 5 items
+                subList = list.subList(listSize - 6, listSize - 1);
+            }
+
+            ArrayList<MyItem> a = new ArrayList<>(subList.size());
+            a.addAll(subList);
             return a;
         }
 

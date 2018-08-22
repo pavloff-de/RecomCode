@@ -15,6 +15,10 @@ public class YamlLoader implements CodeFragmentLoader {
     private ArrayList<CodeParam> params;
     private ArrayList<CodeFragment> fragments;
 
+    public YamlLoader() {
+        load(null);
+    }
+
     @Override
     public ArrayList<CodeFragment> getCodeFragments(File[] files) {
         if (fragments == null) {

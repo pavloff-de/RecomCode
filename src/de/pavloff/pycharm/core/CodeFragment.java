@@ -189,4 +189,38 @@ public class CodeFragment {
             return new CodeFragment(this);
         }
     }
+
+    public static class FragmentSorter {
+        Map<CodeFragment, Integer> ratings;
+
+        public FragmentSorter() {
+            ratings = new HashMap<>();
+        }
+
+        public void add(CodeFragment fragment) {
+            add(fragment, 1);
+        }
+
+        public void add(CodeFragment fragment, int rating) {
+            if (!ratings.containsKey(fragment)) {
+                ratings.put(fragment, rating);
+            } else {
+                ratings.put(fragment, ratings.get(fragment) + rating);
+            }
+        }
+
+        public LinkedHashSet<CodeFragment> sortFragments() {
+            List<Map.Entry<CodeFragment, Integer>> ratedFragments = new ArrayList<>(ratings.entrySet());
+            LinkedHashSet<CodeFragment> sortedFragments = new LinkedHashSet<>();
+            ratedFragments.sort(Map.Entry.comparingByValue());
+            ListIterator it = ratedFragments.listIterator(ratedFragments.size());
+
+            while(it.hasPrevious()) {
+                Map.Entry bestRec = (Map.Entry) it.previous();
+                sortedFragments.add((CodeFragment) bestRec.getKey());
+            }
+
+            return sortedFragments;
+        }
+    }
 }
