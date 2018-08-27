@@ -24,7 +24,7 @@ public interface Worker {
 
     void columnSelected(int column);
 
-    LinkedHashSet<CodeFragment> getRecommendation();
+    void codeFragmentSelected(CodeFragment fragment);
 
-    void selectedCodeFragment(CodeFragment fragment);
+    LinkedHashSet<CodeFragment> getRecommendation();
 }

@@ -94,13 +94,13 @@ public class KeywordWorker implements Worker {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendation() {
-        return recommendations;
+    public void codeFragmentSelected(CodeFragment fragment) {
+        keywords.clear();
     }
 
     @Override
-    public void selectedCodeFragment(CodeFragment fragment) {
-        keywords.clear();
+    public LinkedHashSet<CodeFragment> getRecommendation() {
+        return recommendations;
     }
 
     private void searchForFragments() {

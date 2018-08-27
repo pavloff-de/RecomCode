@@ -88,13 +88,13 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendation() {
-        return recommendations;
+    public void codeFragmentSelected(CodeFragment fragment) {
+        items.add(new MyItem(fragment));
     }
 
     @Override
-    public void selectedCodeFragment(CodeFragment fragment) {
-        items.add(new MyItem(fragment));
+    public LinkedHashSet<CodeFragment> getRecommendation() {
+        return recommendations;
     }
 
     private Iterable<Transaction<MyItem>> getLastTransactions() {
