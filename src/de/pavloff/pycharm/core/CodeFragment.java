@@ -107,6 +107,24 @@ public class CodeFragment {
         return String.join("", keywords).toLowerCase().contains(keyword.toLowerCase());
     }
 
+    public int containsKeywords(List<String> keywords) {
+        if (keywords.size() == 0) {
+            return 0;
+        }
+        if (this.keywords == null) {
+            return 0;
+        }
+
+        int numMatches = 0;
+        Iterator<String> it = keywords.iterator();
+        while (it.hasNext()) {
+            if (containsKeyword(it.next())) {
+                numMatches++;
+            }
+        }
+        return numMatches;
+    }
+
     public String getCleanTextkey() {
         if (this.textkey == null) {
             return "";

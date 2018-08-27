@@ -12,6 +12,7 @@ public class KeywordWorker implements Worker {
     private CodeFragmentLoader loader;
     private LinkedHashSet<CodeFragment> recommendations;
     private List<String> keywords;
+    private List<String> inputs;
     private TableModel currentDataframe;
 
     public KeywordWorker(CodeFragmentLoader loader) {
@@ -30,7 +31,7 @@ public class KeywordWorker implements Worker {
     }
 
     private void addKeyword(String keyword) {
-        if (keyword.length() == 0) {
+        if (keyword.length() < 2) {
             return;
         }
         final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
@@ -39,14 +40,11 @@ public class KeywordWorker implements Worker {
         keywords.add(keyword);
     }
 
-    private void addKeywords(String[] keywords) {
-        for (String keyword : keywords) {
-            addKeyword(keyword);
-        }
-    }
-
     public void onInput(String input) {
-        addKeywords(input.split(" "));
+        inputs = new LinkedList<>();
+        for (String s : input.split(" ")) {
+            inputs.add(s);
+        }
         searchForFragments();
     }
 
@@ -59,7 +57,7 @@ public class KeywordWorker implements Worker {
 
     @Override
     public void cellSelected(int row, int column) {
-        // get important informations about cell, row, column
+        // get important information about cell, row, column
         addKeyword("cell");
         addKeyword("row");
         addKeyword("column");
@@ -88,7 +86,7 @@ public class KeywordWorker implements Worker {
 
     @Override
     public void columnSelected(int column) {
-        // get important informations about column
+        // get important information about column
         addKeyword("column");
         searchForFragments();
     }
@@ -107,11 +105,7 @@ public class KeywordWorker implements Worker {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         for (CodeFragment fragment : loader.getCodeFragments(null)) {
-            for (String keyword : keywords) {
-                if (keyword.length() != 0 && fragment.containsKeyword(keyword)) {
-                    sorter.add(fragment);
-                }
-            }
+            sorter.add(fragment, fragment.containsKeywords(keywords) + fragment.containsKeywords(inputs));
         }
 
         recommendations = sorter.sortFragments();
