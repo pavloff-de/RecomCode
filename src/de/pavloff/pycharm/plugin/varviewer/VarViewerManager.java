@@ -276,6 +276,7 @@ public class VarViewerManager implements BaseConstants {
 
         final JFrame popup = new JFrame();
         popup.add(tab);
+        tab.setBorder(BorderFactory.createEmptyBorder());
         popup.setSize(800, 500);
         popup.addWindowListener(new WindowListener() {
             @Override
