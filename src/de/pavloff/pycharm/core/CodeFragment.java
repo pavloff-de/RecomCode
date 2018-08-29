@@ -108,10 +108,7 @@ public class CodeFragment {
     }
 
     public int containsKeywords(List<String> keywords) {
-        if (keywords.size() == 0) {
-            return 0;
-        }
-        if (this.keywords == null) {
+        if (this.keywords == null || keywords == null || keywords.size() == 0) {
             return 0;
         }
 
