@@ -42,6 +42,9 @@ public class PyVariableMacro extends Macro {
         PsiElement[] pyElements = getElements(context);
         LookupElement[] lookupElements = new LookupElement[pyElements.length];
         for (int i = 0; i < pyElements.length; i++) {
+            if (vars[i].length() == 0) {
+                continue;
+            }
             lookupElements[i] = LookupElementBuilder.createWithSmartPointer(vars[i], pyElements[i]);
         }
         return lookupElements;
@@ -51,6 +54,9 @@ public class PyVariableMacro extends Macro {
         PsiElement[] elements = new PsiElement[vars.length];
         PyElementGeneratorImpl generator = new PyElementGeneratorImpl(context.getProject());
         for (int i = 0; i < vars.length; i++) {
+            if (vars[i].length() == 0) {
+                continue;
+            }
             try{
                 elements[i] = generator.createFromText(
                         LanguageLevel.PYTHON26, PyExpressionStatement.class, vars[i]);
