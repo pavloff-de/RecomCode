@@ -6,9 +6,9 @@ keywords: [select, row]
 textkey:
   - "select|get single row by position|integer|number"
   - "retrieve row in dataframe"
-code: $dataframe$.ix[$row-index-num$]
+code: $dataframe$.ix[$rowIndexNum$]
 parameter:
-  - name: row-index-num
+  - name: rowIndexNum
 ---
 recType: code
 recID: py.pd.col.001
@@ -16,12 +16,17 @@ group: pandas
 keywords: [drop, remove, delete column]
 textkey:
   - "drop|remove|delete|kill|purge single column from dataframe"
-code: $dataframe$.drop($columnName$, axis=1)
+code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=$axis$)"
 parameter:
+  - name: dataframe2
+    expr: "pyIterableVariable"
   - name: columnName
+  - name: axis
+    vars: "0|1"
 ---
 recType: code
 recID: py.pd.col.002
+group: pandas
 keywords: [drop, remove, delete, multipe, columns]
 textkey:
   - "drop|remove|delete|kill|purge multiple columns from dataframe"

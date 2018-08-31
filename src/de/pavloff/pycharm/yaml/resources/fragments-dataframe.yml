@@ -48,3 +48,20 @@ textkey:
   - "transpose index and columns of a dataframe"
   - "flip|reflect a matrix over its diagonal"
 code: "$dataframe$.transpose()"
+---
+recType: code
+group: pandas
+recID: py.pd.df.006
+keywords: [read, dataframe, csv, load]
+textkey:
+  - "read dataframe from csv|tsv"
+code: "$dataframe$ = $pandas$.read_csv(\"$path$\", delimiter=\"$sep$\", header=$header$)$END$"
+parameter:
+  - name: path
+    vars: ""
+  - name: sep
+    vars: ",|;"
+  - name: header
+    vars: "0|None"
+  - name: pandas
+    expr: "PyClassNameMacro"
