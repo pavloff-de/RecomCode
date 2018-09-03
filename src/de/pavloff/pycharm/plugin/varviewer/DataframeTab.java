@@ -153,5 +153,6 @@ class DataframeTab extends JPanel implements BaseConstants {
         removeAll();
         add(new JBScrollPane(panel));
         revalidate();
+        repaint();
     }
 }
