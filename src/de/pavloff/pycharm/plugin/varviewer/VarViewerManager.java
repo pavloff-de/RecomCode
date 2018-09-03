@@ -10,8 +10,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
-import de.pavloff.pycharm.ipnb.ConnectionManager;
-import de.pavloff.pycharm.ipnb.OutputCell;
+import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
+import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 

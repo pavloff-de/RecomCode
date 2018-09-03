@@ -1,4 +1,4 @@
-package de.pavloff.pycharm.ipnb;
+package de.pavloff.pycharm.plugin.ipnb;
 
 import java.util.List;
 

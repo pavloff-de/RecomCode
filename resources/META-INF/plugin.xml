@@ -24,7 +24,7 @@
 
     <project-components>
         <component>
-            <implementation-class>de.pavloff.pycharm.ipnb.ConnectionManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.plugin.ipnb.ConnectionManager</implementation-class>
         </component>
     </project-components>
 

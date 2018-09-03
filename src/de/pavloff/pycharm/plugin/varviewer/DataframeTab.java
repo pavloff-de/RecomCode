@@ -7,8 +7,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeFragmentManager;
-import de.pavloff.pycharm.ipnb.ConnectionManager;
-import de.pavloff.pycharm.ipnb.OutputCell;
+import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
+import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 

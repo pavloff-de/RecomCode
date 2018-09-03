@@ -1,4 +1,4 @@
-package de.pavloff.pycharm.ipnb;
+package de.pavloff.pycharm.plugin.ipnb;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
