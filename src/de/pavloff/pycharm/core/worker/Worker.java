@@ -10,6 +10,7 @@ import java.util.List;
 public interface Worker {
 
     String workerName();
+
     String description();
 
     void onInput(String input);
@@ -25,6 +26,8 @@ public interface Worker {
     void columnSelected(int column);
 
     void codeFragmentSelected(CodeFragment fragment);
+
+    void sourceCode(String code);
 
     LinkedHashSet<CodeFragment> getRecommendation();
 }

@@ -93,6 +93,11 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
+    public void sourceCode(String code) {
+
+    }
+
+    @Override
     public LinkedHashSet<CodeFragment> getRecommendation() {
         return recommendations;
     }

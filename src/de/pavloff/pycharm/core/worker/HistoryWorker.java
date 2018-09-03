@@ -68,6 +68,11 @@ public class HistoryWorker implements Worker {
     }
 
     @Override
+    public void sourceCode(String code) {
+
+    }
+
+    @Override
     public LinkedHashSet<CodeFragment> getRecommendation() {
         LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
         if (history.size() == 0) {

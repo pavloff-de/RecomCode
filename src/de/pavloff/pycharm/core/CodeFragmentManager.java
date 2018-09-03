@@ -133,6 +133,13 @@ public class CodeFragmentManager implements Worker {
     }
 
     @Override
+    public void sourceCode(String code) {
+        worker1.sourceCode(code);
+        worker2.sourceCode(code);
+        worker3.sourceCode(code);
+    }
+
+    @Override
     public LinkedHashSet<CodeFragment> getRecommendation() {
         return null;
     }
