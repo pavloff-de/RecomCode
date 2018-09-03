@@ -1,4 +1,4 @@
-package de.pavloff.pycharm.core.macros;
+package de.pavloff.pycharm.plugin.macros;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;

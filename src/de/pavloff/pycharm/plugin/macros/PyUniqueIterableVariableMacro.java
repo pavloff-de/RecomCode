@@ -1,4 +1,4 @@
-package de.pavloff.pycharm.core.macros;
+package de.pavloff.pycharm.plugin.macros;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;

@@ -1,13 +1,8 @@
 package de.pavloff.pycharm.core;
 
-import com.intellij.codeInsight.template.*;
-import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.openapi.project.Project;
-import de.pavloff.pycharm.core.macros.PyVariableMacro;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CodeFragment {
 
@@ -47,7 +42,7 @@ public class CodeFragment {
         return code;
     }
 
-    private Map<String, CodeParam> getGlobalParams(Project openedProject) {
+    public Map<String, CodeParam> getGlobalParameters(Project openedProject) {
         Map<String, CodeParam> params = new HashMap<>();
 
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
@@ -59,45 +54,12 @@ public class CodeFragment {
 
         return params;
     }
-    
-    public Template getTemplate(TemplateManager templateManager, Project openedProject) {
-        Template t = templateManager.createTemplate(getRecID(), getGroup(), code);
-        t.setToReformat(false);
-        t.setToIndent(false);
 
-        Map<String, CodeParam> globals = getGlobalParams(openedProject);
-
-        Set<String> visitedVaribles = new HashSet<>();
-        Pattern VARS_PATTERN = Pattern.compile("\\$(.*?)\\$");
-        Matcher m = VARS_PATTERN.matcher(code);
-        while (m.find()) {
-            String v = m.group(1);
-            if (visitedVaribles.contains(v)) {
-                continue;
-            }
-            visitedVaribles.add(v);
-
-            CodeParam p = null;
-            if (globals.containsKey(v)) {
-                p = globals.get(v);
-            } else if (parameters.containsKey(v)) {
-                p = parameters.get(v);
-            }
-
-            if (p != null) {
-                if (p.hasExpression()) {
-                    t.addVariable(p.getName(), p.getExpr(), p.getVars(), true);
-                } else {
-                    MacroCallNode macro = new MacroCallNode(new PyVariableMacro(p.getVars().split("\\|")));
-                    t.addVariable(p.getName(), macro, true);
-                }
-            }
-        }
-
-        return t;
+    public Map<String, CodeParam> getParameters() {
+        return parameters;
     }
-
-    public Boolean containsKeyword(String keyword) {
+    
+    private Boolean containsKeyword(String keyword) {
         if (keyword.length() == 0) {
             return false;
         }

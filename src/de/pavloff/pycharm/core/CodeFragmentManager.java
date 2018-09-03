@@ -21,7 +21,6 @@ public class CodeFragmentManager implements Worker {
     private Worker worker3 = new HistoryWorker(loader);
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
-    private List<CodeParamListener> codeParamListeners = new LinkedList<>();
 
     public static CodeFragmentManager getInstance(Project project) {
         return project.getComponent(CodeFragmentManager.class);
@@ -29,10 +28,6 @@ public class CodeFragmentManager implements Worker {
 
     public void addCodeFragmentListener(CodeFragmentListener listener) {
         codeFragmentListeners.add(listener);
-    }
-
-    public void addCodeParamListener(CodeParamListener listener) {
-        codeParamListeners.add(listener);
     }
 
     public CodeFragmentLoader getLoader() {
