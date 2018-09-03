@@ -19,7 +19,7 @@ textkey:
 code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=$axis$)"
 parameter:
   - name: dataframe2
-    expr: "pyIterableVariable"
+    expr: "pyUniqueIterableVariable"
   - name: columnName
   - name: axis
     vars: "0|1"

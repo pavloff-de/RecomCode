@@ -38,7 +38,7 @@ textkey:
 code: "$dataframe$.dot($dataframe2$)"
 parameter:
   - name: dataframe2
-    expr: "pyIterableVariable"
+    expr: "pyUniqueIterableVariable"
 ---
 recType: code
 group: pandas
