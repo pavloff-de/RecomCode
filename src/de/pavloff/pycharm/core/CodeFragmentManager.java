@@ -129,6 +129,13 @@ public class CodeFragmentManager implements Worker {
     }
 
     @Override
+    public void codeVariables(Map<String, CodeVariable> variables) {
+        for (Worker worker : workers.values()) {
+            worker.codeVariables(variables);
+        }
+    }
+
+    @Override
     public LinkedHashSet<CodeFragment> getRecommendation() {
         return null;
     }

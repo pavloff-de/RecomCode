@@ -1,7 +1,8 @@
-from IPython.core.magics.namespace import NamespaceMagics # Used to query namespace.
+from IPython.core.magics.namespace import NamespaceMagics as __NsMagics__ # Used to query namespace.
 
-ns = NamespaceMagics()
-ns.shell = get_ipython().kernel.shell
+__ns_magics__ = __NsMagics__()
+__ns_magics__.shell = get_ipython().kernel.shell
 
-for val in ns.who_ls():
-    print type(eval(val)).__name__, val
+for val in __ns_magics__.who_ls():
+    # do not create new variables to keep the list clean
+    print type(eval(val)).__name__, val, eval(val).__name__ if type(eval(val)).__name__ == "module" else ""

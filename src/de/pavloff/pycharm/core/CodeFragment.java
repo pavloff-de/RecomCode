@@ -75,9 +75,8 @@ public class CodeFragment {
         }
 
         int numMatches = 0;
-        Iterator<String> it = keywords.iterator();
-        while (it.hasNext()) {
-            if (containsKeyword(it.next())) {
+        for (String keyword : keywords) {
+            if (containsKeyword(keyword)) {
                 numMatches++;
             }
         }

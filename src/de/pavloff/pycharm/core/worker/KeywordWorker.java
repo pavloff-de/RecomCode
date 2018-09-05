@@ -3,6 +3,7 @@ package de.pavloff.pycharm.core.worker;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
+import de.pavloff.pycharm.core.CodeVariable;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -98,6 +99,11 @@ public class KeywordWorker implements Worker {
 
     @Override
     public void sourceCode(String code) {
+
+    }
+
+    @Override
+    public void codeVariables(Map<String, CodeVariable> variables) {
 
     }
 

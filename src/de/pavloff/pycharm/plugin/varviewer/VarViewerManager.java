@@ -10,6 +10,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
+import de.pavloff.pycharm.core.CodeFragmentManager;
+import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
@@ -130,13 +132,13 @@ public class VarViewerManager implements BaseConstants {
         ipnb.execute(openedFile, code, new OutputCell() {
             @Override
             public void onOutput(List<String> output) {
-                createTabs(output);
+                evaluateOutput(output);
             }
 
             @Override
             public void onPayload(String payload) {
                 // ???
-                createTabs(Collections.singletonList(payload));
+                evaluateOutput(Collections.singletonList(payload));
             }
 
             @Override
@@ -145,6 +147,55 @@ public class VarViewerManager implements BaseConstants {
                 tabbedPane.addTab(OUTPUT_TAB, createTabPanel(IpnbErrorPanel.createColoredPanel(traceback)));
             }
         });
+    }
+
+    private void evaluateOutput(List<String> fromIpnb) {
+        String output;
+        if (fromIpnb.size() != 1) {
+            output = String.join(LINE_SEP, fromIpnb);
+        } else {
+            output = fromIpnb.get(0);
+        }
+
+        String[] outputLines = output.split(LINE_SEP);
+        StringBuilder mainOutput = new StringBuilder();
+        LinkedList<String> dfOutput = new LinkedList<>();
+        Map<String, CodeVariable> varOutput = new HashMap<>();
+        boolean varViewerOutputFound = false;
+
+        for (String s : outputLines) {
+            if (s.startsWith(VAR_VIEWER_SEP)) {
+                varViewerOutputFound = true;
+
+            } else if (varViewerOutputFound) {
+                String[] vars = s.split(" ");
+                String varType = null;
+                String varName = null;
+                String moduleName = null;
+
+                if (vars.length > 0) {
+                    varType = vars[0];
+                }
+                if (vars.length > 1) {
+                    varName = vars[1];
+                }
+                if (vars.length > 2) {
+                    moduleName = vars[2];
+                }
+
+                varOutput.put(varName, new CodeVariable(varType, varName, moduleName));
+
+                if (varType.equals("DataFrame")) {
+                    dfOutput.add(s);
+                }
+
+            } else {
+                mainOutput.append(s).append(LINE_SEP);
+            }
+        }
+        CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
+        manager.codeVariables(varOutput);
+        createTabs(mainOutput, dfOutput);
     }
 
     private void initConn() {
@@ -225,32 +276,7 @@ public class VarViewerManager implements BaseConstants {
         return new JBScrollPane(panel);
     }
 
-    private void createTabs(List<String> fromIpnb) {
-        String output;
-        if (fromIpnb.size() != 1) {
-            output = String.join(LINE_SEP, fromIpnb);
-        } else {
-            output = fromIpnb.get(0);
-        }
-
-        String[] outputLines = output.split(LINE_SEP);
-        StringBuilder mainOutput = new StringBuilder();
-        LinkedList<String> dfOutput = new LinkedList<>();
-        boolean varViewerOutputFound = false;
-
-        for (String s : outputLines) {
-            if (s.startsWith(VAR_VIEWER_SEP)) {
-                varViewerOutputFound = true;
-
-            } else if (varViewerOutputFound) {
-                if (s.startsWith("DataFrame ")) {
-                    dfOutput.add(s);
-                }
-            } else {
-                mainOutput.append(s).append(LINE_SEP);
-            }
-        }
-
+    private void createTabs(StringBuilder mainOutput, LinkedList<String> dfOutput) {
         int openedTab = tabbedPane.getSelectedIndex();
         if (openedTab < 0) {
             openedTab = 0;

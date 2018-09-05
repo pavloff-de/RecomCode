@@ -5,6 +5,7 @@ import de.mrapp.apriori.*;
 import de.mrapp.apriori.metrics.Confidence;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
+import de.pavloff.pycharm.core.CodeVariable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;
@@ -94,6 +95,11 @@ public class AprioriWorker implements Worker {
 
     @Override
     public void sourceCode(String code) {
+
+    }
+
+    @Override
+    public void codeVariables(Map<String, CodeVariable> variables) {
 
     }
 
