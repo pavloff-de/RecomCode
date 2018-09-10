@@ -183,9 +183,10 @@ public class VarViewerManager implements BaseConstants {
                     moduleName = vars[2];
                 }
 
-                varOutput.put(varName, new CodeVariable(varType, varName, moduleName));
+                varOutput.put(varName, new CodeVariable.Builder()
+                        .setType(varType).setName(varName).setModuleName(moduleName).build());
 
-                if (varType.equals("DataFrame")) {
+                if (varType != null && varType.equals("DataFrame")) {
                     dfOutput.add(s);
                 }
 
