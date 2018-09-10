@@ -78,14 +78,13 @@ public class HistoryWorker implements Worker {
     @Override
     public LinkedHashSet<CodeFragment> getRecommendation() {
         LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
-        if (history.size() == 0) {
-            return lastFragments;
-        }
 
-        // find last 5 fragments
-        ListIterator<CodeFragment> it = history.listIterator(Math.max(history.size() - 5, 1) - 1);
-        while (it.hasNext()) {
-            lastFragments.add(it.next());
+        if (history.size() != 0) {
+            // find last 5 fragments
+            ListIterator<CodeFragment> it = history.listIterator(Math.max(history.size() - 5, 1) - 1);
+            while (it.hasNext()) {
+                lastFragments.add(it.next());
+            }
         }
 
         return lastFragments;

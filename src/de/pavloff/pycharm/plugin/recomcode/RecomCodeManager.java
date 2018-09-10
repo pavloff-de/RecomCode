@@ -144,7 +144,8 @@ public class RecomCodeManager {
         t.setToReformat(false);
         t.setToIndent(false);
 
-        Map<String, CodeParam> globals = fragment.getGlobalParameters(openedProject);
+        Map<String, CodeParam> params = fragment.getParameters();
+        Map<String, CodeParam> globalParams = fragment.getGlobalParameters(openedProject);
 
         Set<String> visitedVariables = new HashSet<>();
         Pattern VARS_PATTERN = Pattern.compile("\\$(.*?)\\$");
@@ -157,10 +158,10 @@ public class RecomCodeManager {
             visitedVariables.add(v);
 
             CodeParam p = null;
-            if (globals.containsKey(v)) {
-                p = globals.get(v);
-            } else if (fragment.getParameters().containsKey(v)) {
-                p = fragment.getParameters().get(v);
+            if (globalParams.containsKey(v)) {
+                p = globalParams.get(v);
+            } else if (params.containsKey(v)) {
+                p = params.get(v);
             }
 
             if (p != null) {

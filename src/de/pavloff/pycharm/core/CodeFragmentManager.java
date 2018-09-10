@@ -63,7 +63,7 @@ public class CodeFragmentManager implements Worker {
 
     @Override
     public String description() {
-        return "Just a proxy. Do not use as a worker.";
+        return "Proxy for multiple worker.";
     }
 
     @Override
