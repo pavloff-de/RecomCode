@@ -5,83 +5,62 @@ import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeParam;
 import org.yaml.snakeyaml.Yaml;
 
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 public class YamlLoader implements CodeFragmentLoader {
 
     private Yaml yamlReader = new Yaml();
-    private ArrayList<CodeParam> params;
+
     private ArrayList<CodeFragment> fragments;
 
-    public YamlLoader() {
-        load(null);
-    }
-
     @Override
-    public ArrayList<CodeFragment> getCodeFragments(File[] files) {
+    public List<CodeFragment> getCodeFragments() {
         if (fragments == null) {
-            load(files);
+            load();
         }
-
         return fragments;
     }
 
     @Override
-    public ArrayList<CodeParam> getCodeParams(File[] files) {
-        if (params == null) {
-            load(files);
-        }
-
-        return params;
-    }
-
-    private void load(File[] files) {
-        if (params == null) {
-            params = new ArrayList<>();
-        }
+    public void load() {
         if (fragments == null) {
             fragments = new ArrayList<>();
         }
 
-        if (files == null) {
-            loadDefault();
-        } else {
-            for (File file : files) {
-                try {
-                    loadFrom(file);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void loadDefault() {
         URL resources = YamlLoader.class.getResource("resources");
         FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
         File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
 
-        if (yamlResources != null) {
-            for (File file : yamlResources) {
-                try {
-                    loadFrom(file);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+        if (yamlResources == null) {
+            return;
+        }
+
+        for (File file : yamlResources) {
+            try {
+                loadFrom(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
-        } else {
-            //TODO: log
         }
     }
 
-    private void loadFrom(File path) throws FileNotFoundException {
+    @Override
+    public void loadFrom(File path) throws FileNotFoundException {
         InputStream yamlFile = new FileInputStream(path);
 
         Iterable<Object> jamlSections = yamlReader.loadAll(yamlFile);
+        Map<String, CodeParam> params = new HashMap<>();
+
         for (Object yamlSection : jamlSections) {
             HashMap record = (HashMap) yamlSection;
+
+            if (record == null) {
+                continue;
+            }
 
             if (record.get("recType").equals("params")) {
                 CodeParam p = new CodeParam.Builder()
@@ -92,7 +71,7 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setVars(castToString(record.get("vars")))
                         .setExpr(castToString(record.get("expr")))
                         .build();
-                params.add(p);
+                params.put(p.getName(), p);
 
             } else if (record.get("recType").equals("code")) {
                 CodeFragment c = new CodeFragment.Builder()
@@ -105,7 +84,7 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
                         .setCode(castToString(record.get("code")))
-                        .setParameters(castToParameter(record.get("parameter")))
+                        .setParameters(castToParameter(params, record.get("parameter")))
                         .build();
                 fragments.add(c);
             }
@@ -134,8 +113,10 @@ public class YamlLoader implements CodeFragmentLoader {
         return castedList;
     }
 
-    private Map<String, CodeParam> castToParameter(Object list) {
+    private Map<String, CodeParam> castToParameter(Map<String, CodeParam> globalParams, Object list) {
         Map<String, CodeParam> params = new HashMap<>();
+        params.putAll(globalParams);
+
         if (list == null) {
             return params;
         }

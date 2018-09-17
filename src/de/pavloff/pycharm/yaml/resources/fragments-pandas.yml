@@ -1,4 +1,29 @@
 ---
+recType: params
+recID: py.pd.par.001
+group: pandas
+name: dataframe
+type: DataFrame
+vars: dataframe|df|frame
+expr: "pyUniqueIterableVariable"
+---
+recType: params
+recID: py.pd.par.002
+group: pandas
+name: columnNames
+type: list|tuple
+vars: columnNames|names|columns
+expr: "pyUniqueIterableVariable"
+---
+recType: params
+recID: py.pd.par.003
+group: pandas
+name: i
+type: int
+vars: columnNames|names|columns
+expr: "collectionElementName"
+replaceable: no
+---
 recType: code
 recID: py.pd.rw.001
 group: pandas
@@ -16,13 +41,11 @@ group: pandas
 keywords: [drop, remove, delete column]
 textkey:
   - "drop|remove|delete|kill|purge single column from dataframe"
-code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=$axis$)"
+code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=1)"
 parameter:
   - name: dataframe2
     expr: "pyUniqueIterableVariable"
   - name: columnName
-  - name: axis
-    vars: "0|1"
 ---
 recType: code
 recID: py.pd.col.002
@@ -61,9 +84,75 @@ keywords: [rename, columns, dictionary]
 textkey:
  - "rename columns in a dataframe via dictionary"
 code: |
-    # todo: setup the dictionary
-    # df = df.rename(columns={'oldName1': 'newName1', 'oldName2': 'newName2'})
     $dataframe$ = $dataframe$.rename(columns=$dictionaryOfColumnNames$)
 parameter:
   - name: dictionaryOfColumnNames
     vars: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"
+---
+---
+recType: code
+group: pandas
+recID: py.pd.df.001
+keywords: [dataframe, iterator, columns, items]
+textkey:
+- "iterate over columns of a dataframe"
+code: "for $i$ in $dataframe$.iteritems():\n    $END$"
+---
+recType: code
+group: pandas
+recID: py.pd.df.002
+keywords: [dataframe, iterator, rows]
+textkey:
+- "iterate over rows of a dataframe"
+code: "for $i$ in $dataframe$.iterrows():\n    $END$"
+---
+recType: code
+group: pandas
+recID: py.pd.df.003
+keywords: [dataframe, iterator, rows, tuples, namedtuples]
+textkey:
+- "iterate over rows as namedtuples"
+code: "for $i$ in $dataframe$.itertuples(index=$index$, name=\"$name$\"):\n    $END$"
+parameter:
+- name: index
+  vars: True|False
+- name: name
+  vars: Pandas
+---
+recType: code
+group: pandas
+recID: py.pd.df.004
+keywords: [dataframe, dot, product, matrix, multiplication]
+textkey:
+- "dot product with other dataframe|series object"
+- "matrix multiplication with dataframe|Series objects"
+code: "$dataframe$.dot($dataframe2$)"
+parameter:
+- name: dataframe2
+  expr: "pyUniqueIterableVariable"
+---
+recType: code
+group: pandas
+recID: py.pd.df.005
+keywords: [dataframe, transpose, matrix, diagonal]
+textkey:
+- "transpose index and columns of a dataframe"
+- "flip|reflect a matrix over its diagonal"
+code: "$dataframe$.transpose()"
+---
+recType: code
+group: pandas
+recID: py.pd.df.006
+keywords: [read, dataframe, csv, load]
+textkey:
+- "read dataframe from csv|tsv"
+code: "$dataframe$ = $module$.read_csv(\"$path$\", delimiter=\"$sep$\", header=$header$)$END$"
+parameter:
+- name: path
+  vars: ""
+- name: sep
+  vars: ",|;"
+- name: header
+  vars: "0|None"
+- name: module
+  vars: "pandas|pd"

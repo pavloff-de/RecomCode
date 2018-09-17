@@ -1,10 +1,11 @@
 package de.pavloff.pycharm.core;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 public interface CodeFragmentLoader {
-
-    ArrayList<CodeFragment> getCodeFragments(File[] files);
-    ArrayList<CodeParam> getCodeParams(File[] files);
+    void load();
+    void loadFrom(File file) throws FileNotFoundException;
+    List<CodeFragment> getCodeFragments();
 }
