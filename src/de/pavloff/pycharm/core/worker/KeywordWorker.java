@@ -43,9 +43,7 @@ public class KeywordWorker implements Worker {
 
     public void onInput(String input) {
         inputs = new LinkedList<>();
-        for (String s : input.split(" ")) {
-            inputs.add(s);
-        }
+        Collections.addAll(inputs, input.split(" "));
         searchForFragments();
     }
 
@@ -115,8 +113,14 @@ public class KeywordWorker implements Worker {
     private void searchForFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
-        for (CodeFragment fragment : loader.getCodeFragments(null)) {
-            sorter.add(fragment, fragment.containsKeywords(keywords) + fragment.containsKeywords(inputs));
+        for (CodeFragment fragment : loader.getCodeFragments()) {
+            int rating = fragment.containsKeywords(keywords) + fragment.containsKeywords(inputs);
+
+            if (rating == 0) {
+                continue;
+            }
+
+            sorter.add(fragment, rating);
         }
 
         recommendations = sorter.sortFragments();
