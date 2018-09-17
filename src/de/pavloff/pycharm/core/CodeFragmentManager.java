@@ -17,6 +17,9 @@ public class CodeFragmentManager implements Worker {
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
 
+    private TableModel selectedDataframe;
+    private Map<String, CodeVariable> myVariables = new HashMap<>();
+
     public static CodeFragmentManager getInstance(Project project) {
         return project.getComponent(CodeFragmentManager.class);
     }
@@ -51,8 +54,20 @@ public class CodeFragmentManager implements Worker {
         }
 
         recommendation = sorter.sortFragments();
+
+        LinkedHashSet<CodeFragment> withVariables = new LinkedHashSet<>();
+        for (CodeFragment fragment : recommendation) {
+
+            List<CodeFragment> fragmentWithVariables = fragment.getWithVariables(myVariables);
+            if (fragmentWithVariables.size() != 0) {
+                withVariables.addAll(fragmentWithVariables);
+            } else {
+                withVariables.add(fragment);
+            }
+        }
+
         for (CodeFragmentListener listener : codeFragmentListeners) {
-            listener.onOutput(recommendation);
+            listener.onOutput(withVariables);
         }
     }
 
@@ -79,6 +94,11 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.dataframeSelected(table);
         }
+
+        selectedDataframe = table;
+        myVariables.put("dataframe", new CodeVariable.Builder()
+                .setType("DataFrame").setName("df").build());
+
         returnRecommendations();
     }
 
@@ -87,6 +107,17 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.cellSelected(row, column);
         }
+
+        myVariables.put("row_index", new CodeVariable.Builder()
+                .setType("int").setName("row_index").setValue(String.valueOf(row)).build());
+        myVariables.put("column_index", new CodeVariable.Builder()
+                .setType("int").setName("column_index").setValue(String.valueOf(column)).build());
+
+        if (selectedDataframe != null) {
+            myVariables.put("column_name", new CodeVariable.Builder()
+                    .setType("str").setName("column_name").setValue(selectedDataframe.getColumnName(column)).build());
+        }
+
         returnRecommendations();
     }
 
@@ -103,6 +134,10 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.rowSelected(row);
         }
+
+        myVariables.put("row_index", new CodeVariable.Builder()
+                .setType("int").setName("row_index").setValue(String.valueOf(row)).build());
+
         returnRecommendations();
     }
 
@@ -111,6 +146,15 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.columnSelected(column);
         }
+
+        myVariables.put("column_index", new CodeVariable.Builder()
+                .setType("int").setName("column_index").setValue(String.valueOf(column)).build());
+
+        if (selectedDataframe != null) {
+            myVariables.put("column_name", new CodeVariable.Builder()
+                    .setType("str").setName("column_name").setValue(selectedDataframe.getColumnName(column)).build());
+        }
+
         returnRecommendations();
     }
 
@@ -132,6 +176,12 @@ public class CodeFragmentManager implements Worker {
     public void codeVariables(Map<String, CodeVariable> variables) {
         for (Worker worker : workers.values()) {
             worker.codeVariables(variables);
+        }
+
+        for (CodeVariable var : variables.values()) {
+            if (var.getType().equals("module")) {
+                myVariables.put(var.getType(), var);
+            }
         }
     }
 

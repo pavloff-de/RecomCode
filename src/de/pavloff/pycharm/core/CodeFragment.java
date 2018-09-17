@@ -1,8 +1,8 @@
 package de.pavloff.pycharm.core;
 
-import com.intellij.openapi.project.Project;
-
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CodeFragment {
 
@@ -27,7 +27,30 @@ public class CodeFragment {
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
-        this.parameters = builder.parameters;
+        this.parameters = addCodeParams(builder.parameters);
+    }
+
+    private Map<String, CodeParam> addCodeParams(Map<String, CodeParam> codeParams) {
+        Map<String, CodeParam> fragmentParams = new HashMap<>();
+
+        for (String varName : searchCodeForVariables()) {
+            if (codeParams.containsKey(varName)) {
+                fragmentParams.put(varName, codeParams.get(varName));
+            }
+        }
+
+        return fragmentParams;
+    }
+
+    public Set<String> searchCodeForVariables() {
+        Set<String> visitedVariables = new HashSet<>();
+        Matcher m = Pattern.compile("\\$(.*?)\\$").matcher(getCode());
+
+        while (m.find()) {
+            visitedVariables.add(m.group(1));
+        }
+
+        return visitedVariables;
     }
 
     public String getRecID() {
@@ -42,23 +65,52 @@ public class CodeFragment {
         return code;
     }
 
-    public Map<String, CodeParam> getGlobalParameters(Project openedProject) {
-        Map<String, CodeParam> params = new HashMap<>();
-
-        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-        ArrayList<CodeParam> vars = recommender.getLoader().getCodeParams(null);
-
-        for (CodeParam var : vars) {
-            params.put(var.getName(), var);
-        }
-
-        return params;
-    }
-
     public Map<String, CodeParam> getParameters() {
         return parameters;
     }
-    
+
+    public List<CodeFragment> getWithVariables(Map<String, CodeVariable> variables) {
+        List<CodeFragment> withVariables = new ArrayList<>();
+        Map<String, CodeParam> newParams = new HashMap<>();
+
+        String newTextKey = "";
+        if (textkey.size() != 0) {
+            newTextKey = textkey.get(0);
+        }
+
+        for (Map.Entry<String, CodeVariable> varEntry : variables.entrySet()) {
+            String parName = varEntry.getKey();
+
+            if (parameters.containsKey(parName)) {
+                CodeVariable var = varEntry.getValue();
+                newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
+                        .setExpr("").setName(var.getType()).setVars(var.getName()).build());
+
+                if (newTextKey.contains(parName)) {
+                    newTextKey = newTextKey.replace(parName, var.getName());
+                }
+            }
+        }
+
+        if (newParams.size() != 0) {
+            Builder builder = new Builder().setRecId(recID).setGroup(group)
+                    .setKeywords(keywords).setSources(sources).setCode(code);
+
+            Map<String, CodeParam> updatedParams = new HashMap<>(parameters);
+            updatedParams.putAll(newParams);
+            builder.setParameters(updatedParams);
+
+            //TODO: replace text with varNames
+            ArrayList<String> newTextKeys = new ArrayList<>();
+            newTextKeys.add(newTextKey);
+            builder.setTextkey(newTextKeys);
+
+            withVariables.add(builder.build());
+        }
+
+        return withVariables;
+    }
+
     private Boolean containsKeyword(String keyword) {
         if (keyword.length() == 0) {
             return false;

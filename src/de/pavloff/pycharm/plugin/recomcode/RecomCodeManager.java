@@ -22,11 +22,8 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class RecomCodeManager {
 
@@ -148,22 +145,12 @@ public class RecomCodeManager {
         t.setToIndent(false);
 
         Map<String, CodeParam> params = fragment.getParameters();
-        Map<String, CodeParam> globalParams = fragment.getGlobalParameters(openedProject);
+        Set<String> variables = fragment.searchCodeForVariables();
 
-        Set<String> visitedVariables = new HashSet<>();
-        Pattern VARS_PATTERN = Pattern.compile("\\$(.*?)\\$");
-        Matcher m = VARS_PATTERN.matcher(fragment.getCode());
-        while (m.find()) {
-            String v = m.group(1);
-            if (visitedVariables.contains(v)) {
-                continue;
-            }
-            visitedVariables.add(v);
-
+        for (String v : variables) {
             CodeParam p = null;
-            if (globalParams.containsKey(v)) {
-                p = globalParams.get(v);
-            } else if (params.containsKey(v)) {
+
+            if (params.containsKey(v)) {
                 p = params.get(v);
             }
 

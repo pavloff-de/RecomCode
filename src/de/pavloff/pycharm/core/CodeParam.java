@@ -41,7 +41,7 @@ public class CodeParam {
         return !expr.equals("");
     }
 
-    public CodeParam(Builder builder) {
+    private CodeParam(Builder builder) {
         this.recID = builder.recID;
         this.group = builder.group;
         this.name = builder.name;
