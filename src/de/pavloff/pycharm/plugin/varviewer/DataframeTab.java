@@ -96,7 +96,9 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.setCellSelectionEnabled(true);
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
-                // TODO: setSelectedDataframe
+
+                CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
+                manager.dataframeSelected(tableView.getModel());
             }
 
             @Override

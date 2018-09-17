@@ -107,34 +107,37 @@ public class RecomCodeManager {
 
     private void setCodeFragmentHandler() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+
         recommender.addCodeFragmentListener(fragments -> {
-            recomCodePanel.removeAll();
+            EventQueue.invokeLater(() -> {
+                recomCodePanel.removeAll();
 
-            if (fragments == null) {
-                return;
-            }
+                if (fragments == null) {
+                    return;
+                }
 
-            for (CodeFragment fragment : fragments) {
-                RecomCode r = new RecomCode(fragment);
+                for (CodeFragment fragment : fragments) {
+                    RecomCode r = new RecomCode(fragment);
 
-                r.addListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        recommender.codeFragmentSelected(fragment);
+                    r.addListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            recommender.codeFragmentSelected(fragment);
 
-                        Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
+                            Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
-                        if (editor != null) {
-                            TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                            templateManager.startTemplate(editor, newTemplate(fragment));
-                            IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
+                            if (editor != null) {
+                                TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
+                                templateManager.startTemplate(editor, newTemplate(fragment));
+                                IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
+                            }
                         }
-                    }
-                });
+                    });
 
-                recomCodePanel.add(r);
-            }
-            recomCodePanel.repaint();
+                    recomCodePanel.add(r);
+                }
+                recomCodePanel.repaint();
+            });
         });
     }
 
