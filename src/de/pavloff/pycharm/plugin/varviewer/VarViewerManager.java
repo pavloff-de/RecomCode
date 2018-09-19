@@ -113,9 +113,9 @@ public class VarViewerManager implements BaseConstants {
         codeContent.append(String.format("print '%s'", VAR_VIEWER_SEP)).append(LINE_SEP);
 
         URL resources = VarViewerManager.class.getResource("python/var_viewer.py");
+        StringBuilder content = new StringBuilder();
         try {
-            StringBuilder content = new StringBuilder();
-            BufferedInputStream in = (BufferedInputStream) resources.getContent();
+            FilterInputStream in = (FilterInputStream) resources.getContent();
             int bytesRead;
             byte[] bytes = new byte[256];
             while((bytesRead = in.read(bytes)) != -1) {

@@ -1,11 +1,9 @@
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.yaml.YamlLoader;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TestYamlLoader {

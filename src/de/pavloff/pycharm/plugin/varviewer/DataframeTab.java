@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.BufferedInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ class DataframeTab extends JPanel implements BaseConstants {
         String toCSV = "";
         URL resources = DataframeTab.class.getResource("python/df_to_csv.py");
         try {
-            BufferedInputStream in = (BufferedInputStream) resources.getContent();
+            FilterInputStream in = (FilterInputStream) resources.getContent();
             int bytesRead;
             byte[] bytes = new byte[128];
             while ((bytesRead = in.read(bytes)) != -1) {
