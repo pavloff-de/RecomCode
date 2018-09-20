@@ -3,21 +3,18 @@ package de.pavloff.pycharm.core;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.worker.Worker;
-import de.pavloff.pycharm.yaml.YamlLoader;
 
 import javax.swing.table.TableModel;
 import java.util.*;
 
 public class CodeFragmentManager implements Worker {
 
-    // TODO: make configurable
-    private CodeFragmentLoader loader = new YamlLoader();
-
     private Map<String, Worker> workers = new HashMap<>();
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
 
     private TableModel selectedDataframe;
+
     private Map<String, CodeVariable> myVariables = new HashMap<>();
 
     public static CodeFragmentManager getInstance(Project project) {
@@ -30,10 +27,6 @@ public class CodeFragmentManager implements Worker {
 
     public void addWorker(Worker worker) {
         workers.put(worker.workerName(), worker);
-    }
-
-    CodeFragmentLoader getLoader() {
-        return loader;
     }
 
     private void returnRecommendations() {

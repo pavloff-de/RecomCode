@@ -29,7 +29,13 @@ class RecomCode extends JPanel {
         fragmentName.setPreferredSize(textSize);
         fragmentName.setMaximumSize(textSize);
 
-        fragmentName.setText("<html>" + fragment.getCleanTextkey() + "</html>");
+        String[] textkeys = fragment.getCleanTextkeys();
+        String textkey = fragment.getCode(); // no text ?
+
+        if (textkeys != null && textkeys.length != 0) {
+            textkey = textkeys[0];
+        }
+        fragmentName.setText("<html>" + textkey + "</html>");
         add(fragmentName, c);
 
         c.gridx = 0;

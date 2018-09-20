@@ -1,8 +1,6 @@
 package de.pavloff.pycharm.core;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CodeFragment {
 
@@ -10,47 +8,24 @@ public class CodeFragment {
     private final String group;
     private final String parent;
     private final ArrayList<String> related;
-    private final ArrayList<String> textkey;
+    private final ArrayList<String> textkeys;
     private final ArrayList<String> keywords;
     private final String sources;
     private final String documentation;
     private final String code;
-    private final Map<String, CodeParam> parameters;
+    private final Map<String, CodeParam> defaultParams;
 
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
         this.group = builder.group;
         this.parent = builder.parent;
         this.related = builder.related;
-        this.textkey = builder.textkey;
+        this.textkeys = builder.textkeys;
         this.keywords = builder.keywords;
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
-        this.parameters = addCodeParams(builder.parameters);
-    }
-
-    private Map<String, CodeParam> addCodeParams(Map<String, CodeParam> codeParams) {
-        Map<String, CodeParam> fragmentParams = new HashMap<>();
-
-        for (String varName : searchCodeForVariables()) {
-            if (codeParams.containsKey(varName)) {
-                fragmentParams.put(varName, codeParams.get(varName));
-            }
-        }
-
-        return fragmentParams;
-    }
-
-    public Set<String> searchCodeForVariables() {
-        Set<String> visitedVariables = new HashSet<>();
-        Matcher m = Pattern.compile("\\$(.*?)\\$").matcher(getCode());
-
-        while (m.find()) {
-            visitedVariables.add(m.group(1));
-        }
-
-        return visitedVariables;
+        this.defaultParams = builder.defaultParams;
     }
 
     public String getRecID() {
@@ -61,6 +36,10 @@ public class CodeFragment {
         return group;
     }
 
+    public ArrayList<String> getTextkeys() {
+        return textkeys;
+    }
+
     public ArrayList<String> getKeywords() {
         return keywords;
     }
@@ -69,8 +48,12 @@ public class CodeFragment {
         return code;
     }
 
-    public Map<String, CodeParam> getParameters() {
-        return parameters;
+    public String[] getVariables() {
+        return defaultParams.keySet().toArray(new String[0]);
+    }
+
+    public Map<String, CodeParam> getDefaultParams() {
+        return defaultParams;
     }
 
     public List<CodeFragment> getWithVariables(Map<String, CodeVariable> variables) {
@@ -78,14 +61,14 @@ public class CodeFragment {
         Map<String, CodeParam> newParams = new HashMap<>();
 
         String newTextKey = "";
-        if (textkey.size() != 0) {
-            newTextKey = textkey.get(0);
+        if (textkeys.size() != 0) {
+            newTextKey = textkeys.get(0);
         }
 
         for (Map.Entry<String, CodeVariable> varEntry : variables.entrySet()) {
             String parName = varEntry.getKey();
 
-            if (parameters.containsKey(parName)) {
+            if (defaultParams.containsKey(parName)) {
                 CodeVariable var = varEntry.getValue();
                 newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
                         .setExpr("").setName(var.getType()).setVars(var.getName()).build());
@@ -100,14 +83,14 @@ public class CodeFragment {
             Builder builder = new Builder().setRecId(recID).setGroup(group)
                     .setKeywords(keywords).setSources(sources).setCode(code);
 
-            Map<String, CodeParam> updatedParams = new HashMap<>(parameters);
+            Map<String, CodeParam> updatedParams = new HashMap<>(defaultParams);
             updatedParams.putAll(newParams);
-            builder.setParameters(updatedParams);
+            builder.setDefaultParams(updatedParams);
 
             //TODO: replace text with varNames
             ArrayList<String> newTextKeys = new ArrayList<>();
             newTextKeys.add(newTextKey);
-            builder.setTextkey(newTextKeys);
+            builder.setTextkeys(newTextKeys);
 
             withVariables.add(builder.build());
         }
@@ -115,19 +98,25 @@ public class CodeFragment {
         return withVariables;
     }
 
-    public String getCleanTextkey() {
-        if (this.textkey == null) {
-            return "";
-        }
-        if (this.textkey.size() == 0) {
-            return "";
-        }
-        String[] split = this.textkey.get(0).split(" ");
-        for (int i = 0; i < split.length; i++) {
-            split[i] = split[i].split("\\|")[0];
+    public String[] getCleanTextkeys() {
+        if (textkeys == null || textkeys.size() == 0) {
+            return null;
         }
 
-        return String.join(" ", split);
+        List<String> cleanTextkeys = new ArrayList<>();
+        String splitter = " ";
+
+        for (String tk : textkeys) {
+            String[] split = tk.split(splitter);
+
+            for (int i = 0; i < split.length; i++) {
+                split[i] = split[i].split("\\|")[0];
+            }
+
+            cleanTextkeys.add(String.join(splitter, split));
+        }
+
+        return cleanTextkeys.toArray(new String[0]);
     }
 
     public static class Builder {
@@ -136,12 +125,12 @@ public class CodeFragment {
         private String group;
         private String parent;
         private ArrayList<String> related;
-        private ArrayList<String> textkey;
+        private ArrayList<String> textkeys;
         private ArrayList<String> keywords;
         private String sources;
         private String documentation;
         private String code;
-        private Map<String, CodeParam> parameters;
+        private Map<String, CodeParam> defaultParams;
 
         public Builder setRecId(String recID) {
             this.recID = recID;
@@ -163,8 +152,8 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setTextkey(ArrayList<String> textkey) {
-            this.textkey = textkey;
+        public Builder setTextkeys(ArrayList<String> textkeys) {
+            this.textkeys = textkeys;
             return this;
         }
 
@@ -188,8 +177,8 @@ public class CodeFragment {
             return this;
         }
 
-        public Builder setParameters(Map<String, CodeParam> parameterValues) {
-            this.parameters = parameterValues;
+        public Builder setDefaultParams(Map<String, CodeParam> parameterValues) {
+            this.defaultParams = parameterValues;
             return this;
         }
 

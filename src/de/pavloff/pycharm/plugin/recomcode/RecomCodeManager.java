@@ -144,8 +144,8 @@ public class RecomCodeManager {
         t.setToReformat(false);
         t.setToIndent(false);
 
-        Map<String, CodeParam> params = fragment.getParameters();
-        Set<String> variables = fragment.searchCodeForVariables();
+        Map<String, CodeParam> params = fragment.getDefaultParams();
+        String[] variables = fragment.getVariables();
 
         for (String v : variables) {
             CodeParam p = null;

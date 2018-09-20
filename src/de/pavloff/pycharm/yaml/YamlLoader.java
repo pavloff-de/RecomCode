@@ -5,11 +5,12 @@ import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeParam;
 import org.yaml.snakeyaml.Yaml;
 
-import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class YamlLoader implements CodeFragmentLoader {
 
@@ -53,7 +54,7 @@ public class YamlLoader implements CodeFragmentLoader {
         InputStream yamlFile = new FileInputStream(path);
 
         Iterable<Object> jamlSections = yamlReader.loadAll(yamlFile);
-        Map<String, CodeParam> params = new HashMap<>();
+        Map<String, CodeParam> globalParams = new HashMap<>();
 
         for (Object yamlSection : jamlSections) {
             HashMap record = (HashMap) yamlSection;
@@ -71,20 +72,24 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setVars(castToString(record.get("vars")))
                         .setExpr(castToString(record.get("expr")))
                         .build();
-                params.put(p.getName(), p);
+                globalParams.put(p.getName(), p);
 
             } else if (record.get("recType").equals("code")) {
+                String code = castToString(record.get("code"));
+                Map<String, CodeParam> defaultParams = castToParams(record.get("parameter"));
+
                 CodeFragment c = new CodeFragment.Builder()
                         .setRecId(castToString(record.get("recID")))
                         .setGroup(castToString(record.get("group")))
                         .setParent(castToString(record.get("parent")))
                         .setRelated(castToStrings(record.get("related")))
-                        .setTextkey(castToStrings(record.get("textkey")))
+                        .setTextkeys(castToStrings(record.get("textkey")))
                         .setKeywords(castToStrings(record.get("keywords")))
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
-                        .setCode(castToString(record.get("code")))
-                        .setParameters(castToParameter(params, record.get("parameter")))
+                        .setCode(code)
+                        .setDefaultParams(filterParams(
+                                parseVariables(code), defaultParams, globalParams))
                         .build();
                 fragments.add(c);
             }
@@ -113,9 +118,8 @@ public class YamlLoader implements CodeFragmentLoader {
         return castedList;
     }
 
-    private Map<String, CodeParam> castToParameter(Map<String, CodeParam> globalParams, Object list) {
+    private Map<String, CodeParam> castToParams(Object list) {
         Map<String, CodeParam> params = new HashMap<>();
-        params.putAll(globalParams);
 
         if (list == null) {
             return params;
@@ -147,6 +151,30 @@ public class YamlLoader implements CodeFragmentLoader {
             }
         } catch (ClassCastException ignored) {}
 
+        return params;
+    }
+
+    private String[] parseVariables(String code) {
+        Set<String> visitedVariables = new HashSet<>();
+        Matcher m = Pattern.compile("\\$(.*?)\\$").matcher(code);
+
+        while (m.find()) {
+            visitedVariables.add(m.group(1));
+        }
+        return visitedVariables.toArray(new String[0]);
+    }
+
+    private Map<String, CodeParam> filterParams(String[] variables, Map<String, CodeParam> defaultParams, Map<String, CodeParam> globalParams) {
+        Map<String, CodeParam> params = new HashMap<>();
+
+        for (String var : variables) {
+            if (globalParams.containsKey(var)) {
+                params.put(var, globalParams.get(var));
+            }
+            if (defaultParams.containsKey(var)) {
+                params.put(var, defaultParams.get(var));
+            }
+        }
         return params;
     }
 }
