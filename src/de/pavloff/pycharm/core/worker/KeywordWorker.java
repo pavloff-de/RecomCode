@@ -19,6 +19,7 @@ public class KeywordWorker implements Worker {
     public KeywordWorker(CodeFragmentLoader loader) {
         this.loader = loader;
         keywords = new LinkedList<>();
+        inputs = new LinkedList<>();
     }
 
     @Override
@@ -32,18 +33,18 @@ public class KeywordWorker implements Worker {
     }
 
     private void addKeyword(String keyword) {
-        if (keyword.length() < 2) {
+        final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
+                .replace("[^A-Za-z0-9]+$", "").toLowerCase();
+        if (kw.length() < 2) {
             return;
         }
-        final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
-                .replace("[^A-Za-z0-9]+$", "");
         keywords.removeIf(k -> k.equals(kw));
         keywords.add(keyword);
     }
 
     public void onInput(String input) {
-        inputs = new LinkedList<>();
-        Collections.addAll(inputs, input.split(" "));
+        inputs.clear();
+        Collections.addAll(inputs, input.toLowerCase().split(" "));
         searchForFragments();
     }
 
@@ -114,7 +115,7 @@ public class KeywordWorker implements Worker {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         for (CodeFragment fragment : loader.getCodeFragments()) {
-            int rating = fragment.containsKeywords(keywords) + fragment.containsKeywords(inputs);
+            int rating = rate(fragment);
 
             if (rating == 0) {
                 continue;
@@ -124,5 +125,30 @@ public class KeywordWorker implements Worker {
         }
 
         recommendations = sorter.sortFragments();
+    }
+
+    private int rate(CodeFragment fragment) {
+        int rating = 0;
+
+        List<String> fragmentKeywords = fragment.getKeywords();
+        if (fragmentKeywords == null || fragmentKeywords.size() == 0) {
+            return rating;
+        }
+
+        String fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
+
+        for (String keyword : keywords) {
+            if (fragmentKeyword.contains(keyword)) {
+                rating++;
+            }
+        }
+
+        for (String keyword : inputs) {
+            if (fragmentKeyword.contains(keyword)) {
+                rating++;
+            }
+        }
+
+        return rating;
     }
 }

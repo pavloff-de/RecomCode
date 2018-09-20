@@ -61,6 +61,10 @@ public class CodeFragment {
         return group;
     }
 
+    public ArrayList<String> getKeywords() {
+        return keywords;
+    }
+
     public String getCode() {
         return code;
     }
@@ -109,30 +113,6 @@ public class CodeFragment {
         }
 
         return withVariables;
-    }
-
-    private Boolean containsKeyword(String keyword) {
-        if (keyword.length() == 0) {
-            return false;
-        }
-        if (this.keywords == null) {
-            return false;
-        }
-        return String.join("", keywords).toLowerCase().contains(keyword.toLowerCase());
-    }
-
-    public int containsKeywords(List<String> keywords) {
-        if (this.keywords == null || keywords == null || keywords.size() == 0) {
-            return 0;
-        }
-
-        int numMatches = 0;
-        for (String keyword : keywords) {
-            if (containsKeyword(keyword)) {
-                numMatches++;
-            }
-        }
-        return numMatches;
     }
 
     public String getCleanTextkey() {
