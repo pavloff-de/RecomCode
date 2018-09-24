@@ -3,6 +3,7 @@ package de.pavloff.pycharm.plugin.recomcode;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.ui.JBColor;
 import de.pavloff.pycharm.core.CodeFragment;
 
 import javax.swing.*;
@@ -35,7 +36,9 @@ class RecomCode extends JPanel {
         if (textkeys != null && textkeys.length != 0) {
             textkey = textkeys[0];
         }
+
         fragmentName.setText("<html>" + textkey + "</html>");
+        fragmentName.setForeground(new JBColor(JBColor.DARK_GRAY, JBColor.LIGHT_GRAY));
         add(fragmentName, c);
 
         c.gridx = 0;
@@ -53,7 +56,7 @@ class RecomCode extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.BLACK);
+        g.setColor(new JBColor(JBColor.LIGHT_GRAY, JBColor.DARK_GRAY));
         g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // i dont know which
     }
 }
