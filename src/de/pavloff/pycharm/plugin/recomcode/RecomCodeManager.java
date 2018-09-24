@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentManager;
@@ -23,7 +24,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
-import java.util.Set;
 
 public class RecomCodeManager {
 
@@ -43,6 +43,10 @@ public class RecomCodeManager {
 
         JPanel mainPanel = new JPanel();
         searchField = new JBTextField();
+
+        JBScrollPane recomCodePanelWrapper = new JBScrollPane(
+                recomCodePanel, JBScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
         GroupLayout layout = new GroupLayout(mainPanel);
         mainPanel.setLayout(layout);
         layout.setHorizontalGroup(
@@ -50,10 +54,10 @@ public class RecomCodeManager {
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(recomCodePanelWrapper)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(searchField, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                                                .addGap(76, 76, 76)))
+                                                .addComponent(searchField, 200, 400, 600)
+                                                .addGap(100)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -62,7 +66,7 @@ public class RecomCodeManager {
                                 .addContainerGap()
                                 .addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(recomCodePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(recomCodePanelWrapper, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addContainerGap())
         );
 
