@@ -168,8 +168,12 @@ public class RecomCodeManager {
                         t.addVariable(p.getName(), macro, true);
 
                     } else {
-                        // just put default value and continue
-                        t.addVariable(p.getName(), new TextExpression(vars[0]), false);
+                        if (vars[0].length() == 0) {
+                            t.addVariable(p.getName(), new TextExpression(vars[0]), true);
+                        } else {
+                            // just put default value and continue
+                            t.addVariable(p.getName(), new TextExpression(vars[0]), false);
+                        }
                     }
                 }
             }
