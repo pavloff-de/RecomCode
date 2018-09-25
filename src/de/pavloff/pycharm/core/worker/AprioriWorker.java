@@ -46,7 +46,7 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public void dataframeSelected(TableModel table) {
+    public void dataframeSelected(String tableName, TableModel table) {
         items.add(new MyItem("DataFrame_" + table.toString()));
         searchForFragments();
     }
@@ -104,7 +104,7 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendation() {
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         return recommendations;
     }
 

@@ -35,7 +35,7 @@ public class HistoryWorker implements Worker {
     }
 
     @Override
-    public void dataframeSelected(TableModel table) {
+    public void dataframeSelected(String tableName, TableModel table) {
 
     }
 
@@ -76,7 +76,7 @@ public class HistoryWorker implements Worker {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendation() {
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
 
         if (history.size() != 0) {

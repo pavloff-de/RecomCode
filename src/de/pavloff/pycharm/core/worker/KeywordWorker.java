@@ -49,7 +49,7 @@ public class KeywordWorker implements Worker {
     }
 
     @Override
-    public void dataframeSelected(TableModel table) {
+    public void dataframeSelected(String tableName, TableModel table) {
         currentDataframe = table;
         addKeyword("dataframe");
         searchForFragments();
@@ -107,7 +107,7 @@ public class KeywordWorker implements Worker {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendation() {
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         return recommendations;
     }
 

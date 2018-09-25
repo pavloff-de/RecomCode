@@ -34,9 +34,11 @@ class DataframeTab extends JPanel implements BaseConstants {
     }
 
     void open(Project openedProject, VirtualFile openedFile, String name) {
+        String varName = name.split(" ")[1];
+
         if (tableView != null) {
             CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-            manager.dataframeSelected(tableView.getModel());
+            manager.dataframeSelected(varName, tableView.getModel());
         }
         if (isOpened) {
             return;
@@ -50,7 +52,7 @@ class DataframeTab extends JPanel implements BaseConstants {
             byte[] bytes = new byte[128];
             while ((bytesRead = in.read(bytes)) != -1) {
                 toCSV = String.format(new String(bytes, 0, bytesRead),
-                        name.split(" ")[1], DELIMITER, LINE_SEP_ESC);
+                        varName, DELIMITER, LINE_SEP_ESC);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,7 +100,7 @@ class DataframeTab extends JPanel implements BaseConstants {
                 show(tableView);
 
                 CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-                manager.dataframeSelected(tableView.getModel());
+                manager.dataframeSelected(varName, tableView.getModel());
             }
 
             @Override

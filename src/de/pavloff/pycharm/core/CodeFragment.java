@@ -56,7 +56,7 @@ public class CodeFragment {
         return defaultParams;
     }
 
-    public List<CodeFragment> getWithVariables(Map<String, CodeVariable> variables) {
+    public List<CodeFragment> getWithVariables(Map<String, List<CodeVariable>> variables) {
         List<CodeFragment> withVariables = new ArrayList<>();
         Map<String, CodeParam> newParams = new HashMap<>();
 
@@ -65,16 +65,17 @@ public class CodeFragment {
             newTextKey = textkeys.get(0);
         }
 
-        for (Map.Entry<String, CodeVariable> varEntry : variables.entrySet()) {
+        for (Map.Entry<String, List<CodeVariable>> varEntry : variables.entrySet()) {
             String parName = varEntry.getKey();
 
             if (defaultParams.containsKey(parName)) {
-                CodeVariable var = varEntry.getValue();
-                newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
-                        .setExpr("").setName(var.getType()).setVars(var.getName()).build());
+                for (CodeVariable var : varEntry.getValue()) {
+                    newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
+                            .setExpr("").setName(var.getType()).setVars(var.getName()).build());
 
-                if (newTextKey.contains(parName)) {
-                    newTextKey = newTextKey.replace(parName, var.getName());
+                    if (newTextKey.contains(parName)) {
+                        newTextKey = newTextKey.replace(parName, var.getName());
+                    }
                 }
             }
         }

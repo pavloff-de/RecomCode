@@ -17,7 +17,7 @@ public interface Worker {
 
     void onInput(String input);
 
-    void dataframeSelected(TableModel table);
+    void dataframeSelected(String tableName, TableModel table);
 
     void cellSelected(int row, int column);
 
@@ -33,5 +33,5 @@ public interface Worker {
 
     void codeVariables(Map<String, CodeVariable> variables);
 
-    LinkedHashSet<CodeFragment> getRecommendation();
+    LinkedHashSet<CodeFragment> getRecommendations();
 }
