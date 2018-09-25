@@ -4,6 +4,7 @@ import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
+import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -109,37 +110,35 @@ public class RecomCodeManager {
     private void setCodeFragmentHandler() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
 
-        recommender.addCodeFragmentListener(fragments -> {
-            EventQueue.invokeLater(() -> {
-                recomCodePanel.removeAll();
+        recommender.addCodeFragmentListener(fragments -> EventQueue.invokeLater(() -> {
+            recomCodePanel.removeAll();
 
-                if (fragments == null) {
-                    return;
-                }
+            if (fragments == null) {
+                return;
+            }
 
-                for (CodeFragment fragment : fragments) {
-                    RecomCode r = new RecomCode(fragment);
+            for (CodeFragment fragment : fragments) {
+                RecomCode r = new RecomCode(fragment);
 
-                    r.addListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            recommender.codeFragmentSelected(fragment);
+                r.addListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        recommender.codeFragmentSelected(fragment);
 
-                            Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
+                        Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
-                            if (editor != null) {
-                                TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                                templateManager.startTemplate(editor, newTemplate(fragment));
-                                IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
-                            }
+                        if (editor != null) {
+                            TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
+                            templateManager.startTemplate(editor, newTemplate(fragment));
+                            IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
                         }
-                    });
+                    }
+                });
 
-                    recomCodePanel.add(r);
-                }
-                recomCodePanel.repaint();
-            });
-        });
+                recomCodePanel.add(r);
+            }
+            recomCodePanel.repaint();
+        }));
     }
 
     private Template newTemplate(CodeFragment fragment) {
@@ -162,8 +161,16 @@ public class RecomCodeManager {
                 if (p.hasExpression()) {
                     t.addVariable(p.getName(), p.getExpr(), p.getVars(), true);
                 } else {
-                    MacroCallNode macro = new MacroCallNode(new PyVariableMacro(p.getVars().split("\\|")));
-                    t.addVariable(p.getName(), macro, true);
+                    String[] vars = p.getVars().split("\\|");
+
+                    if (vars.length > 1) {
+                        MacroCallNode macro = new MacroCallNode(new PyVariableMacro(vars));
+                        t.addVariable(p.getName(), macro, true);
+
+                    } else {
+                        // just put default value and continue
+                        t.addVariable(p.getName(), new TextExpression(vars[0]), false);
+                    }
                 }
             }
         }
