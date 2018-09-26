@@ -123,7 +123,7 @@ public class RecomCodeManager {
                 r.addListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        recommender.codeFragmentSelected(fragment);
+                        recommender.onCodeFragment(fragment);
 
                         Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 

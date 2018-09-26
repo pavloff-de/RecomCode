@@ -5,33 +5,142 @@ import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeVariable;
 
 import javax.swing.table.TableModel;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public interface Worker {
+public abstract class Worker {
 
-    String workerName();
+    private Map<String, List<CodeVariable>> myVariables = new HashMap<>();
 
-    String description();
+    private List<CodeFragment> selectedCodeFragments = new LinkedList<>();
 
-    void onInput(String input);
+    private TableModel selectedDataframe;
 
-    void dataframeSelected(String tableName, TableModel table);
+    public abstract void initialize();
 
-    void cellSelected(int row, int column);
+    public abstract String workerName();
 
-    void cellsSelected(List<Pair<Integer, Integer>> cells);
+    public abstract String description();
 
-    void rowSelected(int row);
+    public Map<String, List<CodeVariable>> getMyVariables() {
+        return myVariables;
+    }
 
-    void columnSelected(int column);
+    public TableModel getSelectedDataframe() {
+        return selectedDataframe;
+    }
 
-    void codeFragmentSelected(CodeFragment fragment);
+    public LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
+        return getSelectedCodeFragments(5);
+    }
 
-    void sourceCode(String code);
+    public LinkedHashSet<CodeFragment> getSelectedCodeFragments(int numOfFragments) {
+        LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
 
-    void codeVariables(Map<String, CodeVariable> variables);
+        if (selectedCodeFragments.size() != 0) {
+            // find last numOfFragments fragments
+            ListIterator<CodeFragment> it = selectedCodeFragments.listIterator(Math.max(selectedCodeFragments.size() - numOfFragments, 1) - 1);
+            while (it.hasNext()) {
+                lastFragments.add(it.next());
+            }
+        }
 
-    LinkedHashSet<CodeFragment> getRecommendations();
+        return lastFragments;
+    }
+
+    public abstract LinkedHashSet<CodeFragment> getRecommendations();
+
+    public void onInput(String input) {
+        inputProcessing(input);
+    }
+
+    public void onDataframe(String tableName, TableModel table) {
+        selectedDataframe = table;
+        addVariable("dataframe", "DataFrame", tableName, null, null);
+
+        dataframeProcessing(tableName, table);
+    }
+
+    public void onCell(int row, int column) {
+        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
+        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
+
+        if (selectedDataframe != null) {
+            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+        }
+
+        cellProcessing(row, column);
+    }
+
+    public void onCells(List<Pair<Integer, Integer>> cells) {
+        cellsprocessing(cells);
+    }
+
+    public void onRow(int row) {
+        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
+
+        rowProcessing(row);
+    }
+
+    public void onColumn(int column) {
+        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
+
+        if (selectedDataframe != null) {
+            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+        }
+
+        columnProcessing(column);
+    }
+
+    public void onSourcecode(String code) {
+        sourcecodeProcessing(code);
+    }
+
+    public void onVariables(Map<String, CodeVariable> variables) {
+        for (CodeVariable var : variables.values()) {
+            if (var.getType().equals("module")) {
+                addVariable(var.getType(), var.getType(), var.getName(), var.getValue(), var.getModuleName());
+            }
+        }
+
+        variablesProcessing(variables);
+    }
+
+    public void onCodeFragment(CodeFragment fragment) {
+        selectedCodeFragments.removeIf(k -> k.equals(fragment));
+        selectedCodeFragments.add(0, fragment);
+
+        codeFragmentProcessing(fragment);
+    }
+
+    protected void addVariable(String param, String type, String varName, String value, String moduleName) {
+        List<CodeVariable> vars;
+
+        if (myVariables.containsKey(param)) {
+            vars = myVariables.get(param);
+        } else {
+            vars = new LinkedList<>();
+            myVariables.put(param, vars);
+        }
+
+        vars.add(new CodeVariable.Builder()
+                .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
+    }
+
+    protected abstract void inputProcessing(String input);
+
+    protected abstract void dataframeProcessing(String tableName, TableModel table);
+
+    protected abstract void cellProcessing(int row, int column);
+
+    protected abstract void cellsprocessing(List<Pair<Integer, Integer>> cells);
+
+    protected abstract void rowProcessing(int row);
+
+    protected abstract void columnProcessing(int column);
+
+    protected abstract void sourcecodeProcessing(String code);
+
+    protected abstract void variablesProcessing(Map<String, CodeVariable> variables);
+
+    protected abstract void codeFragmentProcessing(CodeFragment fragment);
 }
