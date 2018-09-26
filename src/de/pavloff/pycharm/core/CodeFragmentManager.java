@@ -2,7 +2,10 @@ package de.pavloff.pycharm.core;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import de.pavloff.pycharm.core.worker.AprioriWorker;
+import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
+import de.pavloff.pycharm.yaml.YamlLoader;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -23,12 +26,18 @@ public class CodeFragmentManager implements Worker {
         return project.getComponent(CodeFragmentManager.class);
     }
 
-    public void addCodeFragmentListener(CodeFragmentListener listener) {
-        codeFragmentListeners.add(listener);
+    public void initialize() {
+        CodeFragmentLoader loader = new YamlLoader();
+
+        Worker kw = new KeywordWorker(loader);
+        workers.put(kw.workerName(), kw);
+
+        Worker aw = new AprioriWorker(loader);
+        workers.put(aw.workerName(), aw);
     }
 
-    public void addWorker(Worker worker) {
-        workers.put(worker.workerName(), worker);
+    public void addCodeFragmentListener(CodeFragmentListener listener) {
+        codeFragmentListeners.add(listener);
     }
 
     private void returnRecommendations() {
