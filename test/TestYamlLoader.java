@@ -23,6 +23,6 @@ public class TestYamlLoader {
         yamlReader.loadFrom(new File("src/de/pavloff/pycharm/yaml/resources/fragments-pandas.yml"));
         List<CodeFragment> fragments = yamlReader.getCodeFragments();
 
-        assert fragments.size() == 11;
+        assert fragments.size() == 12;
     }
 }
