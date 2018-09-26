@@ -13,6 +13,8 @@ public class CodeFragmentManager implements Worker {
 
     private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
 
+    private List<CodeFragment> selectedCodeFragmets = new LinkedList<>();
+
     private TableModel selectedDataframe;
 
     private Map<String, List<CodeVariable>> myVariables = new HashMap<>();
@@ -32,14 +34,20 @@ public class CodeFragmentManager implements Worker {
     private void returnRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
-        LinkedHashSet<CodeFragment> recommendation;
-        Iterator<CodeFragment> it;
-        int rank;
+        LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
+        Iterator<CodeFragment> it = recommendation.iterator();
+        int rank = recommendation.size();
+
+        while (it.hasNext()) {
+            sorter.add(it.next(), rank);
+            rank--;
+        }
 
         for (Worker worker : workers.values()) {
             recommendation = worker.getRecommendations();
             it = recommendation.iterator();
             rank = recommendation.size();
+
             while (it.hasNext()) {
                 sorter.add(it.next(), rank);
                 rank--;
@@ -162,6 +170,9 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.codeFragmentSelected(fragment);
         }
+
+        selectedCodeFragmets.removeIf(k -> k.equals(fragment));
+        selectedCodeFragmets.add(0, fragment);
     }
 
     @Override
@@ -187,5 +198,23 @@ public class CodeFragmentManager implements Worker {
     @Override
     public LinkedHashSet<CodeFragment> getRecommendations() {
         return null;
+    }
+
+    public LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
+        return getSelectedCodeFragments(5);
+    }
+
+    public LinkedHashSet<CodeFragment> getSelectedCodeFragments(int numOfFragments) {
+        LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
+
+        if (selectedCodeFragmets.size() != 0) {
+            // find last numOfFragments fragments
+            ListIterator<CodeFragment> it = selectedCodeFragmets.listIterator(Math.max(selectedCodeFragmets.size() - numOfFragments, 1) - 1);
+            while (it.hasNext()) {
+                lastFragments.add(it.next());
+            }
+        }
+
+        return lastFragments;
     }
 }

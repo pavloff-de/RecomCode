@@ -6,7 +6,6 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.worker.AprioriWorker;
-import de.pavloff.pycharm.core.worker.HistoryWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.yaml.YamlLoader;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +21,5 @@ public class RecomCodeProjectComponent implements ToolWindowFactory {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
         recommender.addWorker(new KeywordWorker(loader));
         recommender.addWorker(new AprioriWorker(loader));
-        recommender.addWorker(new HistoryWorker(loader));
     }
 }
