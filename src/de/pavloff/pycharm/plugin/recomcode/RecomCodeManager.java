@@ -148,7 +148,7 @@ public class RecomCodeManager {
         t.setToIndent(false);
 
         Map<String, CodeParam> params = fragment.getDefaultParams();
-        String[] variables = fragment.getVariables();
+        String[] variables = fragment.getParamsList();
 
         for (String v : variables) {
             CodeParam p = null;
