@@ -4,18 +4,22 @@
 package recommender_rpc;
 
 /**
- * Protobuf type {@code recommender_rpc.SuggesionData}
+ * <pre>
+ * A single code suggestion (i.e. suggested fragment)
+ * </pre>
+ *
+ * Protobuf type {@code recommender_rpc.SuggesionItem}
  */
-public  final class SuggesionData extends
+public  final class SuggesionItem extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:recommender_rpc.SuggesionData)
-    SuggesionDataOrBuilder {
+    // @@protoc_insertion_point(message_implements:recommender_rpc.SuggesionItem)
+    SuggesionItemOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use SuggesionData.newBuilder() to construct.
-  private SuggesionData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use SuggesionItem.newBuilder() to construct.
+  private SuggesionItem(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private SuggesionData() {
+  private SuggesionItem() {
     suggestionID_ = 0L;
     suggestedCode_ = "";
     comment_ = "";
@@ -27,7 +31,7 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
-  private SuggesionData(
+  private SuggesionItem(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
@@ -96,14 +100,14 @@ private static final long serialVersionUID = 0L;
   }
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionData_descriptor;
+    return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionItem_descriptor;
   }
 
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionData_fieldAccessorTable
+    return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionItem_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            recommender_rpc.SuggesionData.class, recommender_rpc.SuggesionData.Builder.class);
+            recommender_rpc.SuggesionItem.class, recommender_rpc.SuggesionItem.Builder.class);
   }
 
   private int bitField0_;
@@ -295,10 +299,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof recommender_rpc.SuggesionData)) {
+    if (!(obj instanceof recommender_rpc.SuggesionItem)) {
       return super.equals(obj);
     }
-    recommender_rpc.SuggesionData other = (recommender_rpc.SuggesionData) obj;
+    recommender_rpc.SuggesionItem other = (recommender_rpc.SuggesionItem) obj;
 
     boolean result = true;
     result = result && (getSuggestionID()
@@ -336,69 +340,69 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static recommender_rpc.SuggesionData parseFrom(byte[] data)
+  public static recommender_rpc.SuggesionItem parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static recommender_rpc.SuggesionData parseFrom(java.io.InputStream input)
+  public static recommender_rpc.SuggesionItem parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
-  public static recommender_rpc.SuggesionData parseDelimitedFrom(java.io.InputStream input)
+  public static recommender_rpc.SuggesionItem parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
-  public static recommender_rpc.SuggesionData parseDelimitedFrom(
+  public static recommender_rpc.SuggesionItem parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static recommender_rpc.SuggesionData parseFrom(
+  public static recommender_rpc.SuggesionItem parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -410,7 +414,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(recommender_rpc.SuggesionData prototype) {
+  public static Builder newBuilder(recommender_rpc.SuggesionItem prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   public Builder toBuilder() {
@@ -425,25 +429,29 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code recommender_rpc.SuggesionData}
+   * <pre>
+   * A single code suggestion (i.e. suggested fragment)
+   * </pre>
+   *
+   * Protobuf type {@code recommender_rpc.SuggesionItem}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:recommender_rpc.SuggesionData)
-      recommender_rpc.SuggesionDataOrBuilder {
+      // @@protoc_insertion_point(builder_implements:recommender_rpc.SuggesionItem)
+      recommender_rpc.SuggesionItemOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionData_descriptor;
+      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionItem_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionData_fieldAccessorTable
+      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionItem_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              recommender_rpc.SuggesionData.class, recommender_rpc.SuggesionData.Builder.class);
+              recommender_rpc.SuggesionItem.class, recommender_rpc.SuggesionItem.Builder.class);
     }
 
-    // Construct using recommender_rpc.SuggesionData.newBuilder()
+    // Construct using recommender_rpc.SuggesionItem.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -478,23 +486,23 @@ private static final long serialVersionUID = 0L;
 
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionData_descriptor;
+      return recommender_rpc.RecommenderRpcProto.internal_static_recommender_rpc_SuggesionItem_descriptor;
     }
 
-    public recommender_rpc.SuggesionData getDefaultInstanceForType() {
-      return recommender_rpc.SuggesionData.getDefaultInstance();
+    public recommender_rpc.SuggesionItem getDefaultInstanceForType() {
+      return recommender_rpc.SuggesionItem.getDefaultInstance();
     }
 
-    public recommender_rpc.SuggesionData build() {
-      recommender_rpc.SuggesionData result = buildPartial();
+    public recommender_rpc.SuggesionItem build() {
+      recommender_rpc.SuggesionItem result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
       return result;
     }
 
-    public recommender_rpc.SuggesionData buildPartial() {
-      recommender_rpc.SuggesionData result = new recommender_rpc.SuggesionData(this);
+    public recommender_rpc.SuggesionItem buildPartial() {
+      recommender_rpc.SuggesionItem result = new recommender_rpc.SuggesionItem(this);
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       result.suggestionID_ = suggestionID_;
@@ -541,16 +549,16 @@ private static final long serialVersionUID = 0L;
       return (Builder) super.addRepeatedField(field, value);
     }
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof recommender_rpc.SuggesionData) {
-        return mergeFrom((recommender_rpc.SuggesionData)other);
+      if (other instanceof recommender_rpc.SuggesionItem) {
+        return mergeFrom((recommender_rpc.SuggesionItem)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(recommender_rpc.SuggesionData other) {
-      if (other == recommender_rpc.SuggesionData.getDefaultInstance()) return this;
+    public Builder mergeFrom(recommender_rpc.SuggesionItem other) {
+      if (other == recommender_rpc.SuggesionItem.getDefaultInstance()) return this;
       if (other.getSuggestionID() != 0L) {
         setSuggestionID(other.getSuggestionID());
       }
@@ -601,11 +609,11 @@ private static final long serialVersionUID = 0L;
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      recommender_rpc.SuggesionData parsedMessage = null;
+      recommender_rpc.SuggesionItem parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        parsedMessage = (recommender_rpc.SuggesionData) e.getUnfinishedMessage();
+        parsedMessage = (recommender_rpc.SuggesionItem) e.getUnfinishedMessage();
         throw e.unwrapIOException();
       } finally {
         if (parsedMessage != null) {
@@ -1102,39 +1110,39 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:recommender_rpc.SuggesionData)
+    // @@protoc_insertion_point(builder_scope:recommender_rpc.SuggesionItem)
   }
 
-  // @@protoc_insertion_point(class_scope:recommender_rpc.SuggesionData)
-  private static final recommender_rpc.SuggesionData DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:recommender_rpc.SuggesionItem)
+  private static final recommender_rpc.SuggesionItem DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new recommender_rpc.SuggesionData();
+    DEFAULT_INSTANCE = new recommender_rpc.SuggesionItem();
   }
 
-  public static recommender_rpc.SuggesionData getDefaultInstance() {
+  public static recommender_rpc.SuggesionItem getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<SuggesionData>
-      PARSER = new com.google.protobuf.AbstractParser<SuggesionData>() {
-    public SuggesionData parsePartialFrom(
+  private static final com.google.protobuf.Parser<SuggesionItem>
+      PARSER = new com.google.protobuf.AbstractParser<SuggesionItem>() {
+    public SuggesionItem parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return new SuggesionData(input, extensionRegistry);
+      return new SuggesionItem(input, extensionRegistry);
     }
   };
 
-  public static com.google.protobuf.Parser<SuggesionData> parser() {
+  public static com.google.protobuf.Parser<SuggesionItem> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<SuggesionData> getParserForType() {
+  public com.google.protobuf.Parser<SuggesionItem> getParserForType() {
     return PARSER;
   }
 
-  public recommender_rpc.SuggesionData getDefaultInstanceForType() {
+  public recommender_rpc.SuggesionItem getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

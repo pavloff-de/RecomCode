@@ -3,8 +3,8 @@
 
 package recommender_rpc;
 
-public interface SuggesionDataOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:recommender_rpc.SuggesionData)
+public interface SuggesionItemOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:recommender_rpc.SuggesionItem)
     com.google.protobuf.MessageOrBuilder {
 
   /**

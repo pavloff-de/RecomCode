@@ -20,6 +20,7 @@ private static final long serialVersionUID = 0L;
     searchText_ = "";
     changeType_ = 0;
     activeVariables_ = java.util.Collections.emptyList();
+    userFocusHint_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -92,6 +93,15 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
+          case 242: {
+            if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+              userFocusHint_ = new java.util.ArrayList<recommender_rpc.UserFocusHint>();
+              mutable_bitField0_ |= 0x00000020;
+            }
+            userFocusHint_.add(
+                input.readMessage(recommender_rpc.UserFocusHint.parser(), extensionRegistry));
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -102,6 +112,9 @@ private static final long serialVersionUID = 0L;
     } finally {
       if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
         activeVariables_ = java.util.Collections.unmodifiableList(activeVariables_);
+      }
+      if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+        userFocusHint_ = java.util.Collections.unmodifiableList(userFocusHint_);
       }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -125,17 +138,37 @@ private static final long serialVersionUID = 0L;
   public enum ChangeType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * user changed the typed search text
+     * </pre>
+     *
      * <code>SEARCHTEXT = 0;</code>
      */
     SEARCHTEXT(0),
     /**
-     * <code>VIEWERSTATE = 1;</code>
+     * <pre>
+     * changes in the variable viewer state
+     * </pre>
+     *
+     * <code>VARVIEWERSTATE = 1;</code>
      */
-    VIEWERSTATE(1),
+    VARVIEWERSTATE(1),
     /**
-     * <code>PREFERENCES = 2;</code>
+     * <pre>
+     * source file was changed
+     * </pre>
+     *
+     * <code>SOURCEFILE = 2;</code>
      */
-    PREFERENCES(2),
+    SOURCEFILE(2),
+    /**
+     * <pre>
+     * prefered vars, domains etc. changed
+     * </pre>
+     *
+     * <code>PREFERENCES = 3;</code>
+     */
+    PREFERENCES(3),
     /**
      * <pre>
      * should force complete re-computation
@@ -148,17 +181,37 @@ private static final long serialVersionUID = 0L;
     ;
 
     /**
+     * <pre>
+     * user changed the typed search text
+     * </pre>
+     *
      * <code>SEARCHTEXT = 0;</code>
      */
     public static final int SEARCHTEXT_VALUE = 0;
     /**
-     * <code>VIEWERSTATE = 1;</code>
+     * <pre>
+     * changes in the variable viewer state
+     * </pre>
+     *
+     * <code>VARVIEWERSTATE = 1;</code>
      */
-    public static final int VIEWERSTATE_VALUE = 1;
+    public static final int VARVIEWERSTATE_VALUE = 1;
     /**
-     * <code>PREFERENCES = 2;</code>
+     * <pre>
+     * source file was changed
+     * </pre>
+     *
+     * <code>SOURCEFILE = 2;</code>
      */
-    public static final int PREFERENCES_VALUE = 2;
+    public static final int SOURCEFILE_VALUE = 2;
+    /**
+     * <pre>
+     * prefered vars, domains etc. changed
+     * </pre>
+     *
+     * <code>PREFERENCES = 3;</code>
+     */
+    public static final int PREFERENCES_VALUE = 3;
     /**
      * <pre>
      * should force complete re-computation
@@ -188,8 +241,9 @@ private static final long serialVersionUID = 0L;
     public static ChangeType forNumber(int value) {
       switch (value) {
         case 0: return SEARCHTEXT;
-        case 1: return VIEWERSTATE;
-        case 2: return PREFERENCES;
+        case 1: return VARVIEWERSTATE;
+        case 2: return SOURCEFILE;
+        case 3: return PREFERENCES;
         case 10: return OTHER;
         default: return null;
       }
@@ -341,34 +395,57 @@ private static final long serialVersionUID = 0L;
   public static final int VIEWERSTATE_FIELD_NUMBER = 20;
   private recommender_rpc.ViewerSelectionState viewerState_;
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   public boolean hasViewerState() {
     return viewerState_ != null;
   }
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   public recommender_rpc.ViewerSelectionState getViewerState() {
     return viewerState_ == null ? recommender_rpc.ViewerSelectionState.getDefaultInstance() : viewerState_;
   }
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   public recommender_rpc.ViewerSelectionStateOrBuilder getViewerStateOrBuilder() {
     return getViewerState();
+  }
+
+  public static final int USERFOCUSHINT_FIELD_NUMBER = 30;
+  private java.util.List<recommender_rpc.UserFocusHint> userFocusHint_;
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  public java.util.List<recommender_rpc.UserFocusHint> getUserFocusHintList() {
+    return userFocusHint_;
+  }
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  public java.util.List<? extends recommender_rpc.UserFocusHintOrBuilder> 
+      getUserFocusHintOrBuilderList() {
+    return userFocusHint_;
+  }
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  public int getUserFocusHintCount() {
+    return userFocusHint_.size();
+  }
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  public recommender_rpc.UserFocusHint getUserFocusHint(int index) {
+    return userFocusHint_.get(index);
+  }
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  public recommender_rpc.UserFocusHintOrBuilder getUserFocusHintOrBuilder(
+      int index) {
+    return userFocusHint_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -398,6 +475,9 @@ private static final long serialVersionUID = 0L;
     if (viewerState_ != null) {
       output.writeMessage(20, getViewerState());
     }
+    for (int i = 0; i < userFocusHint_.size(); i++) {
+      output.writeMessage(30, userFocusHint_.get(i));
+    }
     unknownFields.writeTo(output);
   }
 
@@ -424,6 +504,10 @@ private static final long serialVersionUID = 0L;
     if (viewerState_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(20, getViewerState());
+    }
+    for (int i = 0; i < userFocusHint_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(30, userFocusHint_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -453,6 +537,8 @@ private static final long serialVersionUID = 0L;
       result = result && getViewerState()
           .equals(other.getViewerState());
     }
+    result = result && getUserFocusHintList()
+        .equals(other.getUserFocusHintList());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -478,6 +564,10 @@ private static final long serialVersionUID = 0L;
     if (hasViewerState()) {
       hash = (37 * hash) + VIEWERSTATE_FIELD_NUMBER;
       hash = (53 * hash) + getViewerState().hashCode();
+    }
+    if (getUserFocusHintCount() > 0) {
+      hash = (37 * hash) + USERFOCUSHINT_FIELD_NUMBER;
+      hash = (53 * hash) + getUserFocusHintList().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -605,6 +695,7 @@ private static final long serialVersionUID = 0L;
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
         getActiveVariablesFieldBuilder();
+        getUserFocusHintFieldBuilder();
       }
     }
     public Builder clear() {
@@ -626,6 +717,12 @@ private static final long serialVersionUID = 0L;
       } else {
         viewerState_ = null;
         viewerStateBuilder_ = null;
+      }
+      if (userFocusHintBuilder_ == null) {
+        userFocusHint_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000020);
+      } else {
+        userFocusHintBuilder_.clear();
       }
       return this;
     }
@@ -667,6 +764,15 @@ private static final long serialVersionUID = 0L;
         result.viewerState_ = viewerState_;
       } else {
         result.viewerState_ = viewerStateBuilder_.build();
+      }
+      if (userFocusHintBuilder_ == null) {
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          userFocusHint_ = java.util.Collections.unmodifiableList(userFocusHint_);
+          bitField0_ = (bitField0_ & ~0x00000020);
+        }
+        result.userFocusHint_ = userFocusHint_;
+      } else {
+        result.userFocusHint_ = userFocusHintBuilder_.build();
       }
       result.bitField0_ = to_bitField0_;
       onBuilt();
@@ -748,6 +854,32 @@ private static final long serialVersionUID = 0L;
       }
       if (other.hasViewerState()) {
         mergeViewerState(other.getViewerState());
+      }
+      if (userFocusHintBuilder_ == null) {
+        if (!other.userFocusHint_.isEmpty()) {
+          if (userFocusHint_.isEmpty()) {
+            userFocusHint_ = other.userFocusHint_;
+            bitField0_ = (bitField0_ & ~0x00000020);
+          } else {
+            ensureUserFocusHintIsMutable();
+            userFocusHint_.addAll(other.userFocusHint_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.userFocusHint_.isEmpty()) {
+          if (userFocusHintBuilder_.isEmpty()) {
+            userFocusHintBuilder_.dispose();
+            userFocusHintBuilder_ = null;
+            userFocusHint_ = other.userFocusHint_;
+            bitField0_ = (bitField0_ & ~0x00000020);
+            userFocusHintBuilder_ = 
+              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                 getUserFocusHintFieldBuilder() : null;
+          } else {
+            userFocusHintBuilder_.addAllMessages(other.userFocusHint_);
+          }
+        }
       }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
@@ -1160,20 +1292,12 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         recommender_rpc.ViewerSelectionState, recommender_rpc.ViewerSelectionState.Builder, recommender_rpc.ViewerSelectionStateOrBuilder> viewerStateBuilder_;
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public boolean hasViewerState() {
       return viewerStateBuilder_ != null || viewerState_ != null;
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public recommender_rpc.ViewerSelectionState getViewerState() {
@@ -1184,10 +1308,6 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public Builder setViewerState(recommender_rpc.ViewerSelectionState value) {
@@ -1204,10 +1324,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public Builder setViewerState(
@@ -1222,10 +1338,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public Builder mergeViewerState(recommender_rpc.ViewerSelectionState value) {
@@ -1244,10 +1356,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public Builder clearViewerState() {
@@ -1262,10 +1370,6 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public recommender_rpc.ViewerSelectionState.Builder getViewerStateBuilder() {
@@ -1274,10 +1378,6 @@ private static final long serialVersionUID = 0L;
       return getViewerStateFieldBuilder().getBuilder();
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     public recommender_rpc.ViewerSelectionStateOrBuilder getViewerStateOrBuilder() {
@@ -1289,10 +1389,6 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <pre>
-     * We might all add the prefs like preferred variables etc.
-     * </pre>
-     *
      * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
@@ -1307,6 +1403,246 @@ private static final long serialVersionUID = 0L;
         viewerState_ = null;
       }
       return viewerStateBuilder_;
+    }
+
+    private java.util.List<recommender_rpc.UserFocusHint> userFocusHint_ =
+      java.util.Collections.emptyList();
+    private void ensureUserFocusHintIsMutable() {
+      if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        userFocusHint_ = new java.util.ArrayList<recommender_rpc.UserFocusHint>(userFocusHint_);
+        bitField0_ |= 0x00000020;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        recommender_rpc.UserFocusHint, recommender_rpc.UserFocusHint.Builder, recommender_rpc.UserFocusHintOrBuilder> userFocusHintBuilder_;
+
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public java.util.List<recommender_rpc.UserFocusHint> getUserFocusHintList() {
+      if (userFocusHintBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(userFocusHint_);
+      } else {
+        return userFocusHintBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public int getUserFocusHintCount() {
+      if (userFocusHintBuilder_ == null) {
+        return userFocusHint_.size();
+      } else {
+        return userFocusHintBuilder_.getCount();
+      }
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public recommender_rpc.UserFocusHint getUserFocusHint(int index) {
+      if (userFocusHintBuilder_ == null) {
+        return userFocusHint_.get(index);
+      } else {
+        return userFocusHintBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder setUserFocusHint(
+        int index, recommender_rpc.UserFocusHint value) {
+      if (userFocusHintBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.set(index, value);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder setUserFocusHint(
+        int index, recommender_rpc.UserFocusHint.Builder builderForValue) {
+      if (userFocusHintBuilder_ == null) {
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        userFocusHintBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder addUserFocusHint(recommender_rpc.UserFocusHint value) {
+      if (userFocusHintBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.add(value);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder addUserFocusHint(
+        int index, recommender_rpc.UserFocusHint value) {
+      if (userFocusHintBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.add(index, value);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder addUserFocusHint(
+        recommender_rpc.UserFocusHint.Builder builderForValue) {
+      if (userFocusHintBuilder_ == null) {
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.add(builderForValue.build());
+        onChanged();
+      } else {
+        userFocusHintBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder addUserFocusHint(
+        int index, recommender_rpc.UserFocusHint.Builder builderForValue) {
+      if (userFocusHintBuilder_ == null) {
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        userFocusHintBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder addAllUserFocusHint(
+        java.lang.Iterable<? extends recommender_rpc.UserFocusHint> values) {
+      if (userFocusHintBuilder_ == null) {
+        ensureUserFocusHintIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, userFocusHint_);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder clearUserFocusHint() {
+      if (userFocusHintBuilder_ == null) {
+        userFocusHint_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public Builder removeUserFocusHint(int index) {
+      if (userFocusHintBuilder_ == null) {
+        ensureUserFocusHintIsMutable();
+        userFocusHint_.remove(index);
+        onChanged();
+      } else {
+        userFocusHintBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public recommender_rpc.UserFocusHint.Builder getUserFocusHintBuilder(
+        int index) {
+      return getUserFocusHintFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public recommender_rpc.UserFocusHintOrBuilder getUserFocusHintOrBuilder(
+        int index) {
+      if (userFocusHintBuilder_ == null) {
+        return userFocusHint_.get(index);  } else {
+        return userFocusHintBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public java.util.List<? extends recommender_rpc.UserFocusHintOrBuilder> 
+         getUserFocusHintOrBuilderList() {
+      if (userFocusHintBuilder_ != null) {
+        return userFocusHintBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(userFocusHint_);
+      }
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public recommender_rpc.UserFocusHint.Builder addUserFocusHintBuilder() {
+      return getUserFocusHintFieldBuilder().addBuilder(
+          recommender_rpc.UserFocusHint.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public recommender_rpc.UserFocusHint.Builder addUserFocusHintBuilder(
+        int index) {
+      return getUserFocusHintFieldBuilder().addBuilder(
+          index, recommender_rpc.UserFocusHint.getDefaultInstance());
+    }
+    /**
+     * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+     */
+    public java.util.List<recommender_rpc.UserFocusHint.Builder> 
+         getUserFocusHintBuilderList() {
+      return getUserFocusHintFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        recommender_rpc.UserFocusHint, recommender_rpc.UserFocusHint.Builder, recommender_rpc.UserFocusHintOrBuilder> 
+        getUserFocusHintFieldBuilder() {
+      if (userFocusHintBuilder_ == null) {
+        userFocusHintBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+            recommender_rpc.UserFocusHint, recommender_rpc.UserFocusHint.Builder, recommender_rpc.UserFocusHintOrBuilder>(
+                userFocusHint_,
+                ((bitField0_ & 0x00000020) == 0x00000020),
+                getParentForChildren(),
+                isClean());
+        userFocusHint_ = null;
+      }
+      return userFocusHintBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

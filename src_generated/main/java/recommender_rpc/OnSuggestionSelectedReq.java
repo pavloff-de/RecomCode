@@ -4,6 +4,10 @@
 package recommender_rpc;
 
 /**
+ * <pre>
+ * This is for later: when a particular suggested fragment is selected, the GUI informs the engine about this fact
+ * </pre>
+ *
  * Protobuf type {@code recommender_rpc.OnSuggestionSelectedReq}
  */
 public  final class OnSuggestionSelectedReq extends
@@ -17,6 +21,7 @@ private static final long serialVersionUID = 0L;
   }
   private OnSuggestionSelectedReq() {
     sessionId_ = 0L;
+    suggestionID_ = 0L;
   }
 
   @java.lang.Override
@@ -55,6 +60,11 @@ private static final long serialVersionUID = 0L;
             sessionId_ = input.readInt64();
             break;
           }
+          case 16: {
+
+            suggestionID_ = input.readInt64();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -82,14 +92,23 @@ private static final long serialVersionUID = 0L;
   public static final int SESSIONID_FIELD_NUMBER = 1;
   private long sessionId_;
   /**
-   * <pre>
-   * todo
-   * </pre>
-   *
    * <code>int64 sessionId = 1;</code>
    */
   public long getSessionId() {
     return sessionId_;
+  }
+
+  public static final int SUGGESTIONID_FIELD_NUMBER = 2;
+  private long suggestionID_;
+  /**
+   * <pre>
+   * might have more infos
+   * </pre>
+   *
+   * <code>int64 suggestionID = 2;</code>
+   */
+  public long getSuggestionID() {
+    return suggestionID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -107,6 +126,9 @@ private static final long serialVersionUID = 0L;
     if (sessionId_ != 0L) {
       output.writeInt64(1, sessionId_);
     }
+    if (suggestionID_ != 0L) {
+      output.writeInt64(2, suggestionID_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -118,6 +140,10 @@ private static final long serialVersionUID = 0L;
     if (sessionId_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(1, sessionId_);
+    }
+    if (suggestionID_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(2, suggestionID_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -137,6 +163,8 @@ private static final long serialVersionUID = 0L;
     boolean result = true;
     result = result && (getSessionId()
         == other.getSessionId());
+    result = result && (getSuggestionID()
+        == other.getSuggestionID());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -151,6 +179,9 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + SESSIONID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getSessionId());
+    hash = (37 * hash) + SUGGESTIONID_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getSuggestionID());
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -245,6 +276,10 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * This is for later: when a particular suggested fragment is selected, the GUI informs the engine about this fact
+   * </pre>
+   *
    * Protobuf type {@code recommender_rpc.OnSuggestionSelectedReq}
    */
   public static final class Builder extends
@@ -282,6 +317,8 @@ private static final long serialVersionUID = 0L;
       super.clear();
       sessionId_ = 0L;
 
+      suggestionID_ = 0L;
+
       return this;
     }
 
@@ -305,6 +342,7 @@ private static final long serialVersionUID = 0L;
     public recommender_rpc.OnSuggestionSelectedReq buildPartial() {
       recommender_rpc.OnSuggestionSelectedReq result = new recommender_rpc.OnSuggestionSelectedReq(this);
       result.sessionId_ = sessionId_;
+      result.suggestionID_ = suggestionID_;
       onBuilt();
       return result;
     }
@@ -349,6 +387,9 @@ private static final long serialVersionUID = 0L;
       if (other.getSessionId() != 0L) {
         setSessionId(other.getSessionId());
       }
+      if (other.getSuggestionID() != 0L) {
+        setSuggestionID(other.getSuggestionID());
+      }
       this.mergeUnknownFields(other.unknownFields);
       onChanged();
       return this;
@@ -378,20 +419,12 @@ private static final long serialVersionUID = 0L;
 
     private long sessionId_ ;
     /**
-     * <pre>
-     * todo
-     * </pre>
-     *
      * <code>int64 sessionId = 1;</code>
      */
     public long getSessionId() {
       return sessionId_;
     }
     /**
-     * <pre>
-     * todo
-     * </pre>
-     *
      * <code>int64 sessionId = 1;</code>
      */
     public Builder setSessionId(long value) {
@@ -401,15 +434,49 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <pre>
-     * todo
-     * </pre>
-     *
      * <code>int64 sessionId = 1;</code>
      */
     public Builder clearSessionId() {
       
       sessionId_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private long suggestionID_ ;
+    /**
+     * <pre>
+     * might have more infos
+     * </pre>
+     *
+     * <code>int64 suggestionID = 2;</code>
+     */
+    public long getSuggestionID() {
+      return suggestionID_;
+    }
+    /**
+     * <pre>
+     * might have more infos
+     * </pre>
+     *
+     * <code>int64 suggestionID = 2;</code>
+     */
+    public Builder setSuggestionID(long value) {
+      
+      suggestionID_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * might have more infos
+     * </pre>
+     *
+     * <code>int64 suggestionID = 2;</code>
+     */
+    public Builder clearSuggestionID() {
+      
+      suggestionID_ = 0L;
       onChanged();
       return this;
     }

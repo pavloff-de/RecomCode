@@ -13,26 +13,43 @@ public interface SuggestionsSetRespOrBuilder extends
   long getSessionId();
 
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <pre>
+   * change of this response compared to previous one
+   * </pre>
+   *
+   * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
    */
-  java.util.List<recommender_rpc.SuggesionData> 
-      getSuggestionsList();
+  int getResponseChangeValue();
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <pre>
+   * change of this response compared to previous one
+   * </pre>
+   *
+   * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
    */
-  recommender_rpc.SuggesionData getSuggestions(int index);
+  recommender_rpc.SuggestionsSetResp.ResponseChange getResponseChange();
+
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  int getSuggestionsCount();
+  java.util.List<recommender_rpc.SuggesionItem> 
+      getSuggestionItemsList();
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  java.util.List<? extends recommender_rpc.SuggesionDataOrBuilder> 
-      getSuggestionsOrBuilderList();
+  recommender_rpc.SuggesionItem getSuggestionItems(int index);
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  recommender_rpc.SuggesionDataOrBuilder getSuggestionsOrBuilder(
+  int getSuggestionItemsCount();
+  /**
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
+   */
+  java.util.List<? extends recommender_rpc.SuggesionItemOrBuilder> 
+      getSuggestionItemsOrBuilderList();
+  /**
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
+   */
+  recommender_rpc.SuggesionItemOrBuilder getSuggestionItemsOrBuilder(
       int index);
 }

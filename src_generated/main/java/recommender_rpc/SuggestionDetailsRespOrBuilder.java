@@ -8,11 +8,16 @@ public interface SuggestionDetailsRespOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
+   * <code>int64 sessionId = 1;</code>
+   */
+  long getSessionId();
+
+  /**
    * <pre>
    * todo
    * </pre>
    *
-   * <code>int64 sessionId = 1;</code>
+   * <code>int64 suggestionID = 2;</code>
    */
-  long getSessionId();
+  long getSuggestionID();
 }

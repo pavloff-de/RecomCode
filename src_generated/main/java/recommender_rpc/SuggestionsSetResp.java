@@ -4,6 +4,10 @@
 package recommender_rpc;
 
 /**
+ * <pre>
+ * The list of suggestions, main answer from the recom-engine
+ * </pre>
+ *
  * Protobuf type {@code recommender_rpc.SuggestionsSetResp}
  */
 public  final class SuggestionsSetResp extends
@@ -17,7 +21,8 @@ private static final long serialVersionUID = 0L;
   }
   private SuggestionsSetResp() {
     sessionId_ = 0L;
-    suggestions_ = java.util.Collections.emptyList();
+    responseChange_ = 0;
+    suggestionItems_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -56,13 +61,19 @@ private static final long serialVersionUID = 0L;
             sessionId_ = input.readInt64();
             break;
           }
-          case 18: {
-            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-              suggestions_ = new java.util.ArrayList<recommender_rpc.SuggesionData>();
-              mutable_bitField0_ |= 0x00000002;
+          case 16: {
+            int rawValue = input.readEnum();
+
+            responseChange_ = rawValue;
+            break;
+          }
+          case 26: {
+            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              suggestionItems_ = new java.util.ArrayList<recommender_rpc.SuggesionItem>();
+              mutable_bitField0_ |= 0x00000004;
             }
-            suggestions_.add(
-                input.readMessage(recommender_rpc.SuggesionData.parser(), extensionRegistry));
+            suggestionItems_.add(
+                input.readMessage(recommender_rpc.SuggesionItem.parser(), extensionRegistry));
             break;
           }
         }
@@ -73,8 +84,8 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-        suggestions_ = java.util.Collections.unmodifiableList(suggestions_);
+      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        suggestionItems_ = java.util.Collections.unmodifiableList(suggestionItems_);
       }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -92,6 +103,104 @@ private static final long serialVersionUID = 0L;
             recommender_rpc.SuggestionsSetResp.class, recommender_rpc.SuggestionsSetResp.Builder.class);
   }
 
+  /**
+   * Protobuf enum {@code recommender_rpc.SuggestionsSetResp.ResponseChange}
+   */
+  public enum ResponseChange
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>NO_CHANGE = 0;</code>
+     */
+    NO_CHANGE(0),
+    /**
+     * <code>UPDATE = 1;</code>
+     */
+    UPDATE(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>NO_CHANGE = 0;</code>
+     */
+    public static final int NO_CHANGE_VALUE = 0;
+    /**
+     * <code>UPDATE = 1;</code>
+     */
+    public static final int UPDATE_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static ResponseChange valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static ResponseChange forNumber(int value) {
+      switch (value) {
+        case 0: return NO_CHANGE;
+        case 1: return UPDATE;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<ResponseChange>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        ResponseChange> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<ResponseChange>() {
+            public ResponseChange findValueByNumber(int number) {
+              return ResponseChange.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return recommender_rpc.SuggestionsSetResp.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final ResponseChange[] VALUES = values();
+
+    public static ResponseChange valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private ResponseChange(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:recommender_rpc.SuggestionsSetResp.ResponseChange)
+  }
+
   private int bitField0_;
   public static final int SESSIONID_FIELD_NUMBER = 1;
   private long sessionId_;
@@ -102,39 +211,63 @@ private static final long serialVersionUID = 0L;
     return sessionId_;
   }
 
-  public static final int SUGGESTIONS_FIELD_NUMBER = 2;
-  private java.util.List<recommender_rpc.SuggesionData> suggestions_;
+  public static final int RESPONSECHANGE_FIELD_NUMBER = 2;
+  private int responseChange_;
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <pre>
+   * change of this response compared to previous one
+   * </pre>
+   *
+   * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
    */
-  public java.util.List<recommender_rpc.SuggesionData> getSuggestionsList() {
-    return suggestions_;
+  public int getResponseChangeValue() {
+    return responseChange_;
   }
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <pre>
+   * change of this response compared to previous one
+   * </pre>
+   *
+   * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
    */
-  public java.util.List<? extends recommender_rpc.SuggesionDataOrBuilder> 
-      getSuggestionsOrBuilderList() {
-    return suggestions_;
+  public recommender_rpc.SuggestionsSetResp.ResponseChange getResponseChange() {
+    recommender_rpc.SuggestionsSetResp.ResponseChange result = recommender_rpc.SuggestionsSetResp.ResponseChange.valueOf(responseChange_);
+    return result == null ? recommender_rpc.SuggestionsSetResp.ResponseChange.UNRECOGNIZED : result;
+  }
+
+  public static final int SUGGESTIONITEMS_FIELD_NUMBER = 3;
+  private java.util.List<recommender_rpc.SuggesionItem> suggestionItems_;
+  /**
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
+   */
+  public java.util.List<recommender_rpc.SuggesionItem> getSuggestionItemsList() {
+    return suggestionItems_;
   }
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  public int getSuggestionsCount() {
-    return suggestions_.size();
+  public java.util.List<? extends recommender_rpc.SuggesionItemOrBuilder> 
+      getSuggestionItemsOrBuilderList() {
+    return suggestionItems_;
   }
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  public recommender_rpc.SuggesionData getSuggestions(int index) {
-    return suggestions_.get(index);
+  public int getSuggestionItemsCount() {
+    return suggestionItems_.size();
   }
   /**
-   * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
    */
-  public recommender_rpc.SuggesionDataOrBuilder getSuggestionsOrBuilder(
+  public recommender_rpc.SuggesionItem getSuggestionItems(int index) {
+    return suggestionItems_.get(index);
+  }
+  /**
+   * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
+   */
+  public recommender_rpc.SuggesionItemOrBuilder getSuggestionItemsOrBuilder(
       int index) {
-    return suggestions_.get(index);
+    return suggestionItems_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -152,8 +285,11 @@ private static final long serialVersionUID = 0L;
     if (sessionId_ != 0L) {
       output.writeInt64(1, sessionId_);
     }
-    for (int i = 0; i < suggestions_.size(); i++) {
-      output.writeMessage(2, suggestions_.get(i));
+    if (responseChange_ != recommender_rpc.SuggestionsSetResp.ResponseChange.NO_CHANGE.getNumber()) {
+      output.writeEnum(2, responseChange_);
+    }
+    for (int i = 0; i < suggestionItems_.size(); i++) {
+      output.writeMessage(3, suggestionItems_.get(i));
     }
     unknownFields.writeTo(output);
   }
@@ -167,9 +303,13 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(1, sessionId_);
     }
-    for (int i = 0; i < suggestions_.size(); i++) {
+    if (responseChange_ != recommender_rpc.SuggestionsSetResp.ResponseChange.NO_CHANGE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, suggestions_.get(i));
+        .computeEnumSize(2, responseChange_);
+    }
+    for (int i = 0; i < suggestionItems_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(3, suggestionItems_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -189,8 +329,9 @@ private static final long serialVersionUID = 0L;
     boolean result = true;
     result = result && (getSessionId()
         == other.getSessionId());
-    result = result && getSuggestionsList()
-        .equals(other.getSuggestionsList());
+    result = result && responseChange_ == other.responseChange_;
+    result = result && getSuggestionItemsList()
+        .equals(other.getSuggestionItemsList());
     result = result && unknownFields.equals(other.unknownFields);
     return result;
   }
@@ -205,9 +346,11 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + SESSIONID_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getSessionId());
-    if (getSuggestionsCount() > 0) {
-      hash = (37 * hash) + SUGGESTIONS_FIELD_NUMBER;
-      hash = (53 * hash) + getSuggestionsList().hashCode();
+    hash = (37 * hash) + RESPONSECHANGE_FIELD_NUMBER;
+    hash = (53 * hash) + responseChange_;
+    if (getSuggestionItemsCount() > 0) {
+      hash = (37 * hash) + SUGGESTIONITEMS_FIELD_NUMBER;
+      hash = (53 * hash) + getSuggestionItemsList().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -303,6 +446,10 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
+   * <pre>
+   * The list of suggestions, main answer from the recom-engine
+   * </pre>
+   *
    * Protobuf type {@code recommender_rpc.SuggestionsSetResp}
    */
   public static final class Builder extends
@@ -334,18 +481,20 @@ private static final long serialVersionUID = 0L;
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
-        getSuggestionsFieldBuilder();
+        getSuggestionItemsFieldBuilder();
       }
     }
     public Builder clear() {
       super.clear();
       sessionId_ = 0L;
 
-      if (suggestionsBuilder_ == null) {
-        suggestions_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000002);
+      responseChange_ = 0;
+
+      if (suggestionItemsBuilder_ == null) {
+        suggestionItems_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
       } else {
-        suggestionsBuilder_.clear();
+        suggestionItemsBuilder_.clear();
       }
       return this;
     }
@@ -372,14 +521,15 @@ private static final long serialVersionUID = 0L;
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
       result.sessionId_ = sessionId_;
-      if (suggestionsBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          suggestions_ = java.util.Collections.unmodifiableList(suggestions_);
-          bitField0_ = (bitField0_ & ~0x00000002);
+      result.responseChange_ = responseChange_;
+      if (suggestionItemsBuilder_ == null) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          suggestionItems_ = java.util.Collections.unmodifiableList(suggestionItems_);
+          bitField0_ = (bitField0_ & ~0x00000004);
         }
-        result.suggestions_ = suggestions_;
+        result.suggestionItems_ = suggestionItems_;
       } else {
-        result.suggestions_ = suggestionsBuilder_.build();
+        result.suggestionItems_ = suggestionItemsBuilder_.build();
       }
       result.bitField0_ = to_bitField0_;
       onBuilt();
@@ -426,29 +576,32 @@ private static final long serialVersionUID = 0L;
       if (other.getSessionId() != 0L) {
         setSessionId(other.getSessionId());
       }
-      if (suggestionsBuilder_ == null) {
-        if (!other.suggestions_.isEmpty()) {
-          if (suggestions_.isEmpty()) {
-            suggestions_ = other.suggestions_;
-            bitField0_ = (bitField0_ & ~0x00000002);
+      if (other.responseChange_ != 0) {
+        setResponseChangeValue(other.getResponseChangeValue());
+      }
+      if (suggestionItemsBuilder_ == null) {
+        if (!other.suggestionItems_.isEmpty()) {
+          if (suggestionItems_.isEmpty()) {
+            suggestionItems_ = other.suggestionItems_;
+            bitField0_ = (bitField0_ & ~0x00000004);
           } else {
-            ensureSuggestionsIsMutable();
-            suggestions_.addAll(other.suggestions_);
+            ensureSuggestionItemsIsMutable();
+            suggestionItems_.addAll(other.suggestionItems_);
           }
           onChanged();
         }
       } else {
-        if (!other.suggestions_.isEmpty()) {
-          if (suggestionsBuilder_.isEmpty()) {
-            suggestionsBuilder_.dispose();
-            suggestionsBuilder_ = null;
-            suggestions_ = other.suggestions_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-            suggestionsBuilder_ = 
+        if (!other.suggestionItems_.isEmpty()) {
+          if (suggestionItemsBuilder_.isEmpty()) {
+            suggestionItemsBuilder_.dispose();
+            suggestionItemsBuilder_ = null;
+            suggestionItems_ = other.suggestionItems_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+            suggestionItemsBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getSuggestionsFieldBuilder() : null;
+                 getSuggestionItemsFieldBuilder() : null;
           } else {
-            suggestionsBuilder_.addAllMessages(other.suggestions_);
+            suggestionItemsBuilder_.addAllMessages(other.suggestionItems_);
           }
         }
       }
@@ -506,244 +659,308 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.util.List<recommender_rpc.SuggesionData> suggestions_ =
+    private int responseChange_ = 0;
+    /**
+     * <pre>
+     * change of this response compared to previous one
+     * </pre>
+     *
+     * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
+     */
+    public int getResponseChangeValue() {
+      return responseChange_;
+    }
+    /**
+     * <pre>
+     * change of this response compared to previous one
+     * </pre>
+     *
+     * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
+     */
+    public Builder setResponseChangeValue(int value) {
+      responseChange_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * change of this response compared to previous one
+     * </pre>
+     *
+     * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
+     */
+    public recommender_rpc.SuggestionsSetResp.ResponseChange getResponseChange() {
+      recommender_rpc.SuggestionsSetResp.ResponseChange result = recommender_rpc.SuggestionsSetResp.ResponseChange.valueOf(responseChange_);
+      return result == null ? recommender_rpc.SuggestionsSetResp.ResponseChange.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * change of this response compared to previous one
+     * </pre>
+     *
+     * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
+     */
+    public Builder setResponseChange(recommender_rpc.SuggestionsSetResp.ResponseChange value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      
+      responseChange_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * change of this response compared to previous one
+     * </pre>
+     *
+     * <code>.recommender_rpc.SuggestionsSetResp.ResponseChange responseChange = 2;</code>
+     */
+    public Builder clearResponseChange() {
+      
+      responseChange_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private java.util.List<recommender_rpc.SuggesionItem> suggestionItems_ =
       java.util.Collections.emptyList();
-    private void ensureSuggestionsIsMutable() {
-      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-        suggestions_ = new java.util.ArrayList<recommender_rpc.SuggesionData>(suggestions_);
-        bitField0_ |= 0x00000002;
+    private void ensureSuggestionItemsIsMutable() {
+      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        suggestionItems_ = new java.util.ArrayList<recommender_rpc.SuggesionItem>(suggestionItems_);
+        bitField0_ |= 0x00000004;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        recommender_rpc.SuggesionData, recommender_rpc.SuggesionData.Builder, recommender_rpc.SuggesionDataOrBuilder> suggestionsBuilder_;
+        recommender_rpc.SuggesionItem, recommender_rpc.SuggesionItem.Builder, recommender_rpc.SuggesionItemOrBuilder> suggestionItemsBuilder_;
 
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public java.util.List<recommender_rpc.SuggesionData> getSuggestionsList() {
-      if (suggestionsBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(suggestions_);
+    public java.util.List<recommender_rpc.SuggesionItem> getSuggestionItemsList() {
+      if (suggestionItemsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(suggestionItems_);
       } else {
-        return suggestionsBuilder_.getMessageList();
+        return suggestionItemsBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public int getSuggestionsCount() {
-      if (suggestionsBuilder_ == null) {
-        return suggestions_.size();
+    public int getSuggestionItemsCount() {
+      if (suggestionItemsBuilder_ == null) {
+        return suggestionItems_.size();
       } else {
-        return suggestionsBuilder_.getCount();
+        return suggestionItemsBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public recommender_rpc.SuggesionData getSuggestions(int index) {
-      if (suggestionsBuilder_ == null) {
-        return suggestions_.get(index);
+    public recommender_rpc.SuggesionItem getSuggestionItems(int index) {
+      if (suggestionItemsBuilder_ == null) {
+        return suggestionItems_.get(index);
       } else {
-        return suggestionsBuilder_.getMessage(index);
+        return suggestionItemsBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder setSuggestions(
-        int index, recommender_rpc.SuggesionData value) {
-      if (suggestionsBuilder_ == null) {
+    public Builder setSuggestionItems(
+        int index, recommender_rpc.SuggesionItem value) {
+      if (suggestionItemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureSuggestionsIsMutable();
-        suggestions_.set(index, value);
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.set(index, value);
         onChanged();
       } else {
-        suggestionsBuilder_.setMessage(index, value);
+        suggestionItemsBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder setSuggestions(
-        int index, recommender_rpc.SuggesionData.Builder builderForValue) {
-      if (suggestionsBuilder_ == null) {
-        ensureSuggestionsIsMutable();
-        suggestions_.set(index, builderForValue.build());
+    public Builder setSuggestionItems(
+        int index, recommender_rpc.SuggesionItem.Builder builderForValue) {
+      if (suggestionItemsBuilder_ == null) {
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.set(index, builderForValue.build());
         onChanged();
       } else {
-        suggestionsBuilder_.setMessage(index, builderForValue.build());
+        suggestionItemsBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder addSuggestions(recommender_rpc.SuggesionData value) {
-      if (suggestionsBuilder_ == null) {
+    public Builder addSuggestionItems(recommender_rpc.SuggesionItem value) {
+      if (suggestionItemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureSuggestionsIsMutable();
-        suggestions_.add(value);
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.add(value);
         onChanged();
       } else {
-        suggestionsBuilder_.addMessage(value);
+        suggestionItemsBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder addSuggestions(
-        int index, recommender_rpc.SuggesionData value) {
-      if (suggestionsBuilder_ == null) {
+    public Builder addSuggestionItems(
+        int index, recommender_rpc.SuggesionItem value) {
+      if (suggestionItemsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureSuggestionsIsMutable();
-        suggestions_.add(index, value);
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.add(index, value);
         onChanged();
       } else {
-        suggestionsBuilder_.addMessage(index, value);
+        suggestionItemsBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder addSuggestions(
-        recommender_rpc.SuggesionData.Builder builderForValue) {
-      if (suggestionsBuilder_ == null) {
-        ensureSuggestionsIsMutable();
-        suggestions_.add(builderForValue.build());
+    public Builder addSuggestionItems(
+        recommender_rpc.SuggesionItem.Builder builderForValue) {
+      if (suggestionItemsBuilder_ == null) {
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.add(builderForValue.build());
         onChanged();
       } else {
-        suggestionsBuilder_.addMessage(builderForValue.build());
+        suggestionItemsBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder addSuggestions(
-        int index, recommender_rpc.SuggesionData.Builder builderForValue) {
-      if (suggestionsBuilder_ == null) {
-        ensureSuggestionsIsMutable();
-        suggestions_.add(index, builderForValue.build());
+    public Builder addSuggestionItems(
+        int index, recommender_rpc.SuggesionItem.Builder builderForValue) {
+      if (suggestionItemsBuilder_ == null) {
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.add(index, builderForValue.build());
         onChanged();
       } else {
-        suggestionsBuilder_.addMessage(index, builderForValue.build());
+        suggestionItemsBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder addAllSuggestions(
-        java.lang.Iterable<? extends recommender_rpc.SuggesionData> values) {
-      if (suggestionsBuilder_ == null) {
-        ensureSuggestionsIsMutable();
+    public Builder addAllSuggestionItems(
+        java.lang.Iterable<? extends recommender_rpc.SuggesionItem> values) {
+      if (suggestionItemsBuilder_ == null) {
+        ensureSuggestionItemsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, suggestions_);
+            values, suggestionItems_);
         onChanged();
       } else {
-        suggestionsBuilder_.addAllMessages(values);
+        suggestionItemsBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder clearSuggestions() {
-      if (suggestionsBuilder_ == null) {
-        suggestions_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000002);
+    public Builder clearSuggestionItems() {
+      if (suggestionItemsBuilder_ == null) {
+        suggestionItems_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
       } else {
-        suggestionsBuilder_.clear();
+        suggestionItemsBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public Builder removeSuggestions(int index) {
-      if (suggestionsBuilder_ == null) {
-        ensureSuggestionsIsMutable();
-        suggestions_.remove(index);
+    public Builder removeSuggestionItems(int index) {
+      if (suggestionItemsBuilder_ == null) {
+        ensureSuggestionItemsIsMutable();
+        suggestionItems_.remove(index);
         onChanged();
       } else {
-        suggestionsBuilder_.remove(index);
+        suggestionItemsBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public recommender_rpc.SuggesionData.Builder getSuggestionsBuilder(
+    public recommender_rpc.SuggesionItem.Builder getSuggestionItemsBuilder(
         int index) {
-      return getSuggestionsFieldBuilder().getBuilder(index);
+      return getSuggestionItemsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public recommender_rpc.SuggesionDataOrBuilder getSuggestionsOrBuilder(
+    public recommender_rpc.SuggesionItemOrBuilder getSuggestionItemsOrBuilder(
         int index) {
-      if (suggestionsBuilder_ == null) {
-        return suggestions_.get(index);  } else {
-        return suggestionsBuilder_.getMessageOrBuilder(index);
+      if (suggestionItemsBuilder_ == null) {
+        return suggestionItems_.get(index);  } else {
+        return suggestionItemsBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public java.util.List<? extends recommender_rpc.SuggesionDataOrBuilder> 
-         getSuggestionsOrBuilderList() {
-      if (suggestionsBuilder_ != null) {
-        return suggestionsBuilder_.getMessageOrBuilderList();
+    public java.util.List<? extends recommender_rpc.SuggesionItemOrBuilder> 
+         getSuggestionItemsOrBuilderList() {
+      if (suggestionItemsBuilder_ != null) {
+        return suggestionItemsBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(suggestions_);
+        return java.util.Collections.unmodifiableList(suggestionItems_);
       }
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public recommender_rpc.SuggesionData.Builder addSuggestionsBuilder() {
-      return getSuggestionsFieldBuilder().addBuilder(
-          recommender_rpc.SuggesionData.getDefaultInstance());
+    public recommender_rpc.SuggesionItem.Builder addSuggestionItemsBuilder() {
+      return getSuggestionItemsFieldBuilder().addBuilder(
+          recommender_rpc.SuggesionItem.getDefaultInstance());
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public recommender_rpc.SuggesionData.Builder addSuggestionsBuilder(
+    public recommender_rpc.SuggesionItem.Builder addSuggestionItemsBuilder(
         int index) {
-      return getSuggestionsFieldBuilder().addBuilder(
-          index, recommender_rpc.SuggesionData.getDefaultInstance());
+      return getSuggestionItemsFieldBuilder().addBuilder(
+          index, recommender_rpc.SuggesionItem.getDefaultInstance());
     }
     /**
-     * <code>repeated .recommender_rpc.SuggesionData suggestions = 2;</code>
+     * <code>repeated .recommender_rpc.SuggesionItem suggestionItems = 3;</code>
      */
-    public java.util.List<recommender_rpc.SuggesionData.Builder> 
-         getSuggestionsBuilderList() {
-      return getSuggestionsFieldBuilder().getBuilderList();
+    public java.util.List<recommender_rpc.SuggesionItem.Builder> 
+         getSuggestionItemsBuilderList() {
+      return getSuggestionItemsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        recommender_rpc.SuggesionData, recommender_rpc.SuggesionData.Builder, recommender_rpc.SuggesionDataOrBuilder> 
-        getSuggestionsFieldBuilder() {
-      if (suggestionsBuilder_ == null) {
-        suggestionsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            recommender_rpc.SuggesionData, recommender_rpc.SuggesionData.Builder, recommender_rpc.SuggesionDataOrBuilder>(
-                suggestions_,
-                ((bitField0_ & 0x00000002) == 0x00000002),
+        recommender_rpc.SuggesionItem, recommender_rpc.SuggesionItem.Builder, recommender_rpc.SuggesionItemOrBuilder> 
+        getSuggestionItemsFieldBuilder() {
+      if (suggestionItemsBuilder_ == null) {
+        suggestionItemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+            recommender_rpc.SuggesionItem, recommender_rpc.SuggesionItem.Builder, recommender_rpc.SuggesionItemOrBuilder>(
+                suggestionItems_,
+                ((bitField0_ & 0x00000004) == 0x00000004),
                 getParentForChildren(),
                 isClean());
-        suggestions_ = null;
+        suggestionItems_ = null;
       }
-      return suggestionsBuilder_;
+      return suggestionItemsBuilder_;
     }
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {

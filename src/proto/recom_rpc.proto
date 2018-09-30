@@ -78,39 +78,74 @@ message ViewerSelectionState {
 }
 
 
+// A focus hint/parameter set by user as na additional info
+// Can be a "preference" for working variables, domains, keywords, other settings ...
+// for later GUI extension
+message UserFocusHint {
+    string name = 1;    // name of the variable, domain, keyword
+    string value = 2;   // optional, for some cases obsolete
+    enum HintType {
+        VARIABLE = 0;
+        DOMAIN = 1;
+        KEYWORD = 2;
+        SETTING = 3;
+    }
+    HintType hintType = 3;
+    enum HintImpact {
+        INCLUDE_ALLWAYS = 0;    // means: always include this var in suggested fragments
+        PREFER = 1;             // means: prefer this var in suggested fragments
+        EXCLUDE_ALLWAYS = 2;    // means: always exclude this var from suggested fragments
+    }
+
+}
+
 message OnNewInputReq {
     int64 sessionId = 1;
     string searchText = 2;
     enum ChangeType {
-        SEARCHTEXT = 0;
-        VIEWERSTATE = 1;
-        PREFERENCES = 2;
+        SEARCHTEXT = 0;         // user changed the typed search text
+        VARVIEWERSTATE = 1;     // changes in the variable viewer state
+        SOURCEFILE = 2;         // source file was changed
+        PREFERENCES = 3;        // prefered vars, domains etc. changed
         OTHER = 10;      // should force complete re-computation
     }
     ChangeType changeType = 3;
     repeated Parameter activeVariables = 10;
     ViewerSelectionState viewerState = 20;
-    // We might all add the prefs like preferred variables etc.
+    repeated UserFocusHint userFocusHint= 30;
 }
 
-message SuggesionData {
+
+// A single code suggestion (i.e. suggested fragment)
+message SuggesionItem {
     int64 suggestionID = 1;
     string suggestedCode = 2;
     string comment = 5;
     repeated Parameter parameter = 10;  // todo: later we might use a list of values per placeholder
 }
 
+// The list of suggestions, main answer from the recom-engine
 message SuggestionsSetResp {
     int64 sessionId = 1;
-    repeated SuggesionData suggestions = 2;
+    enum ResponseChange {
+        NO_CHANGE = 0;
+        UPDATE = 1;
+    }
+    ResponseChange responseChange = 2;      // change of this response compared to previous one
+    repeated SuggesionItem suggestionItems = 3;
 }
 
+// This is for later: when a particular suggested fragment is selected, the GUI informs the engine about this fact
 message OnSuggestionSelectedReq {
     int64 sessionId = 1;
-    // todo
+    int64 suggestionID = 2;
+    // might have more infos
 }
 
+// This is for later: when a particular suggested fragment is selected, the engime might return additional data
+// e.g. a preview of the computation
 message SuggestionDetailsResp {
     int64 sessionId = 1;
+    int64 suggestionID = 2;
     // todo
 }

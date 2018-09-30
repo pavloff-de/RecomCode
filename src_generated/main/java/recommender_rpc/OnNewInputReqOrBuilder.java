@@ -56,27 +56,39 @@ public interface OnNewInputReqOrBuilder extends
       int index);
 
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   boolean hasViewerState();
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   recommender_rpc.ViewerSelectionState getViewerState();
   /**
-   * <pre>
-   * We might all add the prefs like preferred variables etc.
-   * </pre>
-   *
    * <code>.recommender_rpc.ViewerSelectionState viewerState = 20;</code>
    */
   recommender_rpc.ViewerSelectionStateOrBuilder getViewerStateOrBuilder();
+
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  java.util.List<recommender_rpc.UserFocusHint> 
+      getUserFocusHintList();
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  recommender_rpc.UserFocusHint getUserFocusHint(int index);
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  int getUserFocusHintCount();
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  java.util.List<? extends recommender_rpc.UserFocusHintOrBuilder> 
+      getUserFocusHintOrBuilderList();
+  /**
+   * <code>repeated .recommender_rpc.UserFocusHint userFocusHint = 30;</code>
+   */
+  recommender_rpc.UserFocusHintOrBuilder getUserFocusHintOrBuilder(
+      int index);
 }

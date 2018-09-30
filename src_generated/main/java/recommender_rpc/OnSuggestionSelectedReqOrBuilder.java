@@ -8,11 +8,16 @@ public interface OnSuggestionSelectedReqOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <pre>
-   * todo
-   * </pre>
-   *
    * <code>int64 sessionId = 1;</code>
    */
   long getSessionId();
+
+  /**
+   * <pre>
+   * might have more infos
+   * </pre>
+   *
+   * <code>int64 suggestionID = 2;</code>
+   */
+  long getSuggestionID();
 }

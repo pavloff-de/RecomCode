@@ -45,15 +45,20 @@ public final class RecommenderRpcProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_recommender_rpc_ViewerSelectionState_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_recommender_rpc_UserFocusHint_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_recommender_rpc_UserFocusHint_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_recommender_rpc_OnNewInputReq_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_recommender_rpc_OnNewInputReq_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_recommender_rpc_SuggesionData_descriptor;
+    internal_static_recommender_rpc_SuggesionItem_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_recommender_rpc_SuggesionData_fieldAccessorTable;
+      internal_static_recommender_rpc_SuggesionItem_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_recommender_rpc_SuggestionsSetResp_descriptor;
   static final 
@@ -93,34 +98,46 @@ public final class RecommenderRpcProto {
       "riableIdShown\030\002 \001(\003\022\020\n\010rowStart\030\003 \001(\005\022\016\n" +
       "\006rowEnd\030\004 \001(\005\022\024\n\014completeRows\030\005 \001(\010\022\020\n\010c" +
       "olStart\030\n \001(\005\022\016\n\006colEnd\030\013 \001(\005\022\027\n\017complet" +
-      "eColumns\030\014 \001(\010\"\261\002\n\rOnNewInputReq\022\021\n\tsess" +
-      "ionId\030\001 \001(\003\022\022\n\nsearchText\030\002 \001(\t\022=\n\nchang" +
-      "eType\030\003 \001(\0162).recommender_rpc.OnNewInput" +
-      "Req.ChangeType\0223\n\017activeVariables\030\n \003(\0132" +
-      "\032.recommender_rpc.Parameter\022:\n\013viewerSta" +
-      "te\030\024 \001(\0132%.recommender_rpc.ViewerSelecti" +
-      "onState\"I\n\nChangeType\022\016\n\nSEARCHTEXT\020\000\022\017\n" +
-      "\013VIEWERSTATE\020\001\022\017\n\013PREFERENCES\020\002\022\t\n\005OTHER" +
-      "\020\n\"|\n\rSuggesionData\022\024\n\014suggestionID\030\001 \001(" +
-      "\003\022\025\n\rsuggestedCode\030\002 \001(\t\022\017\n\007comment\030\005 \001(" +
-      "\t\022-\n\tparameter\030\n \003(\0132\032.recommender_rpc.P" +
-      "arameter\"\\\n\022SuggestionsSetResp\022\021\n\tsessio" +
-      "nId\030\001 \001(\003\0223\n\013suggestions\030\002 \003(\0132\036.recomme" +
-      "nder_rpc.SuggesionData\",\n\027OnSuggestionSe" +
-      "lectedReq\022\021\n\tsessionId\030\001 \001(\003\"*\n\025Suggesti" +
-      "onDetailsResp\022\021\n\tsessionId\030\001 \001(\0032\221\003\n\022Rec" +
-      "ommenderService\022X\n\013InitSession\022\".recomme" +
-      "nder_rpc.InitialisationReq\032#.recommender" +
-      "_rpc.InitialisationResp\"\000\022a\n\014CloseSessio" +
-      "n\022&.recommender_rpc.DisposeRecommenderRe" +
-      "q\032\'.recommender_rpc.DisposeRecommenderRe" +
-      "sp\"\000\022T\n\013onUserInput\022\036.recommender_rpc.On" +
-      "NewInputReq\032#.recommender_rpc.Suggestion" +
-      "sSetResp\"\000\022h\n\022suggestionSelected\022(.recom" +
-      "mender_rpc.OnSuggestionSelectedReq\032&.rec" +
-      "ommender_rpc.SuggestionDetailsResp\"\000B3\n\017" +
-      "recommender_rpcB\023RecommenderRpcProtoP\001\242\002" +
-      "\010RcmdrRPCb\006proto3"
+      "eColumns\030\014 \001(\010\"\353\001\n\rUserFocusHint\022\014\n\004name" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\0229\n\010hintType\030\003 \001(\0162" +
+      "\'.recommender_rpc.UserFocusHint.HintType" +
+      "\">\n\010HintType\022\014\n\010VARIABLE\020\000\022\n\n\006DOMAIN\020\001\022\013" +
+      "\n\007KEYWORD\020\002\022\013\n\007SETTING\020\003\"B\n\nHintImpact\022\023" +
+      "\n\017INCLUDE_ALLWAYS\020\000\022\n\n\006PREFER\020\001\022\023\n\017EXCLU" +
+      "DE_ALLWAYS\020\002\"\373\002\n\rOnNewInputReq\022\021\n\tsessio" +
+      "nId\030\001 \001(\003\022\022\n\nsearchText\030\002 \001(\t\022=\n\nchangeT" +
+      "ype\030\003 \001(\0162).recommender_rpc.OnNewInputRe" +
+      "q.ChangeType\0223\n\017activeVariables\030\n \003(\0132\032." +
+      "recommender_rpc.Parameter\022:\n\013viewerState" +
+      "\030\024 \001(\0132%.recommender_rpc.ViewerSelection" +
+      "State\0225\n\ruserFocusHint\030\036 \003(\0132\036.recommend" +
+      "er_rpc.UserFocusHint\"\\\n\nChangeType\022\016\n\nSE" +
+      "ARCHTEXT\020\000\022\022\n\016VARVIEWERSTATE\020\001\022\016\n\nSOURCE" +
+      "FILE\020\002\022\017\n\013PREFERENCES\020\003\022\t\n\005OTHER\020\n\"|\n\rSu" +
+      "ggesionItem\022\024\n\014suggestionID\030\001 \001(\003\022\025\n\rsug" +
+      "gestedCode\030\002 \001(\t\022\017\n\007comment\030\005 \001(\t\022-\n\tpar" +
+      "ameter\030\n \003(\0132\032.recommender_rpc.Parameter" +
+      "\"\331\001\n\022SuggestionsSetResp\022\021\n\tsessionId\030\001 \001" +
+      "(\003\022J\n\016responseChange\030\002 \001(\01622.recommender" +
+      "_rpc.SuggestionsSetResp.ResponseChange\0227" +
+      "\n\017suggestionItems\030\003 \003(\0132\036.recommender_rp" +
+      "c.SuggesionItem\"+\n\016ResponseChange\022\r\n\tNO_" +
+      "CHANGE\020\000\022\n\n\006UPDATE\020\001\"B\n\027OnSuggestionSele" +
+      "ctedReq\022\021\n\tsessionId\030\001 \001(\003\022\024\n\014suggestion" +
+      "ID\030\002 \001(\003\"@\n\025SuggestionDetailsResp\022\021\n\tses" +
+      "sionId\030\001 \001(\003\022\024\n\014suggestionID\030\002 \001(\0032\221\003\n\022R" +
+      "ecommenderService\022X\n\013InitSession\022\".recom" +
+      "mender_rpc.InitialisationReq\032#.recommend" +
+      "er_rpc.InitialisationResp\"\000\022a\n\014CloseSess" +
+      "ion\022&.recommender_rpc.DisposeRecommender" +
+      "Req\032\'.recommender_rpc.DisposeRecommender" +
+      "Resp\"\000\022T\n\013onUserInput\022\036.recommender_rpc." +
+      "OnNewInputReq\032#.recommender_rpc.Suggesti" +
+      "onsSetResp\"\000\022h\n\022suggestionSelected\022(.rec" +
+      "ommender_rpc.OnSuggestionSelectedReq\032&.r" +
+      "ecommender_rpc.SuggestionDetailsResp\"\000B3" +
+      "\n\017recommender_rpcB\023RecommenderRpcProtoP\001" +
+      "\242\002\010RcmdrRPCb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -170,36 +187,42 @@ public final class RecommenderRpcProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_recommender_rpc_ViewerSelectionState_descriptor,
         new java.lang.String[] { "AnySelection", "VariableIdShown", "RowStart", "RowEnd", "CompleteRows", "ColStart", "ColEnd", "CompleteColumns", });
-    internal_static_recommender_rpc_OnNewInputReq_descriptor =
+    internal_static_recommender_rpc_UserFocusHint_descriptor =
       getDescriptor().getMessageTypes().get(6);
+    internal_static_recommender_rpc_UserFocusHint_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_recommender_rpc_UserFocusHint_descriptor,
+        new java.lang.String[] { "Name", "Value", "HintType", });
+    internal_static_recommender_rpc_OnNewInputReq_descriptor =
+      getDescriptor().getMessageTypes().get(7);
     internal_static_recommender_rpc_OnNewInputReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_recommender_rpc_OnNewInputReq_descriptor,
-        new java.lang.String[] { "SessionId", "SearchText", "ChangeType", "ActiveVariables", "ViewerState", });
-    internal_static_recommender_rpc_SuggesionData_descriptor =
-      getDescriptor().getMessageTypes().get(7);
-    internal_static_recommender_rpc_SuggesionData_fieldAccessorTable = new
+        new java.lang.String[] { "SessionId", "SearchText", "ChangeType", "ActiveVariables", "ViewerState", "UserFocusHint", });
+    internal_static_recommender_rpc_SuggesionItem_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_recommender_rpc_SuggesionItem_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_recommender_rpc_SuggesionData_descriptor,
+        internal_static_recommender_rpc_SuggesionItem_descriptor,
         new java.lang.String[] { "SuggestionID", "SuggestedCode", "Comment", "Parameter", });
     internal_static_recommender_rpc_SuggestionsSetResp_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_recommender_rpc_SuggestionsSetResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_recommender_rpc_SuggestionsSetResp_descriptor,
-        new java.lang.String[] { "SessionId", "Suggestions", });
+        new java.lang.String[] { "SessionId", "ResponseChange", "SuggestionItems", });
     internal_static_recommender_rpc_OnSuggestionSelectedReq_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_recommender_rpc_OnSuggestionSelectedReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_recommender_rpc_OnSuggestionSelectedReq_descriptor,
-        new java.lang.String[] { "SessionId", });
+        new java.lang.String[] { "SessionId", "SuggestionID", });
     internal_static_recommender_rpc_SuggestionDetailsResp_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_recommender_rpc_SuggestionDetailsResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_recommender_rpc_SuggestionDetailsResp_descriptor,
-        new java.lang.String[] { "SessionId", });
+        new java.lang.String[] { "SessionId", "SuggestionID", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
