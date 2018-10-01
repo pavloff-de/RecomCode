@@ -71,13 +71,22 @@ public class CodeFragment {
             String parName = varEntry.getKey();
 
             if (defaultParams.containsKey(parName)) {
-                for (CodeVariable var : varEntry.getValue()) {
+                List<CodeVariable> vars = varEntry.getValue();
+                int vs = vars.size();
+
+                if (vs > 0) {
+                    // using just the last one
+                    // TODO: if code contains many params of same variables
+                    //       (e.g. dataframe, dataframe2) take next var and
+                    //       make many combinations
+                    CodeVariable lastVar = vars.get(vars.size() - 1);
                     newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
-                            .setExpr("").setName(var.getType()).setVars(var.getName()).build());
+                            .setExpr("").setName(lastVar.getName()).setVars(lastVar.getValue()).build());
 
                     if (newTextKey.contains(parName)) {
-                        newTextKey = newTextKey.replace(parName, var.getName());
+                        newTextKey = newTextKey.replace(parName, lastVar.getValue());
                     }
+
                 }
             }
         }

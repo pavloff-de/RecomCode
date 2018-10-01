@@ -50,22 +50,62 @@ public abstract class Worker {
     public abstract LinkedHashSet<CodeFragment> getRecommendations();
 
     public void onInput(String input) {
+        if (input.endsWith(" ")) {
+            // FIXME: during typing all prefixes of a variable will be saved
+            // m, my, myV, myVa, myVar
+            // implement delay OR save just the last one
+            parseVariablesFromInput(input);
+        }
+
         inputProcessing(input);
+    }
+
+    protected void parseVariablesFromInput(String input) {
+        String[] inputs = input.split(" ");
+        int l = inputs.length;
+
+        for (int i = 0; i < l - 1; i++) {
+            String k = inputs[i].toLowerCase();
+
+            switch (k) {
+                case "dataframe":
+                    addDataframeVariable(inputs[i + 1]);
+
+                    break;
+                case "column": {
+                    String c = inputs[i + 1];
+                    if (c.matches("^\\d+$")) {
+                        addColumnVariable(Integer.valueOf(c));
+                    } else {
+                        addColumnNameVariable(c);
+                    }
+
+                    break;
+                }
+                case "row": {
+                    String c = inputs[i + 1];
+                    if (c.matches("^\\d+$")) {
+                        addRowVariable(Integer.valueOf(c));
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     public void onDataframe(String tableName, TableModel table) {
         selectedDataframe = table;
-        addVariable("dataframe", "DataFrame", tableName, null, null);
+        addDataframeVariable(tableName);
 
         dataframeProcessing(tableName, table);
     }
 
     public void onCell(int row, int column) {
-        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
-        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
+        addRowVariable(row);
+        addColumnVariable(column);
 
         if (selectedDataframe != null) {
-            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+            addColumnNameVariable(selectedDataframe.getColumnName(column));
         }
 
         cellProcessing(row, column);
@@ -76,16 +116,16 @@ public abstract class Worker {
     }
 
     public void onRow(int row) {
-        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
+        addRowVariable(row);
 
         rowProcessing(row);
     }
 
     public void onColumn(int column) {
-        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
+        addColumnVariable(column);
 
         if (selectedDataframe != null) {
-            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+            addColumnNameVariable(selectedDataframe.getColumnName(column));
         }
 
         columnProcessing(column);
@@ -98,7 +138,7 @@ public abstract class Worker {
     public void onVariables(Map<String, CodeVariable> variables) {
         for (CodeVariable var : variables.values()) {
             if (var.getType().equals("module")) {
-                addVariable(var.getType(), var.getType(), var.getName(), var.getValue(), var.getModuleName());
+                addVariable(var.getType(), var.getType(), var.getName(), var.getModuleName());
             }
         }
 
@@ -112,14 +152,35 @@ public abstract class Worker {
         codeFragmentProcessing(fragment);
     }
 
-    protected void addVariable(String param, String type, String varName, String value, String moduleName) {
+    protected void addDataframeVariable(String tableName) {
+        addVariable("DataFrame", "dataframe", tableName, null);
+    }
+
+    protected void addRowVariable(int row) {
+        addVariable( "int", "row_index", String.valueOf(row), null);
+    }
+
+    protected void addColumnVariable(int column) {
+        addVariable( "int", "column_index", String.valueOf(column), null);
+    }
+
+    protected void addColumnNameVariable(String columnName) {
+        addVariable("str", "column_name", columnName, null);
+    }
+
+    protected void addVariable(String type, String varName, String value, String moduleName) {
         List<CodeVariable> vars;
 
-        if (myVariables.containsKey(param)) {
-            vars = myVariables.get(param);
+        if (myVariables.containsKey(varName)) {
+            vars = myVariables.get(varName);
+            int s = vars.size();
+            if (s > 4) {
+                vars = vars.subList(s - 5, s - 1);
+            }
+
         } else {
             vars = new LinkedList<>();
-            myVariables.put(param, vars);
+            myVariables.put(varName, vars);
         }
 
         vars.add(new CodeVariable.Builder()

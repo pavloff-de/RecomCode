@@ -24,28 +24,52 @@ vars: columnNames|names|columns
 expr: "collectionElementName"
 replaceable: no
 ---
+recType: params
+recID: py.pd.par.004
+group: pandas
+name: row_index
+type: int
+vars: row|row_index
+expr: "collectionElementName"
+replaceable: no
+---
+recType: params
+recID: py.pd.par.005
+group: pandas
+name: column_index
+type: int
+vars: column|column_index
+expr: "collectionElementName"
+replaceable: no
+---
+recType: params
+recID: py.pd.par.006
+group: pandas
+name: column_name
+type: int
+vars: column|column_name
+expr: "collectionElementName"
+replaceable: no
+---
 recType: code
 recID: py.pd.rw.001
 group: pandas
 keywords: [select, row]
 textkey:
-  - "select|get single row by position|integer|number"
+  - "select|get single row_index by position|integer|number"
   - "retrieve row in dataframe"
-code: $dataframe$.ix[$rowIndexNum$]
-parameter:
-  - name: rowIndexNum
+code: $dataframe$.ix[$row_index$]
 ---
 recType: code
 recID: py.pd.col.001
 group: pandas
 keywords: [drop, remove, delete column]
 textkey:
-  - "drop|remove|delete|kill|purge single column from dataframe"
-code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=1)"
+  - "drop|remove|delete|kill|purge column_name from dataframe"
+code: "$dataframe2$ = $dataframe$.drop(\"$column_name$\", axis=1)"
 parameter:
   - name: dataframe2
     expr: "pyUniqueIterableVariable"
-  - name: columnName
 ---
 recType: code
 recID: py.pd.col.002
