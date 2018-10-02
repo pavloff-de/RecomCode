@@ -106,7 +106,7 @@ public class RecomCodeManager {
             // read always full text
             String input = doc.getText(0, doc.getLength());
             recommender.onInput(input);
-            updateAndDisplayRecommendations(recommender);
+            updateAndDisplayRecommendations();
         } catch (BadLocationException e1) {
             e1.printStackTrace();
         }
@@ -124,7 +124,8 @@ public class RecomCodeManager {
     }
 
 
-    private void updateAndDisplayRecommendations(CodeFragmentManager recommender) {
+    public void updateAndDisplayRecommendations() {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         LinkedHashSet<CodeFragment> newRecommendations = recommender.recomputeRecommendations();
         repaintRecommendations(recommender, newRecommendations);
     }

@@ -10,6 +10,7 @@ import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
+import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
@@ -37,8 +38,10 @@ class DataframeTab extends JPanel implements BaseConstants {
         String varName = name.split(" ")[1];
 
         if (tableView != null) {
-            CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-            manager.dataframeSelected(varName, tableView.getModel());
+            CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+            recommender.dataframeSelected(varName, tableView.getModel());
+            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+            recomCodeManager.updateAndDisplayRecommendations();
         }
         if (isOpened) {
             return;
@@ -99,8 +102,10 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
 
-                CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-                manager.dataframeSelected(varName, tableView.getModel());
+                CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+                recommender.dataframeSelected(varName, tableView.getModel());
+                var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+                recomCodeManager.updateAndDisplayRecommendations();
             }
 
             @Override
@@ -150,6 +155,8 @@ class DataframeTab extends JPanel implements BaseConstants {
             } else {
                 manager.cellsSelected(cells);
             }
+            var recomCodeManager = RecomCodeManager.getInstance(project);
+            recomCodeManager.updateAndDisplayRecommendations();
         }
     }
 

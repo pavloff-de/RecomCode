@@ -37,10 +37,13 @@ public class CodeFragmentManager implements Worker {
         workers.put(aw.workerName(), aw);
     }
 
+/*
     public void addCodeFragmentListener(CodeFragmentListener listener) {
         codeFragmentListeners.add(listener);
     }
+*/
 
+/*
     private void returnRecommendations() {
         LinkedHashSet<CodeFragment> withVariables = recomputeRecommendations();
 
@@ -48,6 +51,7 @@ public class CodeFragmentManager implements Worker {
             listener.onOutput(withVariables);
         }
     }
+*/
 
     @NotNull
     public LinkedHashSet<CodeFragment> recomputeRecommendations() {
@@ -128,7 +132,7 @@ public class CodeFragmentManager implements Worker {
 
         selectedDataframe = table;
         addVariable("dataframe", "DataFrame", tableName, null, null);
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -144,7 +148,7 @@ public class CodeFragmentManager implements Worker {
             addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -152,7 +156,7 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.cellsSelected(cells);
         }
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -163,7 +167,10 @@ public class CodeFragmentManager implements Worker {
 
         addVariable("row_index", "int", "row_index", String.valueOf(row), null);
 
-        returnRecommendations();
+        // returnRecommendations();
+        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
+        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
@@ -178,7 +185,10 @@ public class CodeFragmentManager implements Worker {
             addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
+        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
+        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
