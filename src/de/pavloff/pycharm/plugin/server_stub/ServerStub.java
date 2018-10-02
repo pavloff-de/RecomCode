@@ -1,47 +1,44 @@
 package de.pavloff.pycharm.plugin.server_stub;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.core.CodeFragmentManager;
+import de.pavloff.pycharm.core.CodeVariable;
 
+import javax.swing.table.TableModel;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
-/** Class which wraps all calls to the "core" part.
- *  todo: 1. Extract interface, 2. add additional implementation with gRPC
- *
- */
-public class ServerStub {
+public interface ServerStub {
+    // todo: think whether we need a separate instance per project? Not good for RPC, as we have only 1 server process
 
-    static private  ServerStub stub;
-    private Project project;
+    // instantiate the alternative class ServerStubWithRPC for RPC
+    ServerStub stub = new ServerStubNoRPC();
+    // static ServerStub stub = new ServerStubWithRPC();
 
+    // Currently, there is only 1 instance for all projects!
     public static ServerStub getInstance(Project project) {
-        // var stub = project.getComponent(ServerStub.class);
-        if (stub == null)
-            stub = new ServerStub();
-        stub.project = project;
         return stub;
     }
 
+    void initialize(Project project);
 
-    public void initialize() {
-        CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class);
-        recommender.initialize();
-    }
+    void onInput(String input);
 
-    public void onInput(String input) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.onInput(input);
-    }
+    LinkedHashSet<CodeFragment> getRecomputedRecommendations();
 
-    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
-        var recommender = CodeFragmentManager.getInstance(project);
-        return recommender.getRecomputedRecommendations();
-    }
+    void codeFragmentSelected(CodeFragment fragment);
 
-    public void codeFragmentSelected(CodeFragment fragment) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.codeFragmentSelected(fragment);
-    }
+    void dataframeSelected(String tableName, TableModel table);
 
+    void cellSelected(int row, int column);
+
+    void cellsSelected(List<Pair<Integer, Integer>> cells);
+
+    void rowSelected(int row);
+
+    void columnSelected(int column);
+
+    void codeVariables(Map<String, CodeVariable> variables);
 }

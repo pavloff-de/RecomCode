@@ -14,12 +14,12 @@ public class RecomCodeProjectComponent implements ToolWindowFactory {
         RecomCodeManager manager = RecomCodeManager.getInstance(project);
         toolWindow.getComponent().add(manager.initView(project));
 
-        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
-        recommender.initialize();
+        // CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        // recommender.initialize();
 
-        // Later, we will use ServerStub instead of the CodeFragmentManager
+        // ServerStub replaces previous usage of CodeFragmentManager
         ServerStub server = ServerStub.getInstance(project);
-        server.initialize();
+        server.initialize(project);
 
     }
 }
