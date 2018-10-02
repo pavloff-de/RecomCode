@@ -45,7 +45,7 @@ public class CodeFragmentManager implements Worker {
 
 /*
     private void returnRecommendations() {
-        LinkedHashSet<CodeFragment> withVariables = recomputeRecommendations();
+        LinkedHashSet<CodeFragment> withVariables = getRecomputedRecommendations();
 
         for (CodeFragmentListener listener : codeFragmentListeners) {
             listener.onOutput(withVariables);
@@ -54,7 +54,7 @@ public class CodeFragmentManager implements Worker {
 */
 
     @NotNull
-    public LinkedHashSet<CodeFragment> recomputeRecommendations() {
+    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();

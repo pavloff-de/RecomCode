@@ -18,8 +18,8 @@ public class RecomCodeProjectComponent implements ToolWindowFactory {
         recommender.initialize();
 
         // Later, we will use ServerStub instead of the CodeFragmentManager
-        // ServerStub server = ServerStub.getInstance(project);
-        // server.initialize();
+        ServerStub server = ServerStub.getInstance(project);
+        server.initialize();
 
     }
 }

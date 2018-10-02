@@ -4,22 +4,16 @@ import com.intellij.openapi.project.Project;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
-/** Class which raps all calls to the "core" part.
- *  todo: 1. Extract interface
+/** Class which wraps all calls to the "core" part.
+ *  todo: 1. Extract interface, 2. add additional implementation with gRPC
  *
  */
 public class ServerStub {
 
     static private  ServerStub stub;
-    private CodeFragmentManager recommender;
     private Project project;
-
-    public ServerStub() {
-        // todo later: create a server instance
-    }
 
     public static ServerStub getInstance(Project project) {
         // var stub = project.getComponent(ServerStub.class);
@@ -31,16 +25,22 @@ public class ServerStub {
 
 
     public void initialize() {
-        recommender = project.getComponent(CodeFragmentManager.class);
+        CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class);
         recommender.initialize();
     }
 
     public void onInput(String input) {
+        var recommender = CodeFragmentManager.getInstance(project);
         recommender.onInput(input);
     }
 
+    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
+        var recommender = CodeFragmentManager.getInstance(project);
+        return recommender.getRecomputedRecommendations();
+    }
 
     public void codeFragmentSelected(CodeFragment fragment) {
+        var recommender = CodeFragmentManager.getInstance(project);
         recommender.codeFragmentSelected(fragment);
     }
 
