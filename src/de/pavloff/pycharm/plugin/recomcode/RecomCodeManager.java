@@ -12,9 +12,13 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
+import de.pavloff.pycharm.core.CodeFragmentListener;
 import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
+import de.pavloff.pycharm.plugin.server_stub.CodeFragmentListenerStub;
+import de.pavloff.pycharm.plugin.server_stub.ServerStub;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -24,6 +28,7 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class RecomCodeManager {
@@ -111,35 +116,40 @@ public class RecomCodeManager {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
 
         recommender.addCodeFragmentListener(fragments -> EventQueue.invokeLater(() -> {
-            recomCodePanel.removeAll();
-
-            if (fragments == null) {
-                return;
-            }
-
-            for (CodeFragment fragment : fragments) {
-                RecomCode r = new RecomCode(fragment);
-
-                r.addListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        recommender.codeFragmentSelected(fragment);
-
-                        Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
-
-                        if (editor != null) {
-                            TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                            templateManager.startTemplate(editor, newTemplate(fragment));
-                            IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
-                        }
-                    }
-                });
-
-                recomCodePanel.add(r);
-            }
-            recomCodePanel.repaint();
+            repaintRecommendations(recommender, fragments);
         }));
     }
+
+    private void repaintRecommendations(CodeFragmentManager recommender, LinkedHashSet<CodeFragment> fragments) {
+        recomCodePanel.removeAll();
+
+        if (fragments == null) {
+            return;
+        }
+
+        for (CodeFragment fragment : fragments) {
+            RecomCode r = new RecomCode(fragment);
+
+            r.addListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    recommender.codeFragmentSelected(fragment);
+
+                    Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
+
+                    if (editor != null) {
+                        TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
+                        templateManager.startTemplate(editor, newTemplate(fragment));
+                        IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
+                    }
+                }
+            });
+
+            recomCodePanel.add(r);
+        }
+        recomCodePanel.repaint();
+    }
+
 
     private Template newTemplate(CodeFragment fragment) {
         TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);

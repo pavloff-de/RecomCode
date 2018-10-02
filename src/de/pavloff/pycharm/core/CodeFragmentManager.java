@@ -6,6 +6,7 @@ import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
 import de.pavloff.pycharm.yaml.YamlLoader;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -41,6 +42,15 @@ public class CodeFragmentManager implements Worker {
     }
 
     private void returnRecommendations() {
+        LinkedHashSet<CodeFragment> withVariables = recomputeRecommendations();
+
+        for (CodeFragmentListener listener : codeFragmentListeners) {
+            listener.onOutput(withVariables);
+        }
+    }
+
+    @NotNull
+    private LinkedHashSet<CodeFragment> recomputeRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
@@ -75,10 +85,7 @@ public class CodeFragmentManager implements Worker {
                 withVariables.add(fragment);
             }
         }
-
-        for (CodeFragmentListener listener : codeFragmentListeners) {
-            listener.onOutput(withVariables);
-        }
+        return withVariables;
     }
 
     @Override
