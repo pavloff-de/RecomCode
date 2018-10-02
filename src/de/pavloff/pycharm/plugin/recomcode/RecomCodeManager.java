@@ -12,13 +12,9 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.core.CodeFragmentListener;
 import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
-import de.pavloff.pycharm.plugin.server_stub.CodeFragmentListenerStub;
-import de.pavloff.pycharm.plugin.server_stub.ServerStub;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -93,7 +89,7 @@ public class RecomCodeManager {
             }
         });
 
-        setCodeFragmentHandler();
+        // setCodeFragmentHandler();
 
         return mainPanel;
     }
@@ -113,23 +109,30 @@ public class RecomCodeManager {
 
     }
 
+
+    /*
     private void setCodeFragmentHandler() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
 
-/*
         recommender.addCodeFragmentListener(fragments -> EventQueue.invokeLater(() -> {
             repaintRecommendations(recommender, fragments);
         }));
-*/
     }
+    */
 
-
+    /** This method should be called to update the list of recommendations.
+     *  It replaces the usage of the CodeFragmentListener
+     */
     public void updateAndDisplayRecommendations() {
         CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
         LinkedHashSet<CodeFragment> newRecommendations = recommender.recomputeRecommendations();
         repaintRecommendations(recommender, newRecommendations);
     }
 
+    /** Code which repaints recommendations, and adds listener to each recommended fragement for mause click
+     * @param recommender current CodeFragmentManager
+     * @param fragments set of current fragments
+     */
     private void repaintRecommendations(CodeFragmentManager recommender, LinkedHashSet<CodeFragment> fragments) {
         recomCodePanel.removeAll();
 

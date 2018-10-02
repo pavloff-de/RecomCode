@@ -15,7 +15,7 @@ public class CodeFragmentManager implements Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
 
-    private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
+    // private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
 
     private List<CodeFragment> selectedCodeFragmets = new LinkedList<>();
 

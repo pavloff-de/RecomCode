@@ -39,11 +39,6 @@ public class ServerStub {
         recommender.onInput(input);
     }
 
-    private List<CodeFragmentListenerStub> codeFragmentListenerStubs = new ArrayList<CodeFragmentListenerStub>();
-
-    public void addCodeFragmentListener(CodeFragmentListenerStub listener) {
-        codeFragmentListenerStubs.add(listener);
-    }
 
     public void codeFragmentSelected(CodeFragment fragment) {
         recommender.codeFragmentSelected(fragment);
