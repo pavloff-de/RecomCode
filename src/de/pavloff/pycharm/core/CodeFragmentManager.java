@@ -50,7 +50,7 @@ public class CodeFragmentManager implements Worker {
     }
 
     @NotNull
-    private LinkedHashSet<CodeFragment> recomputeRecommendations() {
+    public LinkedHashSet<CodeFragment> recomputeRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
@@ -117,7 +117,7 @@ public class CodeFragmentManager implements Worker {
         for (Worker worker : workers.values()) {
             worker.onInput(input);
         }
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
