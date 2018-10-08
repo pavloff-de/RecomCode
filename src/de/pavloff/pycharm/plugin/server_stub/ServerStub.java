@@ -26,19 +26,21 @@ public interface ServerStub {
 
     void onInput(String input);
 
-    LinkedHashSet<CodeFragment> getRecomputedRecommendations();
+    void onDataframe(String tableName, TableModel table);
 
-    void codeFragmentSelected(CodeFragment fragment);
+    void onCell(int row, int column);
 
-    void dataframeSelected(String tableName, TableModel table);
+    void onCells(List<Pair<Integer, Integer>> cells);
 
-    void cellSelected(int row, int column);
+    void onRow(int row);
 
-    void cellsSelected(List<Pair<Integer, Integer>> cells);
+    void onColumn(int column);
 
-    void rowSelected(int row);
+    void onSourcecode(String code);
 
-    void columnSelected(int column);
+    void onVariables(Map<String, CodeVariable> variables);
 
-    void codeVariables(Map<String, CodeVariable> variables);
+    void onCodeFragment(CodeFragment fragment);
+
+    LinkedHashSet<CodeFragment> getRecommendations();
 }

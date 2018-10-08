@@ -31,20 +31,20 @@ public class ServerStubNoRPC implements ServerStub {
 
     @Override
     public void onInput(String input) {
-        var recommender = CodeFragmentManager.getInstance(project);
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
         recommender.onInput(input);
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
-        var recommender = CodeFragmentManager.getInstance(project);
-        return recommender.getRecomputedRecommendations();
+    public LinkedHashSet<CodeFragment> getRecommendations() {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        return recommender.getRecommendations();
     }
 
     @Override
-    public void codeFragmentSelected(CodeFragment fragment) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.codeFragmentSelected(fragment);
+    public void onCodeFragment(CodeFragment fragment) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onCodeFragment(fragment);
     }
 
 
@@ -52,39 +52,45 @@ public class ServerStubNoRPC implements ServerStub {
     // Methods for varviewer
 
     @Override
-    public void dataframeSelected(String tableName, TableModel table) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.dataframeSelected(tableName, table);
+    public void onDataframe(String tableName, TableModel table) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onDataframe(tableName, table);
     }
 
     @Override
-    public void cellSelected(int row, int column) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.cellSelected(row, column);
+    public void onCell(int row, int column) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onCell(row, column);
     }
 
     @Override
-    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.cellsSelected(cells);
+    public void onCells(List<Pair<Integer, Integer>> cells) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onCells(cells);
     }
 
     @Override
-    public void rowSelected(int row) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.rowSelected(row);
+    public void onRow(int row) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onRow(row);
     }
 
     @Override
-    public void columnSelected(int column) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.columnSelected(column);
+    public void onColumn(int column) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onColumn(column);
     }
 
     @Override
-    public void codeVariables(Map<String, CodeVariable> variables) {
-        var recommender = CodeFragmentManager.getInstance(project);
-        recommender.codeVariables(variables);
+    public void onSourcecode(String code) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onSourcecode(code);
+    }
+
+    @Override
+    public void onVariables(Map<String, CodeVariable> variables) {
+        CodeFragmentManager recommender = CodeFragmentManager.getInstance(project);
+        recommender.onVariables(variables);
     }
 
 }

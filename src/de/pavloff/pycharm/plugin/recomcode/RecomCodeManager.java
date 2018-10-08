@@ -12,7 +12,6 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
-// import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
@@ -90,20 +89,16 @@ public class RecomCodeManager {
             }
         });
 
-        // setCodeFragmentHandler();
-
         return mainPanel;
     }
 
     private void handleDocumentEvent(DocumentEvent e) {
         // TODO: implement a delay for input
- //       CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-        var serverStub = ServerStub.getInstance(openedProject);
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
         Document doc = e.getDocument();
         try {
             // read always full text
             String input = doc.getText(0, doc.getLength());
-//            recommender.onInput(input);
             serverStub.onInput(input);
             updateAndDisplayRecommendations();
         } catch (BadLocationException e1) {
@@ -112,26 +107,12 @@ public class RecomCodeManager {
 
     }
 
-
-    /*
-    private void setCodeFragmentHandler() {
-        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-
-        recommender.addCodeFragmentListener(fragments -> EventQueue.invokeLater(() -> {
-            repaintRecommendations(recommender, fragments);
-        }));
-    }
-    */
-
     /** This method should be called to update the list of recommendations.
      *  It replaces the usage of the CodeFragmentListener
      */
     public void updateAndDisplayRecommendations() {
-        // var recommender = CodeFragmentManager.getInstance(openedProject);
-        var serverStub = ServerStub.getInstance(openedProject);
-        //LinkedHashSet<CodeFragment> newRecommendations = recommender.getRecomputedRecommendations();
-        LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecomputedRecommendations();
-        // repaintRecommendations(recommender, newRecommendations);
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecommendations();
         EventQueue.invokeLater(() -> { repaintRecommendations(serverStub, newRecommendations); });
     }
 
@@ -139,7 +120,6 @@ public class RecomCodeManager {
      * @param serverStub current CodeFragmentManager
      * @param fragments set of current fragments
      */
-    // private void repaintRecommendations(CodeFragmentManager recommender, LinkedHashSet<CodeFragment> fragments) {
     private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
         recomCodePanel.removeAll();
 
@@ -153,7 +133,7 @@ public class RecomCodeManager {
             r.addListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    serverStub.codeFragmentSelected(fragment);
+                    serverStub.onCodeFragment(fragment);
 
                     Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
@@ -170,7 +150,6 @@ public class RecomCodeManager {
         recomCodePanel.repaint();
     }
 
-
     private Template newTemplate(CodeFragment fragment) {
         TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
         Template t = templateManager.createTemplate(fragment.getRecID(), fragment.getGroup(), fragment.getCode());
@@ -178,7 +157,7 @@ public class RecomCodeManager {
         t.setToIndent(false);
 
         Map<String, CodeParam> params = fragment.getDefaultParams();
-        String[] variables = fragment.getVariables();
+        String[] variables = fragment.getParamsList();
 
         for (String v : variables) {
             CodeParam p = null;

@@ -11,50 +11,16 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.table.TableModel;
 import java.util.*;
 
-public class CodeFragmentManager implements Worker {
+public class CodeFragmentManager extends Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
-
-    // private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
-
-    private List<CodeFragment> selectedCodeFragmets = new LinkedList<>();
-
-    private TableModel selectedDataframe;
-
-    private Map<String, List<CodeVariable>> myVariables = new HashMap<>();
 
     public static CodeFragmentManager getInstance(Project project) {
         return project.getComponent(CodeFragmentManager.class);
     }
 
-    public void initialize() {
-        CodeFragmentLoader loader = new YamlLoader();
-
-        Worker kw = new KeywordWorker(loader);
-        workers.put(kw.workerName(), kw);
-
-        Worker aw = new AprioriWorker(loader);
-        workers.put(aw.workerName(), aw);
-    }
-
-/*
-    public void addCodeFragmentListener(CodeFragmentListener listener) {
-        codeFragmentListeners.add(listener);
-    }
-*/
-
-/*
-    private void returnRecommendations() {
-        LinkedHashSet<CodeFragment> withVariables = getRecomputedRecommendations();
-
-        for (CodeFragmentListener listener : codeFragmentListeners) {
-            listener.onOutput(withVariables);
-        }
-    }
-*/
-
     @NotNull
-    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
@@ -82,14 +48,26 @@ public class CodeFragmentManager implements Worker {
         LinkedHashSet<CodeFragment> withVariables = new LinkedHashSet<>();
         for (CodeFragment fragment : recommendation) {
 
-            List<CodeFragment> fragmentWithVariables = fragment.getWithVariables(myVariables);
+            List<CodeFragment> fragmentWithVariables = fragment.getWithVariables(getMyVariables());
             if (fragmentWithVariables.size() != 0) {
                 withVariables.addAll(fragmentWithVariables);
             } else {
                 withVariables.add(fragment);
             }
         }
+
         return withVariables;
+    }
+
+    @Override
+    public void initialize() {
+        CodeFragmentLoader loader = new YamlLoader();
+
+        Worker kw = new KeywordWorker(loader);
+        workers.put(kw.workerName(), kw);
+
+        Worker aw = new AprioriWorker();
+        workers.put(aw.workerName(), aw);
     }
 
     @Override
@@ -102,22 +80,8 @@ public class CodeFragmentManager implements Worker {
         return "Proxy for multiple worker.";
     }
 
-    private void addVariable(String param, String type, String varName, String value, String moduleName) {
-        List<CodeVariable> vars;
-
-        if (myVariables.containsKey(param)) {
-            vars = myVariables.get(param);
-        } else {
-            vars = new LinkedList<>();
-            myVariables.put(param, vars);
-        }
-
-        vars.add(new CodeVariable.Builder()
-                .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
-    }
-
     @Override
-    public void onInput(String input) {
+    protected void inputProcessing(String input) {
         for (Worker worker : workers.values()) {
             worker.onInput(input);
         }
@@ -125,64 +89,35 @@ public class CodeFragmentManager implements Worker {
     }
 
     @Override
-    public void dataframeSelected(String tableName, TableModel table) {
+    protected void dataframeProcessing(String tableName, TableModel table) {
         for (Worker worker : workers.values()) {
-            worker.dataframeSelected(tableName, table);
-        }
-
-        selectedDataframe = table;
-        addVariable("dataframe", "DataFrame", tableName, null, null);
-        // returnRecommendations();
-    }
-
-    @Override
-    public void cellSelected(int row, int column) {
-        for (Worker worker : workers.values()) {
-            worker.cellSelected(row, column);
-        }
-
-        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
-        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
-
-        if (selectedDataframe != null) {
-            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+            worker.onDataframe(tableName, table);
         }
 
         // returnRecommendations();
     }
 
     @Override
-    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
+    protected void cellProcessing(int row, int column) {
         for (Worker worker : workers.values()) {
-            worker.cellsSelected(cells);
+            worker.onCell(row, column);
+        }
+
+        // returnRecommendations();
+    }
+
+    @Override
+    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
+        for (Worker worker : workers.values()) {
+            worker.onCells(cells);
         }
         // returnRecommendations();
     }
 
     @Override
-    public void rowSelected(int row) {
+    protected void rowProcessing(int row) {
         for (Worker worker : workers.values()) {
-            worker.rowSelected(row);
-        }
-
-        addVariable("row_index", "int", "row_index", String.valueOf(row), null);
-
-        // returnRecommendations();
-        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
-        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
-        //            recomCodeManager.updateAndDisplayRecommendations();
-    }
-
-    @Override
-    public void columnSelected(int column) {
-        for (Worker worker : workers.values()) {
-            worker.columnSelected(column);
-        }
-
-        addVariable("column_index", "int", "column_index", String.valueOf(column), null);
-
-        if (selectedDataframe != null) {
-            addVariable("column_name", "str", "column_name", selectedDataframe.getColumnName(column), null);
+            worker.onRow(row);
         }
 
         // returnRecommendations();
@@ -192,55 +127,35 @@ public class CodeFragmentManager implements Worker {
     }
 
     @Override
-    public void codeFragmentSelected(CodeFragment fragment) {
+    protected void columnProcessing(int column) {
         for (Worker worker : workers.values()) {
-            worker.codeFragmentSelected(fragment);
+            worker.onColumn(column);
         }
 
-        selectedCodeFragmets.removeIf(k -> k.equals(fragment));
-        selectedCodeFragmets.add(0, fragment);
+        // returnRecommendations();
+        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
+        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
-    public void sourceCode(String code) {
+    protected void sourcecodeProcessing(String code) {
         for (Worker worker : workers.values()) {
-            worker.sourceCode(code);
-        }
-    }
-
-    @Override
-    public void codeVariables(Map<String, CodeVariable> variables) {
-        for (Worker worker : workers.values()) {
-            worker.codeVariables(variables);
-        }
-
-        for (CodeVariable var : variables.values()) {
-            if (var.getType().equals("module")) {
-                addVariable(var.getType(), var.getType(), var.getName(), var.getValue(), var.getModuleName());
-            }
+            worker.onSourcecode(code);
         }
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecommendations() {
-        return null;
-    }
-
-    public LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
-        return getSelectedCodeFragments(5);
-    }
-
-    public LinkedHashSet<CodeFragment> getSelectedCodeFragments(int numOfFragments) {
-        LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
-
-        if (selectedCodeFragmets.size() != 0) {
-            // find last numOfFragments fragments
-            ListIterator<CodeFragment> it = selectedCodeFragmets.listIterator(Math.max(selectedCodeFragmets.size() - numOfFragments, 1) - 1);
-            while (it.hasNext()) {
-                lastFragments.add(it.next());
-            }
+    protected void variablesProcessing(Map<String, CodeVariable> variables) {
+        for (Worker worker : workers.values()) {
+            worker.onVariables(variables);
         }
+    }
 
-        return lastFragments;
+    @Override
+    protected void codeFragmentProcessing(CodeFragment fragment) {
+        for (Worker worker : workers.values()) {
+            worker.onCodeFragment(fragment);
+        }
     }
 }

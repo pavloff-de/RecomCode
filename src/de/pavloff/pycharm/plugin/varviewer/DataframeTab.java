@@ -6,7 +6,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
-// import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
@@ -39,11 +38,9 @@ class DataframeTab extends JPanel implements BaseConstants {
         String varName = name.split(" ")[1];
 
         if (tableView != null) {
-//            CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-            var serverStub = ServerStub.getInstance(openedProject);
-//            recommender.dataframeSelected(varName, tableView.getModel());
-            serverStub.dataframeSelected(varName, tableView.getModel());
-            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+            ServerStub serverStub = ServerStub.getInstance(openedProject);
+            serverStub.onDataframe(varName, tableView.getModel());
+            RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
             recomCodeManager.updateAndDisplayRecommendations();
         }
         if (isOpened) {
@@ -105,11 +102,9 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
 
-//                CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
-                var serverStub = ServerStub.getInstance(openedProject);
-//                recommender.dataframeSelected(varName, tableView.getModel());
-                serverStub.dataframeSelected(varName, tableView.getModel());
-                var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+                ServerStub serverStub = ServerStub.getInstance(openedProject);
+                serverStub.onDataframe(varName, tableView.getModel());
+                RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
                 recomCodeManager.updateAndDisplayRecommendations();
             }
 
@@ -125,7 +120,6 @@ class DataframeTab extends JPanel implements BaseConstants {
     }
 
     private static class SelectionListener implements ListSelectionListener {
-//        private CodeFragmentManager manager;
         private ServerStub serverStub;
         private Project project;
         private JBTable table;
@@ -133,7 +127,6 @@ class DataframeTab extends JPanel implements BaseConstants {
         SelectionListener(Project openedProject, JBTable tableView) {
             project = openedProject;
             table = tableView;
-//            manager = CodeFragmentManager.getInstance(project);
             serverStub = ServerStub.getInstance(project);
         }
 
@@ -158,13 +151,11 @@ class DataframeTab extends JPanel implements BaseConstants {
             }
 
             if (cells.size() == 1) {
-//                manager.cellSelected(cells.get(0).first, cells.get(0).second);
-                serverStub.cellSelected(cells.get(0).first, cells.get(0).second);
+                serverStub.onCell(cells.get(0).first, cells.get(0).second);
             } else {
-//                manager.cellsSelected(cells);
-                serverStub.cellsSelected(cells);
+                serverStub.onCells(cells);
             }
-            var recomCodeManager = RecomCodeManager.getInstance(project);
+            RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
             recomCodeManager.updateAndDisplayRecommendations();
         }
     }

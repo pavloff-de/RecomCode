@@ -8,18 +8,25 @@ import de.pavloff.pycharm.core.CodeVariable;
 import javax.swing.table.TableModel;
 import java.util.*;
 
-public class KeywordWorker implements Worker {
+public class KeywordWorker extends Worker {
 
     private CodeFragmentLoader loader;
+
     private LinkedHashSet<CodeFragment> recommendations;
+
     private List<String> keywords;
+
     private List<String> inputs;
-    private TableModel currentDataframe;
 
     public KeywordWorker(CodeFragmentLoader loader) {
         this.loader = loader;
         keywords = new LinkedList<>();
         inputs = new LinkedList<>();
+    }
+
+    @Override
+    public void initialize() {
+
     }
 
     @Override
@@ -32,31 +39,21 @@ public class KeywordWorker implements Worker {
         return "Recommendations done based on single event";
     }
 
-    private void addKeyword(String keyword) {
-        final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
-                .replace("[^A-Za-z0-9]+$", "").toLowerCase();
-        if (kw.length() < 2) {
-            return;
-        }
-        keywords.removeIf(k -> k.equals(kw));
-        keywords.add(keyword);
-    }
-
-    public void onInput(String input) {
+    @Override
+    protected void inputProcessing(String input) {
         inputs.clear();
         Collections.addAll(inputs, input.toLowerCase().split(" "));
         searchForFragments();
     }
 
     @Override
-    public void dataframeSelected(String tableName, TableModel table) {
-        currentDataframe = table;
+    protected void dataframeProcessing(String tableName, TableModel table) {
         addKeyword("dataframe");
         searchForFragments();
     }
 
     @Override
-    public void cellSelected(int row, int column) {
+    protected void cellProcessing(int row, int column) {
         // get important information about cell, row, column
         addKeyword("cell");
         addKeyword("row");
@@ -65,7 +62,7 @@ public class KeywordWorker implements Worker {
     }
 
     @Override
-    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
+    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
         // get important information about cells, rows, columns
         // TODO:
         //  less rows ? row by row
@@ -78,37 +75,47 @@ public class KeywordWorker implements Worker {
     }
 
     @Override
-    public void rowSelected(int row) {
+    protected void rowProcessing(int row) {
         // get important information about row
         addKeyword("row");
         searchForFragments();
     }
 
     @Override
-    public void columnSelected(int column) {
+    protected void columnProcessing(int column) {
         // get important information about column
         addKeyword("column");
         searchForFragments();
     }
 
     @Override
-    public void codeFragmentSelected(CodeFragment fragment) {
+    protected void sourcecodeProcessing(String code) {
+
+    }
+
+    @Override
+    protected void variablesProcessing(Map<String, CodeVariable> variables) {
+
+    }
+
+    @Override
+    protected void codeFragmentProcessing(CodeFragment fragment) {
         keywords.clear();
-    }
-
-    @Override
-    public void sourceCode(String code) {
-
-    }
-
-    @Override
-    public void codeVariables(Map<String, CodeVariable> variables) {
-
     }
 
     @Override
     public LinkedHashSet<CodeFragment> getRecommendations() {
         return recommendations;
+    }
+
+    private void addKeyword(String keyword) {
+        final String kw = keyword.trim().replace("^[^A-Za-z0-9]+", "")
+                .replace("[^A-Za-z0-9]+$", "").toLowerCase();
+        if (kw.length() < 2) {
+            return;
+        }
+        keywords.removeIf(k -> k.equals(kw));
+        keywords.add(keyword);
     }
 
     private void searchForFragments() {
