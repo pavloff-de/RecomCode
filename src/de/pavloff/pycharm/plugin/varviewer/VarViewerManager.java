@@ -110,7 +110,7 @@ public class VarViewerManager implements BaseConstants {
 
         codeContent.append(doc.getText(new TextRange(0, doc.getLineEndOffset(cursorPosition))));
         codeContent.append(LINE_SEP);
-        codeContent.append(String.format("print '%s'", VAR_VIEWER_SEP)).append(LINE_SEP);
+        codeContent.append(String.format("print('%s')", VAR_VIEWER_SEP)).append(LINE_SEP);
 
         URL resources = VarViewerManager.class.getResource("python/var_viewer.py");
         StringBuilder content = new StringBuilder();
