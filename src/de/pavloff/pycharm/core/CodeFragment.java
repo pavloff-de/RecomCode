@@ -13,6 +13,7 @@ public class CodeFragment {
     private final String sources;
     private final String documentation;
     private final String code;
+    private final String[] paramsList;
     private final Map<String, CodeParam> defaultParams;
 
     private CodeFragment(Builder builder) {
@@ -25,6 +26,7 @@ public class CodeFragment {
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
+        this.paramsList = builder.paramsList;
         this.defaultParams = builder.defaultParams;
     }
 
@@ -48,8 +50,8 @@ public class CodeFragment {
         return code;
     }
 
-    public String[] getVariables() {
-        return defaultParams.keySet().toArray(new String[0]);
+    public String[] getParamsList() {
+        return paramsList;
     }
 
     public Map<String, CodeParam> getDefaultParams() {
@@ -69,20 +71,29 @@ public class CodeFragment {
             String parName = varEntry.getKey();
 
             if (defaultParams.containsKey(parName)) {
-                for (CodeVariable var : varEntry.getValue()) {
+                List<CodeVariable> vars = varEntry.getValue();
+                int vs = vars.size();
+
+                if (vs > 0) {
+                    // using just the last one
+                    // TODO: if code contains many params of same variables
+                    //       (e.g. dataframe, dataframe2) take next var and
+                    //       make many combinations
+                    CodeVariable lastVar = vars.get(vars.size() - 1);
                     newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
-                            .setExpr("").setName(var.getType()).setVars(var.getName()).build());
+                            .setExpr("").setName(lastVar.getName()).setVars(lastVar.getValue()).build());
 
                     if (newTextKey.contains(parName)) {
-                        newTextKey = newTextKey.replace(parName, var.getName());
+                        newTextKey = newTextKey.replace(parName, lastVar.getValue());
                     }
+
                 }
             }
         }
 
         if (newParams.size() != 0) {
             Builder builder = new Builder().setRecId(recID).setGroup(group)
-                    .setKeywords(keywords).setSources(sources).setCode(code);
+                    .setKeywords(keywords).setSources(sources).setCode(code).setParamsList(paramsList);
 
             Map<String, CodeParam> updatedParams = new HashMap<>(defaultParams);
             updatedParams.putAll(newParams);
@@ -131,6 +142,7 @@ public class CodeFragment {
         private String sources;
         private String documentation;
         private String code;
+        private String[] paramsList;
         private Map<String, CodeParam> defaultParams;
 
         public Builder setRecId(String recID) {
@@ -175,6 +187,11 @@ public class CodeFragment {
 
         public Builder setCode(String code) {
             this.code = code;
+            return this;
+        }
+
+        public Builder setParamsList(String[] paramsList) {
+            this.paramsList = paramsList;
             return this;
         }
 

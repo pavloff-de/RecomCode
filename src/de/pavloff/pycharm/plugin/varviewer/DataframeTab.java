@@ -38,7 +38,7 @@ class DataframeTab extends JPanel implements BaseConstants {
 
         if (tableView != null) {
             CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-            manager.dataframeSelected(varName, tableView.getModel());
+            manager.onDataframe(varName, tableView.getModel());
         }
         if (isOpened) {
             return;
@@ -100,7 +100,7 @@ class DataframeTab extends JPanel implements BaseConstants {
                 show(tableView);
 
                 CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-                manager.dataframeSelected(varName, tableView.getModel());
+                manager.onDataframe(varName, tableView.getModel());
             }
 
             @Override
@@ -146,9 +146,9 @@ class DataframeTab extends JPanel implements BaseConstants {
             }
 
             if (cells.size() == 1) {
-                manager.cellSelected(cells.get(0).first, cells.get(0).second);
+                manager.onCell(cells.get(0).first, cells.get(0).second);
             } else {
-                manager.cellsSelected(cells);
+                manager.onCells(cells);
             }
         }
     }

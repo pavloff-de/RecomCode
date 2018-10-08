@@ -195,7 +195,7 @@ public class VarViewerManager implements BaseConstants {
             }
         }
         CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-        manager.codeVariables(varOutput);
+        manager.onVariables(varOutput);
         createTabs(mainOutput, dfOutput);
     }
 

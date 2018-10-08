@@ -123,7 +123,7 @@ public class RecomCodeManager {
                 r.addListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        recommender.codeFragmentSelected(fragment);
+                        recommender.onCodeFragment(fragment);
 
                         Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
@@ -148,7 +148,7 @@ public class RecomCodeManager {
         t.setToIndent(false);
 
         Map<String, CodeParam> params = fragment.getDefaultParams();
-        String[] variables = fragment.getVariables();
+        String[] variables = fragment.getParamsList();
 
         for (String v : variables) {
             CodeParam p = null;
