@@ -1,0 +1,151 @@
+// Artur Andrzejak
+// September 2018
+// Messages and services for RPC link between a recommendation engine/server (core) and the IDE-GUI-part
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "recommender_rpc";
+option java_outer_classname = "RecommenderRpcProto";
+option objc_class_prefix = "RcmdrRPC";
+
+package recommender_rpc;
+
+// ########################################################
+
+// The advanced recommender service
+service RecommenderService {
+    rpc InitSession (InitialisationReq) returns (InitialisationResp) {}
+    rpc CloseSession (DisposeRecommenderReq) returns (DisposeRecommenderResp) {}
+    rpc onUserInput (OnNewInputReq) returns (SuggestionsSetResp) {}
+    rpc suggestionSelected (OnSuggestionSelectedReq) returns (SuggestionDetailsResp) {}
+
+}
+
+// The initialisation of the recommender service
+message InitialisationReq {
+    // Path to a file with settings of the recommender
+    string settings_path = 1;
+    // Targeted prg language (python, java, ..)
+    string prog_language = 2;
+    // Path to the edited source file
+    string src_file_path = 3;
+    // Path to all sources
+    string src_dir_path = 4;
+    // Optional labels for domains of the developed code (e.g. pandas, numpy, ..)
+    repeated string domain_labels = 5;
+}
+
+// The response message containing the sessionId
+message InitialisationResp {
+    int64 sessionId = 1;
+    string status = 2;  // OK or error message
+}
+
+
+message DisposeRecommenderReq {
+    int64 sessionId = 1;
+    bool saveState = 2;
+}
+
+message DisposeRecommenderResp {
+    int64 sessionId = 1;
+    string status = 2;  // "OK" or "error: X"
+}
+
+
+
+// Can be a parameter or a variable
+message Parameter {
+    int64 variableId = 1;
+    string name = 2;
+    string type = 3;
+    string value = 10;      // how to encode? serialized as string?
+    // maybe other infos, like scope, last line used etc.
+}
+
+
+// Current "selection" (markings) state of the variable viewer
+message ViewerSelectionState {
+    bool anySelection = 1; // is anything marked at all?
+    int64 variableIdShown = 2; // If of the variable displayed (selectable) in the viewer
+    int32 rowStart = 3;
+    int32 rowEnd = 4;
+    bool completeRows = 5; // is/are a complete row or rows marked?
+    int32 colStart = 10;
+    int32 colEnd = 11;
+    bool completeColumns = 12; // is/are a complete column or columns marked?
+}
+
+
+// A focus hint/parameter set by user as na additional info
+// Can be a "preference" for working variables, domains, keywords, other settings ...
+// for later GUI extension
+message UserFocusHint {
+    string name = 1;    // name of the variable, domain, keyword
+    string value = 2;   // optional, for some cases obsolete
+    enum HintType {
+        VARIABLE = 0;
+        DOMAIN = 1;
+        KEYWORD = 2;
+        SETTING = 3;
+    }
+    HintType hintType = 3;
+    enum HintImpact {
+        INCLUDE_ALLWAYS = 0;    // means: always include this var in suggested fragments
+        PREFER = 1;             // means: prefer this var in suggested fragments
+        EXCLUDE_ALLWAYS = 2;    // means: always exclude this var from suggested fragments
+    }
+
+}
+
+message OnNewInputReq {
+    int64 sessionId = 1;
+    string searchText = 2;
+    enum ChangeType {
+        SEARCHTEXT = 0;         // user changed the typed search text
+        VARVIEWERSTATE = 1;     // changes in the variable viewer state
+        SOURCEFILE = 2;         // source file was changed
+        PREFERENCES = 3;        // prefered vars, domains etc. changed
+        OTHER = 10;      // should force complete re-computation
+    }
+    ChangeType changeType = 3;
+    repeated Parameter activeVariables = 10;
+    ViewerSelectionState viewerState = 20;
+    repeated UserFocusHint userFocusHint= 30;
+}
+
+
+// A single code suggestion (i.e. suggested fragment)
+message SuggesionItem {
+    int64 suggestionID = 1;
+    string suggestedCode = 2;
+    string comment = 5;
+    repeated Parameter parameter = 10;  // todo: later we might use a list of values per placeholder
+}
+
+// The list of suggestions, main answer from the recom-engine
+message SuggestionsSetResp {
+    int64 sessionId = 1;
+    enum ResponseChange {
+        NO_CHANGE = 0;
+        UPDATE = 1;
+    }
+    ResponseChange responseChange = 2;      // change of this response compared to previous one
+    repeated SuggesionItem suggestionItems = 3;
+}
+
+// This is for later: when a particular suggested fragment is selected, the GUI informs the engine about this fact
+message OnSuggestionSelectedReq {
+    int64 sessionId = 1;
+    int64 suggestionID = 2;
+    // might have more infos
+}
+
+// This is for later: when a particular suggested fragment is selected, the engime might return additional data
+// e.g. a preview of the computation
+message SuggestionDetailsResp {
+    int64 sessionId = 1;
+    int64 suggestionID = 2;
+    // todo
+}

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="protobuf-3.6.1">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../libs-external/grpc/protobuf-java-3.6.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

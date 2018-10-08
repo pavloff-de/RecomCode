@@ -6,6 +6,7 @@ import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
 import de.pavloff.pycharm.yaml.YamlLoader;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -14,17 +15,12 @@ public class CodeFragmentManager extends Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
 
-    private List<CodeFragmentListener> codeFragmentListeners = new LinkedList<>();
-
     public static CodeFragmentManager getInstance(Project project) {
         return project.getComponent(CodeFragmentManager.class);
     }
 
-    public void addCodeFragmentListener(CodeFragmentListener listener) {
-        codeFragmentListeners.add(listener);
-    }
-
-    private void returnRecommendations() {
+    @NotNull
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
@@ -60,9 +56,7 @@ public class CodeFragmentManager extends Worker {
             }
         }
 
-        for (CodeFragmentListener listener : codeFragmentListeners) {
-            listener.onOutput(withVariables);
-        }
+        return withVariables;
     }
 
     @Override
@@ -91,7 +85,7 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onInput(input);
         }
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -100,7 +94,7 @@ public class CodeFragmentManager extends Worker {
             worker.onDataframe(tableName, table);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -109,7 +103,7 @@ public class CodeFragmentManager extends Worker {
             worker.onCell(row, column);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -117,7 +111,7 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onCells(cells);
         }
-        returnRecommendations();
+        // returnRecommendations();
     }
 
     @Override
@@ -126,7 +120,10 @@ public class CodeFragmentManager extends Worker {
             worker.onRow(row);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
+        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
+        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
@@ -135,7 +132,10 @@ public class CodeFragmentManager extends Worker {
             worker.onColumn(column);
         }
 
-        returnRecommendations();
+        // returnRecommendations();
+        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
+        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
+        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
@@ -157,10 +157,5 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onCodeFragment(fragment);
         }
-    }
-
-    @Override
-    public LinkedHashSet<CodeFragment> getRecommendations() {
-        return null;
     }
 }

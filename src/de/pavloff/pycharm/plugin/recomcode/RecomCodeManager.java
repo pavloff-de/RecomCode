@@ -12,9 +12,9 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
+import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -24,6 +24,7 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class RecomCodeManager {
@@ -88,57 +89,65 @@ public class RecomCodeManager {
             }
         });
 
-        setCodeFragmentHandler();
-
         return mainPanel;
     }
 
     private void handleDocumentEvent(DocumentEvent e) {
         // TODO: implement a delay for input
-        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
         Document doc = e.getDocument();
         try {
             // read always full text
             String input = doc.getText(0, doc.getLength());
-            recommender.onInput(input);
+            serverStub.onInput(input);
+            updateAndDisplayRecommendations();
         } catch (BadLocationException e1) {
             e1.printStackTrace();
         }
 
     }
 
-    private void setCodeFragmentHandler() {
-        CodeFragmentManager recommender = CodeFragmentManager.getInstance(openedProject);
+    /** This method should be called to update the list of recommendations.
+     *  It replaces the usage of the CodeFragmentListener
+     */
+    public void updateAndDisplayRecommendations() {
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecommendations();
+        EventQueue.invokeLater(() -> { repaintRecommendations(serverStub, newRecommendations); });
+    }
 
-        recommender.addCodeFragmentListener(fragments -> EventQueue.invokeLater(() -> {
-            recomCodePanel.removeAll();
+    /** Code which repaints recommendations, and adds listener to each recommended fragement for mause click
+     * @param serverStub current CodeFragmentManager
+     * @param fragments set of current fragments
+     */
+    private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
+        recomCodePanel.removeAll();
 
-            if (fragments == null) {
-                return;
-            }
+        if (fragments == null) {
+            return;
+        }
 
-            for (CodeFragment fragment : fragments) {
-                RecomCode r = new RecomCode(fragment);
+        for (CodeFragment fragment : fragments) {
+            RecomCode r = new RecomCode(fragment);
 
-                r.addListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        recommender.onCodeFragment(fragment);
+            r.addListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    serverStub.onCodeFragment(fragment);
 
-                        Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
+                    Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 
-                        if (editor != null) {
-                            TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
-                            templateManager.startTemplate(editor, newTemplate(fragment));
-                            IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
-                        }
+                    if (editor != null) {
+                        TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
+                        templateManager.startTemplate(editor, newTemplate(fragment));
+                        IdeFocusManager.getInstance(openedProject).requestFocus(editor.getContentComponent(), true);
                     }
-                });
+                }
+            });
 
-                recomCodePanel.add(r);
-            }
-            recomCodePanel.repaint();
-        }));
+            recomCodePanel.add(r);
+        }
+        recomCodePanel.repaint();
     }
 
     private Template newTemplate(CodeFragment fragment) {

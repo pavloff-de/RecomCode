@@ -6,10 +6,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
-import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
+import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
+import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
@@ -37,8 +38,10 @@ class DataframeTab extends JPanel implements BaseConstants {
         String varName = name.split(" ")[1];
 
         if (tableView != null) {
-            CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-            manager.onDataframe(varName, tableView.getModel());
+            ServerStub serverStub = ServerStub.getInstance(openedProject);
+            serverStub.onDataframe(varName, tableView.getModel());
+            RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
+            recomCodeManager.updateAndDisplayRecommendations();
         }
         if (isOpened) {
             return;
@@ -99,8 +102,10 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
                 show(tableView);
 
-                CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-                manager.onDataframe(varName, tableView.getModel());
+                ServerStub serverStub = ServerStub.getInstance(openedProject);
+                serverStub.onDataframe(varName, tableView.getModel());
+                RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
+                recomCodeManager.updateAndDisplayRecommendations();
             }
 
             @Override
@@ -115,14 +120,14 @@ class DataframeTab extends JPanel implements BaseConstants {
     }
 
     private static class SelectionListener implements ListSelectionListener {
-        private CodeFragmentManager manager;
+        private ServerStub serverStub;
         private Project project;
         private JBTable table;
 
         SelectionListener(Project openedProject, JBTable tableView) {
             project = openedProject;
             table = tableView;
-            manager = CodeFragmentManager.getInstance(project);
+            serverStub = ServerStub.getInstance(project);
         }
 
         @Override
@@ -146,10 +151,12 @@ class DataframeTab extends JPanel implements BaseConstants {
             }
 
             if (cells.size() == 1) {
-                manager.onCell(cells.get(0).first, cells.get(0).second);
+                serverStub.onCell(cells.get(0).first, cells.get(0).second);
             } else {
-                manager.onCells(cells);
+                serverStub.onCells(cells);
             }
+            RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
+            recomCodeManager.updateAndDisplayRecommendations();
         }
     }
 

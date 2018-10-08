@@ -10,11 +10,11 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
-import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.BaseConstants;
+import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
@@ -194,8 +194,8 @@ public class VarViewerManager implements BaseConstants {
                 mainOutput.append(s).append(LINE_SEP);
             }
         }
-        CodeFragmentManager manager = CodeFragmentManager.getInstance(openedProject);
-        manager.onVariables(varOutput);
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        serverStub.onVariables(varOutput);
         createTabs(mainOutput, dfOutput);
     }
 
