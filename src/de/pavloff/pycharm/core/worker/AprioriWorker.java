@@ -4,26 +4,30 @@ import com.intellij.openapi.util.Pair;
 import de.mrapp.apriori.*;
 import de.mrapp.apriori.metrics.Confidence;
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeVariable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;
 import java.util.*;
 
-public class AprioriWorker implements Worker {
+public class AprioriWorker extends Worker {
 
-    private CodeFragmentLoader loader;
     private LinkedHashSet<CodeFragment> recommendations;
+
     private LinkedList<MyItem> items;
+
     private ArrayList<MyItem> newItems;
 
     private Apriori<MyItem> apriori;
 
-    public AprioriWorker(CodeFragmentLoader loader) {
-        this.loader = loader;
+    public AprioriWorker() {
         apriori = new Apriori.Builder<MyItem>(0.01).generateRules(0.02).ruleCount(100).create();
         items = new LinkedList<>();
+    }
+
+    @Override
+    public void initialize() {
+
     }
 
     @Override
@@ -37,7 +41,7 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public void onInput(String input) {
+    protected void inputProcessing(String input) {
         if (input.length() == 0) {
             return;
         }
@@ -46,19 +50,19 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public void dataframeSelected(String tableName, TableModel table) {
+    protected void dataframeProcessing(String tableName, TableModel table) {
         items.add(new MyItem("DataFrame_" + table.toString()));
         searchForFragments();
     }
 
     @Override
-    public void cellSelected(int row, int column) {
+    protected void cellProcessing(int row, int column) {
         items.add(new MyItem("Cell_" + String.valueOf(row) + "_" + String.valueOf(column)));
         searchForFragments();
     }
 
     @Override
-    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
+    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
         int s = cells.size();
         if (s == 0) {
             return;
@@ -66,7 +70,7 @@ public class AprioriWorker implements Worker {
 
         Pair first = cells.get(0);
         if (s == 1) {
-            cellSelected((Integer) first.first, (Integer) first.second);
+            onCell((Integer) first.first, (Integer) first.second);
             return;
         }
 
@@ -77,31 +81,32 @@ public class AprioriWorker implements Worker {
     }
 
     @Override
-    public void rowSelected(int row) {
+    protected void rowProcessing(int row) {
         items.add(new MyItem("Row_" + String.valueOf(row)));
         searchForFragments();
     }
 
     @Override
-    public void columnSelected(int column) {
+    protected void columnProcessing(int column) {
         items.add(new MyItem("Column_" + String.valueOf(column)));
         searchForFragments();
     }
 
     @Override
-    public void codeFragmentSelected(CodeFragment fragment) {
+    protected void sourcecodeProcessing(String code) {
+
+    }
+
+    @Override
+    protected void variablesProcessing(Map<String, CodeVariable> variables) {
+
+    }
+
+    @Override
+    protected void codeFragmentProcessing(CodeFragment fragment) {
         items.add(new MyItem(fragment));
     }
 
-    @Override
-    public void sourceCode(String code) {
-
-    }
-
-    @Override
-    public void codeVariables(Map<String, CodeVariable> variables) {
-
-    }
 
     @Override
     public LinkedHashSet<CodeFragment> getRecommendations() {
@@ -223,11 +228,11 @@ public class AprioriWorker implements Worker {
             list = new LinkedList<>();
         }
 
-        public Boolean add(MyItem item) {
-            return list.add(item);
+        void add(MyItem item) {
+            list.add(item);
         }
 
-        public int size() {
+        int size() {
             return list.size();
         }
 

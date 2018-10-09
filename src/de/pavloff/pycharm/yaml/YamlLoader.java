@@ -83,6 +83,7 @@ public class YamlLoader implements CodeFragmentLoader {
             } else if (record.get("recType").equals("code")) {
                 String code = castToString(record.get("code"));
                 Map<String, CodeParam> defaultParams = castToParams(record.get("parameter"));
+                String[] paramsList = parseVariables(code);
 
                 CodeFragment c = new CodeFragment.Builder()
                         .setRecId(castToString(record.get("recID")))
@@ -94,8 +95,8 @@ public class YamlLoader implements CodeFragmentLoader {
                         .setSources(castToString(record.get("sources")))
                         .setDocumentation(castToString(record.get("documentation")))
                         .setCode(code)
-                        .setDefaultParams(filterParams(
-                                parseVariables(code), defaultParams, globalParams))
+                        .setParamsList(paramsList)
+                        .setDefaultParams(filterParams(paramsList, defaultParams, globalParams))
                         .build();
                 fragments.add(c);
             }
@@ -161,7 +162,7 @@ public class YamlLoader implements CodeFragmentLoader {
     }
 
     private String[] parseVariables(String code) {
-        Set<String> visitedVariables = new HashSet<>();
+        Set<String> visitedVariables = new LinkedHashSet<>();
         Matcher m = Pattern.compile("\\$(.*?)\\$").matcher(code);
 
         while (m.find()) {

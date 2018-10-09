@@ -30,12 +30,12 @@ public class ServerStubWithRPC implements ServerStub {
     }
 
     @Override
-    public LinkedHashSet<CodeFragment> getRecomputedRecommendations() {
+    public LinkedHashSet<CodeFragment> getRecommendations() {
         return new LinkedHashSet<>(0);
     }
 
     @Override
-    public void codeFragmentSelected(CodeFragment fragment) {
+    public void onCodeFragment(CodeFragment fragment) {
     }
 
 
@@ -43,27 +43,31 @@ public class ServerStubWithRPC implements ServerStub {
     // Methods for varviewer
 
     @Override
-    public void dataframeSelected(String tableName, TableModel table) {
+    public void onDataframe(String tableName, TableModel table) {
     }
 
     @Override
-    public void cellSelected(int row, int column) {
+    public void onCell(int row, int column) {
     }
 
     @Override
-    public void cellsSelected(List<Pair<Integer, Integer>> cells) {
+    public void onCells(List<Pair<Integer, Integer>> cells) {
     }
 
     @Override
-    public void rowSelected(int row) {
+    public void onRow(int row) {
     }
 
     @Override
-    public void columnSelected(int column) {
+    public void onColumn(int column) {
     }
 
     @Override
-    public void codeVariables(Map<String, CodeVariable> variables) {
+    public void onSourcecode(String code) {
+    }
+
+    @Override
+    public void onVariables(Map<String, CodeVariable> variables) {
     }
 
 }

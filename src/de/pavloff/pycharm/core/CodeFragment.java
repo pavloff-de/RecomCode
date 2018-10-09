@@ -13,6 +13,7 @@ public class CodeFragment {
     private final String sources;
     private final String documentation;
     private final String code;
+    private final String[] paramsList;
     private final Map<String, CodeParam> defaultParams;
 
     private CodeFragment(Builder builder) {
@@ -25,6 +26,7 @@ public class CodeFragment {
         this.sources = builder.sources;
         this.documentation = builder.documentation;
         this.code = builder.code;
+        this.paramsList = builder.paramsList;
         this.defaultParams = builder.defaultParams;
     }
 
@@ -48,8 +50,8 @@ public class CodeFragment {
         return code;
     }
 
-    public String[] getVariables() {
-        return defaultParams.keySet().toArray(new String[0]);
+    public String[] getParamsList() {
+        return paramsList;
     }
 
     public Map<String, CodeParam> getDefaultParams() {
@@ -82,7 +84,7 @@ public class CodeFragment {
 
         if (newParams.size() != 0) {
             Builder builder = new Builder().setRecId(recID).setGroup(group)
-                    .setKeywords(keywords).setSources(sources).setCode(code);
+                    .setKeywords(keywords).setSources(sources).setCode(code).setParamsList(paramsList);
 
             Map<String, CodeParam> updatedParams = new HashMap<>(defaultParams);
             updatedParams.putAll(newParams);
@@ -131,6 +133,7 @@ public class CodeFragment {
         private String sources;
         private String documentation;
         private String code;
+        private String[] paramsList;
         private Map<String, CodeParam> defaultParams;
 
         public Builder setRecId(String recID) {
@@ -175,6 +178,11 @@ public class CodeFragment {
 
         public Builder setCode(String code) {
             this.code = code;
+            return this;
+        }
+
+        public Builder setParamsList(String[] paramsList) {
+            this.paramsList = paramsList;
             return this;
         }
 
