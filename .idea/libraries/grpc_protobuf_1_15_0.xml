@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="grpc-protobuf-1.15.0">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../lib/grpc-protobuf-1.15.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
