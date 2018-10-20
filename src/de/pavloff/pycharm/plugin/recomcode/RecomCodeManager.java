@@ -121,6 +121,8 @@ public class RecomCodeManager {
      * @param fragments set of current fragments
      */
     private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
+        if (recomCodePanel == null) return;
+
         recomCodePanel.removeAll();
 
         if (fragments == null) {
