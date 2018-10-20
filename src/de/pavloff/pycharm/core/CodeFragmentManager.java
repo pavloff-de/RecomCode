@@ -59,8 +59,12 @@ public class CodeFragmentManager extends Worker {
         return withVariables;
     }
 
+    private Boolean initialized = false;
+
     @Override
     public void initialize() {
+        if (initialized) return;
+
         CodeFragmentLoader loader = new YamlLoader();
 
         Worker kw = new KeywordWorker(loader);
@@ -68,6 +72,8 @@ public class CodeFragmentManager extends Worker {
 
         Worker aw = new AprioriWorker();
         workers.put(aw.workerName(), aw);
+
+        initialized = true;
     }
 
     @Override
