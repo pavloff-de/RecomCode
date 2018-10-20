@@ -84,7 +84,9 @@ public class CodeFragment {
                             .setExpr("").setName(lastVar.getName()).setVars(lastVar.getValue()).build());
 
                     if (newTextKey.contains(parName)) {
-                        newTextKey = newTextKey.replace(parName, lastVar.getValue());
+                        String varName = String.format("%s \"%s\"", parName,
+                                lastVar.getValue());
+                        newTextKey = newTextKey.replace(parName, varName);
                     }
 
                 }
