@@ -43,20 +43,21 @@ public class CodeFragmentManager extends Worker {
             }
         }
 
-        recommendation = sorter.sortFragments();
+        LinkedHashSet<Pair<Integer, CodeFragment>> ratedRecommendations = sorter.getSortedFragmentsWithRating();
 
-        LinkedHashSet<CodeFragment> withVariables = new LinkedHashSet<>();
-        for (CodeFragment fragment : recommendation) {
+        for (Pair<Integer, CodeFragment> ratedFragment : ratedRecommendations) {
+            List<CodeFragment> fragmentWithVariables = ratedFragment.second.getWithVariables(getMyVariables());
+            int numOfVariables = fragmentWithVariables.size();
 
-            List<CodeFragment> fragmentWithVariables = fragment.getWithVariables(getMyVariables());
-            if (fragmentWithVariables.size() != 0) {
-                withVariables.addAll(fragmentWithVariables);
-            } else {
-                withVariables.add(fragment);
+            if (numOfVariables != 0) {
+                for (CodeFragment fragmentWithVariable : fragmentWithVariables) {
+                    sorter.add(fragmentWithVariable, ratedFragment.first + numOfVariables);
+                }
+                sorter.remove(ratedFragment.second);
             }
         }
 
-        return withVariables;
+        return sorter.getSortedFragments();
     }
 
     private Boolean initialized = false;

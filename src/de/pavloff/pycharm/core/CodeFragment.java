@@ -1,5 +1,7 @@
 package de.pavloff.pycharm.core;
 
+import com.intellij.openapi.util.Pair;
+
 import java.util.*;
 
 public class CodeFragment {
@@ -226,11 +228,21 @@ public class CodeFragment {
             }
         }
 
-        public LinkedHashSet<CodeFragment> sortFragments() {
+        public void remove(CodeFragment fragment) {
+            if (ratings.containsKey(fragment)) {
+                ratings.remove(fragment);
+            }
+        }
+
+        private ListIterator sortFragments() {
             List<Map.Entry<CodeFragment, Integer>> ratedFragments = new ArrayList<>(ratings.entrySet());
-            LinkedHashSet<CodeFragment> sortedFragments = new LinkedHashSet<>();
             ratedFragments.sort(Map.Entry.comparingByValue());
-            ListIterator it = ratedFragments.listIterator(ratedFragments.size());
+            return ratedFragments.listIterator(ratedFragments.size());
+        }
+
+        public LinkedHashSet<CodeFragment> getSortedFragments() {
+            ListIterator it = sortFragments();
+            LinkedHashSet<CodeFragment> sortedFragments = new LinkedHashSet<>();
 
             while(it.hasPrevious()) {
                 Map.Entry bestRec = (Map.Entry) it.previous();
@@ -238,6 +250,19 @@ public class CodeFragment {
             }
 
             return sortedFragments;
+        }
+
+        public LinkedHashSet<Pair<Integer, CodeFragment>> getSortedFragmentsWithRating() {
+            ListIterator it = sortFragments();
+            LinkedHashSet<Pair<Integer, CodeFragment>> sortedFragmentsWithRating = new LinkedHashSet<>();
+
+            while(it.hasPrevious()) {
+                Map.Entry bestRec = (Map.Entry) it.previous();
+                sortedFragmentsWithRating.add(new Pair<>((Integer) bestRec.getValue(),
+                        (CodeFragment) bestRec.getKey()));
+            }
+
+            return sortedFragmentsWithRating;
         }
     }
 }

@@ -131,7 +131,7 @@ public class KeywordWorker extends Worker {
             sorter.add(fragment, rating);
         }
 
-        recommendations = sorter.sortFragments();
+        recommendations = sorter.getSortedFragments();
     }
 
     private int rate(CodeFragment fragment) {
