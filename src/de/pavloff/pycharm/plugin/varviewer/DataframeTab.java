@@ -99,7 +99,15 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView = new JBTable(new DefaultTableModel(data, header));
                 tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tableView.setCellSelectionEnabled(true);
-                tableView.getSelectionModel().addListSelectionListener(new SelectionListener(openedProject, tableView));
+                tableView.setColumnSelectionAllowed(true);
+                ListSelectionModel columnSelectionModel = tableView.getColumnModel().getSelectionModel();
+                columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                columnSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
+                        tableView));
+                ListSelectionModel rowSelectionModel = tableView.getSelectionModel();
+                rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                rowSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
+                        tableView));
                 show(tableView);
 
                 ServerStub serverStub = ServerStub.getInstance(openedProject);
