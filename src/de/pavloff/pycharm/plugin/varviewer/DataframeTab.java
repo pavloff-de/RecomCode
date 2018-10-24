@@ -96,7 +96,7 @@ class DataframeTab extends JPanel implements BaseConstants {
                     data[i] = outputLines[i].split(DELIMITER);
                 }
 
-                tableView = new JBTable(new DefaultTableModel(data, header));
+                tableView = new JBTable(new NotEditableTableModel(data, header));
                 tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tableView.setCellSelectionEnabled(true);
                 tableView.setColumnSelectionAllowed(true);
@@ -173,5 +173,15 @@ class DataframeTab extends JPanel implements BaseConstants {
         add(new JBScrollPane(panel));
         revalidate();
         repaint();
+    }
+
+    private class NotEditableTableModel extends DefaultTableModel {
+        public NotEditableTableModel(String[][] data, String[] header) {
+            super(data, header);
+        }
+
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
     }
 }
