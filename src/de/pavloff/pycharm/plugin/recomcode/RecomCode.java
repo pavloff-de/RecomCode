@@ -12,8 +12,8 @@ import java.awt.event.MouseListener;
 
 class RecomCode extends JPanel {
 
-    private Dimension mainSize = new Dimension(250, 100);
-    private Dimension textSize = new Dimension(240, 70);
+    private Dimension mainSize = new Dimension(200, 70);
+    private Dimension textSize = new Dimension(190, 70);
 
     private JLabel fragmentName;
 
@@ -37,7 +37,7 @@ class RecomCode extends JPanel {
             textkey = textkeys[0];
         }
 
-        fragmentName.setText("<html>" + textkey + "</html>");
+        fragmentName.setText("<html><font size=5>" + textkey + "</font></html>");
         fragmentName.setForeground(new JBColor(JBColor.DARK_GRAY, JBColor.LIGHT_GRAY));
         add(fragmentName, c);
 
