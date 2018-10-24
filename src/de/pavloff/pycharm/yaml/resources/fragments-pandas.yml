@@ -113,6 +113,27 @@ parameter:
   - name: dictionaryOfColumnNames
     vars: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"
 ---
+recType: code
+recID: py.pd.col.006
+group: pandas
+keywords: [select, columns, number, podition]
+textkey:
+- "select column in a dataframe by position|number|integer"
+code: $dataframe2$ = $dataframe$[$dataframe$.columns[$column_index$]]
+parameter:
+- name: dataframe2
+  expr: "pyUniqueIterableVariable"
+---
+recType: code
+recID: py.pd.col.007
+group: pandas
+keywords: [select, columns, name]
+textkey:
+- "select column in a dataframe by name"
+code: $dataframe2$ = $dataframe$[["$column_name$"]]
+parameter:
+- name: dataframe2
+  expr: "pyUniqueIterableVariable"
 ---
 recType: code
 group: pandas
