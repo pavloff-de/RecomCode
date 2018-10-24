@@ -54,7 +54,7 @@ replaceable: no
 recType: code
 recID: py.pd.rw.001
 group: pandas
-keywords: [select, row]
+keywords: [select, row, position, number]
 textkey:
   - "select|get single row_index by position|integer|number"
   - "retrieve row in dataframe"
@@ -117,7 +117,7 @@ parameter:
 recType: code
 group: pandas
 recID: py.pd.df.001
-keywords: [dataframe, iterator, columns, items]
+keywords: [iterator, columns, iterate]
 textkey:
 - "iterate over columns of a dataframe"
 code: "for $i$ in $dataframe$.iteritems():\n    $END$"
@@ -125,7 +125,7 @@ code: "for $i$ in $dataframe$.iteritems():\n    $END$"
 recType: code
 group: pandas
 recID: py.pd.df.002
-keywords: [dataframe, iterator, rows]
+keywords: [iterator, rows, iterate]
 textkey:
 - "iterate over rows of a dataframe"
 code: "for $i$ in $dataframe$.iterrows():\n    $END$"
@@ -133,7 +133,7 @@ code: "for $i$ in $dataframe$.iterrows():\n    $END$"
 recType: code
 group: pandas
 recID: py.pd.df.003
-keywords: [dataframe, iterator, rows, tuples, namedtuples]
+keywords: [iterator, rows, tuples, namedtuples, iterate]
 textkey:
 - "iterate over rows as namedtuples"
 code: "for $i$ in $dataframe$.itertuples(index=$index$, name=\"$name$\"):\n    $END$"
