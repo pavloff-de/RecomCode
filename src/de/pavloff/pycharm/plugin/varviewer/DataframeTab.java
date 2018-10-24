@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -97,17 +98,23 @@ class DataframeTab extends JPanel implements BaseConstants {
                 }
 
                 tableView = new JBTable(new NotEditableTableModel(data, header));
+                JTableHeader tableHeader = tableView.getTableHeader();
+                tableHeader.setFont(new Font("Default", Font.BOLD, 16));
+
                 tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tableView.setCellSelectionEnabled(true);
                 tableView.setColumnSelectionAllowed(true);
+
                 ListSelectionModel columnSelectionModel = tableView.getColumnModel().getSelectionModel();
                 columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 columnSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
                         tableView));
+
                 ListSelectionModel rowSelectionModel = tableView.getSelectionModel();
                 rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 rowSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
                         tableView));
+
                 show(tableView);
 
                 ServerStub serverStub = ServerStub.getInstance(openedProject);
