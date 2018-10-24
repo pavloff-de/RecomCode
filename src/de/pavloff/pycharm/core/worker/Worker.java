@@ -180,8 +180,9 @@ public abstract class Worker {
 
         } else {
             vars = new LinkedList<>();
-            myVariables.put(varName, vars);
         }
+
+        myVariables.put(varName, vars);
 
         vars.add(new CodeVariable.Builder()
                 .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
