@@ -92,8 +92,10 @@ class DataframeTab extends JPanel implements BaseConstants {
                     outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
                 }
 
-                String[][] data = new String[outputLines.length][header.length];
-                for (int i = 0; i < outputLines.length; i++) {
+                int linesToShow = Math.min(outputLines.length, 1000);
+
+                String[][] data = new String[linesToShow][header.length];
+                for (int i = 0; i < linesToShow; i++) {
                     data[i] = outputLines[i].split(DELIMITER);
                 }
 
