@@ -118,6 +118,7 @@ public class ConnectionManager {
                     }
 
                     outputs.get(m).onOutput(output);
+                    outputs.remove(m);
                 }
 
                 @Override
@@ -135,13 +136,7 @@ public class ConnectionManager {
                 }
 
                 @Override
-                public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {
-                    if (!outputs.containsKey(m)) {
-                        return;
-                    }
-
-                    outputs.remove(m);
-                }
+                public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {}
             };
 
             Pair<String, String> conf = getConfiguration();
