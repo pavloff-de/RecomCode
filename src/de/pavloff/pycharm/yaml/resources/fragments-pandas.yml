@@ -118,7 +118,7 @@ recID: py.pd.col.006
 group: pandas
 keywords: [select, columns, number, podition]
 textkey:
-- "select column in a dataframe by position|number|integer"
+- "select column_index in a dataframe by position|number|integer"
 code: $dataframe2$ = $dataframe$[$dataframe$.columns[$column_index$]]
 parameter:
 - name: dataframe2
@@ -129,7 +129,7 @@ recID: py.pd.col.007
 group: pandas
 keywords: [select, columns, name]
 textkey:
-- "select column in a dataframe by name"
+- "select column_name in a dataframe by name"
 code: $dataframe2$ = $dataframe$[["$column_name$"]]
 parameter:
 - name: dataframe2
