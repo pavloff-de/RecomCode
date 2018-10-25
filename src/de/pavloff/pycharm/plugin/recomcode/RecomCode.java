@@ -12,8 +12,9 @@ import java.awt.event.MouseListener;
 
 class RecomCode extends JPanel {
 
-    private Dimension mainSize = new Dimension(200, 70);
-    private Dimension textSize = new Dimension(190, 70);
+    // Changes the sizes of recommendation "rectangles" (x-size, y-size)
+    private Dimension mainSize = new Dimension(300, 140);
+    private Dimension textSize = new Dimension(295, 138);
 
     private JLabel fragmentName;
 
@@ -25,10 +26,13 @@ class RecomCode extends JPanel {
         c.weightx = 0.0;
         c.gridx = 0;
         c.gridy = 0;
+        // Settings of Jlabel are here: https://docs.oracle.com/javase/7/docs/api/javax/swing/JLabel.html
         fragmentName = new JLabel();
         fragmentName.setMinimumSize(textSize);
         fragmentName.setPreferredSize(textSize);
         fragmentName.setMaximumSize(textSize);
+        fragmentName.setHorizontalAlignment(SwingConstants.CENTER);
+        fragmentName.setVerticalAlignment(SwingConstants.CENTER);
 
         String[] textkeys = fragment.getCleanTextkeys();
         String textkey = fragment.getCode(); // no text ?
@@ -37,7 +41,8 @@ class RecomCode extends JPanel {
             textkey = textkeys[0];
         }
 
-        fragmentName.setText("<html><font size=5>" + textkey + "</font></html>");
+        // fragmentName.setText("<html><font size=6><div style='text-align: center;font-size:2ex;'>" + textkey + "</font></div></html>");
+        fragmentName.setText("<html><div style='text-align: center;font-size:x-large;'>" + textkey + "</div></html>");
         fragmentName.setForeground(new JBColor(JBColor.DARK_GRAY, JBColor.LIGHT_GRAY));
         add(fragmentName, c);
 
@@ -56,7 +61,10 @@ class RecomCode extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(new JBColor(JBColor.LIGHT_GRAY, JBColor.DARK_GRAY));
-        g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // i dont know which
+        // g.setColor(new JBColor(JBColor.LIGHT_GRAY, JBColor.DARK_GRAY));
+        g.setColor(new JBColor(JBColor.ORANGE, JBColor.DARK_GRAY));
+        // Paints rectangle "background" with rounded corners
+        // fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight), https://goo.gl/Wqswqs
+        g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
     }
 }

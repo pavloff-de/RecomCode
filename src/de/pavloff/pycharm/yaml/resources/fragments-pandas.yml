@@ -116,7 +116,7 @@ parameter:
 recType: code
 recID: py.pd.col.006
 group: pandas
-keywords: [select, columns, number, podition]
+keywords: [select, columns, number, position]
 textkey:
 - "select column_index in a dataframe by position|number|integer"
 code: $dataframe2$ = $dataframe$[$dataframe$.columns[$column_index$]]
