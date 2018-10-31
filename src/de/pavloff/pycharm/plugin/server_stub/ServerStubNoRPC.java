@@ -22,6 +22,8 @@ public class ServerStubNoRPC implements ServerStub {
     @Override
     public void initialize(Project project) {
         this.project = project;
+        // CodeFragmentManager defaultCodeFragmentManager = new CodeFragmentManager();
+        // CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class, defaultCodeFragmentManager);
         CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class);
         recommender.initialize();
     }

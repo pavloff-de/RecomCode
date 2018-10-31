@@ -6,12 +6,11 @@ import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.impl.ComponentManagerImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
@@ -20,6 +19,9 @@ import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
+import org.picocontainer.ComponentAdapter;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.PicoContainer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -29,8 +31,10 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+
 
 /** Implements the plugin component which manages the recommendations, and contains the main "event handling" for recommendations.
  * Implements the ProjectComponent interface, see https://goo.gl/kjpXga
@@ -42,7 +46,7 @@ public class RecomCodeManager implements ProjectComponent {
     private JBTextField searchField;
     private JPanel recomCodePanel;
     private Project openedProject;
-    private Logger logger = Logger.getInstance(RecomCodeManager.class);
+    static Logger logger = Logger.getInstance(RecomCodeManager.class);
 
 
 
@@ -50,23 +54,48 @@ public class RecomCodeManager implements ProjectComponent {
         openedProject = inputProject;
     }
 
+    public static RecomCodeManager createAndRegisterInstance (Project project) {
+        MutablePicoContainer container = (MutablePicoContainer) project.getPicoContainer();
+
+        RecomCodeManager manager = new RecomCodeManager(project);
+        container.registerComponentInstance(manager);
+
+        RecomCodeManager managerFromContainer = project.getComponent(RecomCodeManager.class);
+
+        logger.info("MutablePicoContainer instance is: " + container);
+        logger.info("managerFromContainer  is: " + managerFromContainer);
+        return manager;
+/*
+
+        Iterator var3 = container.getComponentAdapters().iterator();
+        while(var3.hasNext()) {
+            ComponentAdapter componentAdapter = (ComponentAdapter)var3.next();
+            if (componentAdapter instanceof ComponentManagerImpl.ComponentConfigComponentAdapter) {
+                componentAdapter.getComponentInstance(container);
+            }
+        }
+
+*/
+    }
+
     @Override
     public void initComponent() {
-        // ToolWindow toolWindow = ToolWindowManager.getInstance(openedProject).getToolWindow("RecomCode");
-        // toolWindow.activate(null);
-        // logger.debug("Created tool window: " +  toolWindow.toString());
-        logger.debug("RecomCodeManager initialized");
+        ServerStub server = ServerStub.getInstance(openedProject);
+        server.initialize(openedProject);
+
+        logger.info("RecomCodeManager initialized");
     }
 
     @Override
     public void disposeComponent() {
         // called when project is disposed
+        logger.debug("RecomCodeManager disposed");
     }
 
     @NotNull
     @Override
     public String getComponentName() {
-        return "RecomCodePlugin";
+        return "RecomCode.RecomCodeManager";
     }
 
     @Override
@@ -83,10 +112,11 @@ public class RecomCodeManager implements ProjectComponent {
 
 
     public static RecomCodeManager getInstance(Project project) {
-        return project.getComponent(RecomCodeManager.class);
+        RecomCodeManager manager = project.getComponent(RecomCodeManager.class);
+        return manager;
     }
 
-
+    // todo: possibly move this method to RecomCodeToolWindow, as the other class is responsible for the panel (what about instance vars?)
     Component initView(Project project) {
         openedProject = project;
 

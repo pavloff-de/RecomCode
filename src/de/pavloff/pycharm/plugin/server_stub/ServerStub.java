@@ -10,6 +10,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+// ServerStub is the object handing all interactions with the "engine".
+// It replaces previous usage of CodeFragmentManager.
 public interface ServerStub {
     // todo: think whether we need a separate instance per project? Not good for RPC, as we have only 1 server process
 
