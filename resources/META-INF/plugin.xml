@@ -47,8 +47,8 @@
     </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.pycharm.plugin.varviewer.VarViewerProjectComponent"/>
-    <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.pycharm.plugin.recomcode.RecomCodeProjectComponent"/>
+      <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.pycharm.plugin.recomcode.RecomCodeExtension"/>
+      <toolWindow id="VarViewer" icon="/img/recomcode.png" anchor="right" factoryClass="de.pavloff.pycharm.plugin.varviewer.VarViewerExtension"/>
 
     <liveTemplateMacro implementation="de.pavloff.pycharm.plugin.macros.PyUniqueIterableVariableMacro"/>
   </extensions>

@@ -5,16 +5,21 @@ import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TextExpression;
+import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
+import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -27,15 +32,60 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-public class RecomCodeManager {
+/** Implements the plugin component which manages the recommendations, and contains the main "event handling" for recommendations.
+ * Implements the ProjectComponent interface, see https://goo.gl/kjpXga
+ * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under <project-components>.
+ */
+
+public class RecomCodeManager implements ProjectComponent {
 
     private JBTextField searchField;
     private JPanel recomCodePanel;
     private Project openedProject;
+    private Logger logger = Logger.getInstance(RecomCodeManager.class);
+
+
+
+    public RecomCodeManager (Project inputProject) {
+        openedProject = inputProject;
+    }
+
+    @Override
+    public void initComponent() {
+        // ToolWindow toolWindow = ToolWindowManager.getInstance(openedProject).getToolWindow("RecomCode");
+        // toolWindow.activate(null);
+        // logger.debug("Created tool window: " +  toolWindow.toString());
+        logger.debug("RecomCodeManager initialized");
+    }
+
+    @Override
+    public void disposeComponent() {
+        // called when project is disposed
+    }
+
+    @NotNull
+    @Override
+    public String getComponentName() {
+        return "RecomCodePlugin";
+    }
+
+    @Override
+    public void projectOpened() {
+        // called when project is opened
+    }
+
+    @Override
+    public void projectClosed() {
+        // called when project is being closed
+    }
+
+
+
 
     public static RecomCodeManager getInstance(Project project) {
         return project.getComponent(RecomCodeManager.class);
     }
+
 
     Component initView(Project project) {
         openedProject = project;
@@ -130,7 +180,7 @@ public class RecomCodeManager {
         }
 
         for (CodeFragment fragment : fragments) {
-            RecomCode r = new RecomCode(fragment);
+            RecomBox r = new RecomBox(fragment);
 
             r.addListener(new MouseAdapter() {
                 @Override

@@ -10,7 +10,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 
-class RecomCode extends JPanel {
+/** Encapsulates single code recommendation, corresponding to a rectangle in the recommendation panel.
+ *  In particular, it draws the rectangle as a JPanel with a JLabel, and adds mouse listener to it
+ */
+class RecomBox extends JPanel {
 
     // Changes the sizes of recommendation "rectangles" (x-size, y-size)
     private Dimension mainSize = new Dimension(300, 140);
@@ -18,7 +21,7 @@ class RecomCode extends JPanel {
 
     private JLabel fragmentName;
 
-    RecomCode(CodeFragment fragment) {
+    RecomBox(CodeFragment fragment) {
         setPreferredSize(mainSize);
         setLayout(new GridBagLayout());
 
@@ -48,6 +51,8 @@ class RecomCode extends JPanel {
 
         c.gridx = 0;
         c.gridy = 1;
+        // todo: explain what this does.
+        // See docu at https://goo.gl/3KhgEq
         ActionManager actionManager = ActionManager.getInstance();
         ActionGroup actionGroup = (ActionGroup) actionManager.getAction("RecomCode.Toolbar");
         ActionToolbar actionToolbar = actionManager.createActionToolbar("RecomCode.Toolbar.ID", actionGroup, false);
