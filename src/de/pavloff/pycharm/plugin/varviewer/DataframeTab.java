@@ -108,12 +108,12 @@ class DataframeTab extends JPanel implements BaseConstants {
                 tableView.setColumnSelectionAllowed(true);
 
                 ListSelectionModel columnSelectionModel = tableView.getColumnModel().getSelectionModel();
-                columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
                 columnSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
                         tableView));
 
                 ListSelectionModel rowSelectionModel = tableView.getSelectionModel();
-                rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
                 rowSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
                         tableView));
 

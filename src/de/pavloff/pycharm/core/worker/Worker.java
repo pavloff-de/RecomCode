@@ -112,6 +112,24 @@ public abstract class Worker {
     }
 
     public void onCells(List<Pair<Integer, Integer>> cells) {
+        if (cells.size() == 0) {
+            return;
+        }
+
+        if (selectedDataframe != null) {
+            int someSelectedRow = cells.get(0).first;
+            ArrayList<String> columnNames = new ArrayList<>();
+
+            for (Pair<Integer, Integer> cell : cells) {
+                if (cell.first != someSelectedRow) {
+                    // run over one row
+                    continue;
+                }
+                columnNames.add(selectedDataframe.getColumnName(cell.second));
+            }
+            addColumnNamesVariable("\"" + String.join("\", \"", columnNames) + "\"");
+        }
+
         cellsprocessing(cells);
     }
 
@@ -157,15 +175,19 @@ public abstract class Worker {
     }
 
     protected void addRowVariable(int row) {
-        addVariable( "int", "row_index", String.valueOf(row), null);
+        addVariable( "int", "rowIndex", String.valueOf(row), null);
     }
 
     protected void addColumnVariable(int column) {
-        addVariable( "int", "column_index", String.valueOf(column), null);
+        addVariable( "int", "columnIndex", String.valueOf(column), null);
     }
 
     protected void addColumnNameVariable(String columnName) {
-        addVariable("str", "column_name", columnName, null);
+        addVariable("str", "columnName", columnName, null);
+    }
+
+    protected void addColumnNamesVariable(String columnNames) {
+        addVariable("list", "columnNames", columnNames, null);
     }
 
     protected void addVariable(String type, String varName, String value, String moduleName) {
