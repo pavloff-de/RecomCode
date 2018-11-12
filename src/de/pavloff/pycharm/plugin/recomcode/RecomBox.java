@@ -51,7 +51,8 @@ class RecomBox extends JPanel {
 
         c.gridx = 0;
         c.gridy = 1;
-        // todo: explain what this does.
+        // placeholder for actions on recommendations. this can be used for
+        // e.g. preview of result after run
         // See docu at https://goo.gl/3KhgEq
         ActionManager actionManager = ActionManager.getInstance();
         ActionGroup actionGroup = (ActionGroup) actionManager.getAction("RecomCode.Toolbar");
