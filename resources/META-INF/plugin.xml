@@ -54,13 +54,6 @@
   </extensions>
 
   <actions>
-      <group id="VarViewer.Toolbar">
-          <action id="VarViewer.RunCodeAction"
-                  class="de.pavloff.pycharm.plugin.varviewer.actions.RunVarViewerAction"
-                  text="Run"
-                  description="Run code until cursor"
-                  icon="/img/play.png"/>
-      </group>
       <group id="RecomCode.Toolbar">
       </group>
   </actions>
