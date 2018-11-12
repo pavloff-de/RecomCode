@@ -1,8 +1,5 @@
 package de.pavloff.pycharm.plugin.varviewer;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
@@ -17,6 +14,7 @@ import de.pavloff.pycharm.plugin.BaseConstants;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -32,6 +30,10 @@ public class VarViewerManager implements BaseConstants {
 
     public static VarViewerManager getInstance(Project project) {
         return project.getComponent(VarViewerManager.class);
+    }
+
+    private static URL getResource(String name) {
+        return VarViewerManager.class.getResource(name);
     }
 
     JComponent initView(Project project) {
@@ -55,9 +57,19 @@ public class VarViewerManager implements BaseConstants {
             }
         });
 
-        ActionManager actionManager = ActionManager.getInstance();
-        ActionGroup actionGroup = (ActionGroup) actionManager.getAction("VarViewer.Toolbar");
-        ActionToolbar actionToolbar = actionManager.createActionToolbar("VarViewer.Toolbar.ID", actionGroup, true);
+        JButton executeButton = new JButton();
+        executeButton.setAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                executeCode();
+            }
+        });
+        try {
+            Image img = ImageIO.read(getResource("/img/play.png"));
+            executeButton.setIcon(new ImageIcon(img));
+        } catch (Exception ex) {
+            executeButton.setText("Run");
+        }
 
         GroupLayout layout = new GroupLayout(mainPanel);
         mainPanel.setLayout(layout);
@@ -68,7 +80,7 @@ public class VarViewerManager implements BaseConstants {
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(tabbedPane)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(actionToolbar.getComponent(), 40, 40, Short.MAX_VALUE)
+                                                .addComponent(executeButton, 40, 40, 40)
                                                 .addGap(0, 100, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
@@ -76,7 +88,7 @@ public class VarViewerManager implements BaseConstants {
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(actionToolbar.getComponent(), 40, 40, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(executeButton, 40, 40, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tabbedPane, 230, 230, Short.MAX_VALUE)
                                 .addContainerGap())
@@ -112,7 +124,7 @@ public class VarViewerManager implements BaseConstants {
         codeContent.append(LINE_SEP);
         codeContent.append(String.format("print('%s')", VAR_VIEWER_SEP)).append(LINE_SEP);
 
-        URL resources = VarViewerManager.class.getResource("python/var_viewer.py");
+        URL resources = getResource("python/var_viewer.py");
         StringBuilder content = new StringBuilder();
         try {
             FilterInputStream in = (FilterInputStream) resources.getContent();
