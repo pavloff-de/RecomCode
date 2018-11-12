@@ -63,14 +63,40 @@ public class KeywordWorker extends Worker {
 
     @Override
     protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
-        // get important information about cells, rows, columns
-        // TODO:
-        //  less rows ? row by row
-        //  less columns ? column by column
-        //  ? cell by cell
+        if (cells == null || cells.size() == 0) {
+            return;
+        }
+
+        if (cells.size() == 1) {
+            cellProcessing(cells.get(0).first, cells.get(0).second);
+            return;
+        }
+
+        Set<Integer> rows = new HashSet<>();
+        Set<Integer> cols = new HashSet<>();
+
+        for (Pair<Integer, Integer> cell : cells) {
+            rows.add(cell.first);
+            cols.add(cell.second);
+        }
+
+        int numRows = rows.size();
+        int numCols = cols.size();
+
         addKeyword("cell");
-        addKeyword("row");
-        addKeyword("column");
+
+        if (numRows == 1) {
+            addKeyword("row");
+            addKeyword("columns");
+        } else if (numRows > numCols) {
+            if (numCols == 1) {
+                addKeyword("column");
+            }
+            addKeyword("rows");
+        } else {
+            addKeyword("columns");
+        }
+
         searchForFragments();
     }
 
@@ -114,7 +140,7 @@ public class KeywordWorker extends Worker {
         if (kw.length() < 2) {
             return;
         }
-        keywords.removeIf(k -> k.equals(kw));
+        keywords.removeIf(k -> k.contains(kw));
         keywords.add(keyword);
     }
 
@@ -144,9 +170,24 @@ public class KeywordWorker extends Worker {
 
         String fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
 
-        for (String keyword : keywords) {
+        for (int i = 0; i < keywords.size(); i++) {
+            String keyword = keywords.get(i);
+            int rateIdx = i + 1;
+
             if (fragmentKeyword.contains(keyword)) {
-                rating++;
+                rating += rateIdx;
+
+                if (rateIdx == keywords.size()) {
+                    rating += 1; // more weight for last keys
+                }
+            }
+
+            if (fragmentKeyword.equals(keyword)) {
+                rating += 2; // more weight for exact keys
+
+                if (rateIdx == keywords.size()) {
+                    rating += 2; // more weight for last keys
+                }
             }
         }
 
