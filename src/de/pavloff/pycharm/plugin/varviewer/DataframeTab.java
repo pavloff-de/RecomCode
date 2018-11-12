@@ -48,7 +48,7 @@ class DataframeTab extends JPanel {
         }
 
         String toCSV = "";
-        URL resources = DataframeTab.class.getResource("python/df_to_csv.py");
+        URL resources = BaseUtils.getResource("/python/df_to_csv.py");
         try {
             FilterInputStream in = (FilterInputStream) resources.getContent();
             int bytesRead;

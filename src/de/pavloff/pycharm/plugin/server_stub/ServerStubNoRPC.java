@@ -1,5 +1,6 @@
 package de.pavloff.pycharm.plugin.server_stub;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
@@ -18,14 +19,18 @@ public class ServerStubNoRPC implements ServerStub {
 
     protected Project project;
 
+    private static Logger logger = Logger.getInstance(ServerStubNoRPC.class);
+
 
     @Override
     public void initialize(Project project) {
+        logger.debug("initializing ServerStub..");
         this.project = project;
         // CodeFragmentManager defaultCodeFragmentManager = new CodeFragmentManager();
         // CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class, defaultCodeFragmentManager);
         CodeFragmentManager recommender = project.getComponent(CodeFragmentManager.class);
         recommender.initialize();
+        logger.debug("ServerStub initialized");
     }
 
     // ======================

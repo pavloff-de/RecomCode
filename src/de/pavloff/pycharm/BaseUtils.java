@@ -1,6 +1,14 @@
 package de.pavloff.pycharm;
 
 
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditorLocation;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+
+import java.net.URL;
+
 public class BaseUtils {
 
     public static String VAR_VIEWER_SEP = "### var viewer output ###";
@@ -57,5 +65,43 @@ public class BaseUtils {
         }
 
         return -1;
+    }
+
+    public static FileEditor getOpenedEditor(Project project) {
+        FileEditor[] editors =
+                FileEditorManager.getInstance(project).getSelectedEditors();
+
+        if (editors.length == 1) {
+            return editors[0];
+        }
+
+        return null;
+    }
+
+    public static VirtualFile getOpenedFile(Project project) {
+        FileEditor editor = getOpenedEditor(project);
+
+        if (editor == null) {
+            return null;
+        }
+        return editor.getFile();
+    }
+
+    public static int getCursorPosition(Project project) {
+        FileEditor editor = getOpenedEditor(project);
+        if (editor == null) {
+            return -1;
+        }
+
+        TextEditorLocation location = (TextEditorLocation) editor.getCurrentLocation();
+        if (location == null) {
+            return -1;
+        }
+
+        return location.getPosition().line;
+    }
+
+    public static URL getResource(String name) {
+        return BaseUtils.class.getResource(name);
     }
 }

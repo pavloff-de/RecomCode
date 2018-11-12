@@ -26,21 +26,12 @@
         <component>
             <implementation-class>de.pavloff.pycharm.plugin.ipnb.ConnectionManager</implementation-class>
         </component>
-    </project-components>
-
-    <project-components>
         <component>
-            <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerManager</implementation-class>
+            <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerToolWindow</implementation-class>
         </component>
-    </project-components>
-
-    <project-components>
         <component>
             <implementation-class>de.pavloff.pycharm.plugin.recomcode.RecomCodeManager</implementation-class>
         </component>
-    </project-components>
-
-    <project-components>
         <component>
             <implementation-class>de.pavloff.pycharm.core.CodeFragmentManager</implementation-class>
         </component>
