@@ -106,6 +106,7 @@ public abstract class Worker {
 
         if (selectedDataframe != null) {
             addColumnNameVariable(selectedDataframe.getColumnName(column));
+            addColumnNamesVariable("\"" + selectedDataframe.getColumnName(column) + "\"");
         }
 
         cellProcessing(row, column);
