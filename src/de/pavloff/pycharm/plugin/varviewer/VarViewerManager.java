@@ -7,10 +7,10 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
+import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
-import de.pavloff.pycharm.plugin.BaseConstants;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
-public class VarViewerManager implements BaseConstants {
+public class VarViewerManager {
 
     private JBTabbedPane tabbedPane;
     private Project openedProject;
@@ -121,8 +121,8 @@ public class VarViewerManager implements BaseConstants {
         StringBuilder codeContent = new StringBuilder();
 
         codeContent.append(doc.getText(new TextRange(0, doc.getLineEndOffset(cursorPosition))));
-        codeContent.append(LINE_SEP);
-        codeContent.append(String.format("print('%s')", VAR_VIEWER_SEP)).append(LINE_SEP);
+        codeContent.append(BaseUtils.LINE_SEP);
+        codeContent.append(String.format("print('%s')", BaseUtils.VAR_VIEWER_SEP)).append(BaseUtils.LINE_SEP);
 
         URL resources = getResource("python/var_viewer.py");
         StringBuilder content = new StringBuilder();
@@ -156,7 +156,7 @@ public class VarViewerManager implements BaseConstants {
             @Override
             public void onError(String eName, String eValue, List<String> traceback) {
                 tabbedPane.removeAll();
-                tabbedPane.addTab(OUTPUT_TAB, createTabPanel(IpnbErrorPanel.createColoredPanel(traceback)));
+                tabbedPane.addTab(BaseUtils.OUTPUT_TAB, createTabPanel(IpnbErrorPanel.createColoredPanel(traceback)));
             }
         });
     }
@@ -164,19 +164,19 @@ public class VarViewerManager implements BaseConstants {
     private void evaluateOutput(List<String> fromIpnb) {
         String output;
         if (fromIpnb.size() != 1) {
-            output = String.join(LINE_SEP, fromIpnb);
+            output = String.join(BaseUtils.LINE_SEP, fromIpnb);
         } else {
             output = fromIpnb.get(0);
         }
 
-        String[] outputLines = output.split(LINE_SEP);
+        String[] outputLines = output.split(BaseUtils.LINE_SEP);
         StringBuilder mainOutput = new StringBuilder();
         LinkedList<String> dfOutput = new LinkedList<>();
         Map<String, CodeVariable> varOutput = new HashMap<>();
         boolean varViewerOutputFound = false;
 
         for (String s : outputLines) {
-            if (s.startsWith(VAR_VIEWER_SEP)) {
+            if (s.startsWith(BaseUtils.VAR_VIEWER_SEP)) {
                 varViewerOutputFound = true;
 
             } else if (varViewerOutputFound) {
@@ -203,7 +203,7 @@ public class VarViewerManager implements BaseConstants {
                 }
 
             } else {
-                mainOutput.append(s).append(LINE_SEP);
+                mainOutput.append(s).append(BaseUtils.LINE_SEP);
             }
         }
         ServerStub serverStub = ServerStub.getInstance(openedProject);
@@ -268,7 +268,7 @@ public class VarViewerManager implements BaseConstants {
         }
 
         String tabName = tabbedPane.getTitleAt(tabIdx);
-        if (tabName.equals(OUTPUT_TAB)) {
+        if (tabName.equals(BaseUtils.OUTPUT_TAB)) {
             return;
         }
 
@@ -296,7 +296,7 @@ public class VarViewerManager implements BaseConstants {
         }
 
         tabbedPane.removeAll();
-        tabbedPane.insertTab(OUTPUT_TAB, null, createTabPanel(mainOutput.toString()), null, 0);
+        tabbedPane.insertTab(BaseUtils.OUTPUT_TAB, null, createTabPanel(mainOutput.toString()), null, 0);
         for (String s : dfOutput) {
             tabbedPane.addTab(s, new DataframeTab());
         }

@@ -8,7 +8,6 @@ import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
-import de.pavloff.pycharm.plugin.BaseConstants;
 import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
@@ -26,7 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-class DataframeTab extends JPanel implements BaseConstants {
+class DataframeTab extends JPanel {
 
     private Boolean isOpened = false;
     private JBTable tableView;
@@ -56,7 +55,7 @@ class DataframeTab extends JPanel implements BaseConstants {
             byte[] bytes = new byte[128];
             while ((bytesRead = in.read(bytes)) != -1) {
                 toCSV = String.format(new String(bytes, 0, bytesRead),
-                        varName, DELIMITER, LINE_SEP_ESC);
+                        varName, BaseUtils.DELIMITER, BaseUtils.LINE_SEP_ESC);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,17 +70,17 @@ class DataframeTab extends JPanel implements BaseConstants {
 
                 String output;
                 if (fromIpnb.size() != 1) {
-                    output = String.join(LINE_SEP, fromIpnb);
+                    output = String.join(BaseUtils.LINE_SEP, fromIpnb);
                 } else {
                     output = fromIpnb.get(0);
                 }
 
-                String[] outputLines = output.split(LINE_SEP);
+                String[] outputLines = output.split(BaseUtils.LINE_SEP);
                 if (outputLines.length == 0) {
                     return;
                 }
 
-                String[] header = outputLines[0].split(DELIMITER);
+                String[] header = outputLines[0].split(BaseUtils.DELIMITER);
 
                 if (BaseUtils.hasHeader(outputLines) < 0) {
                     header = new String[header.length];
@@ -96,7 +95,7 @@ class DataframeTab extends JPanel implements BaseConstants {
 
                 String[][] data = new String[linesToShow][header.length];
                 for (int i = 0; i < linesToShow; i++) {
-                    data[i] = outputLines[i].split(DELIMITER);
+                    data[i] = outputLines[i].split(BaseUtils.DELIMITER);
                 }
 
                 tableView = new JBTable(new NotEditableTableModel(data, header));

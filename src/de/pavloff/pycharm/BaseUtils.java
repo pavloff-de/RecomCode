@@ -1,8 +1,13 @@
 package de.pavloff.pycharm;
 
-import de.pavloff.pycharm.plugin.BaseConstants;
 
-public class BaseUtils implements BaseConstants {
+public class BaseUtils {
+
+    public static String VAR_VIEWER_SEP = "### var viewer output ###";
+    public static String LINE_SEP = "\n";
+    public static String LINE_SEP_ESC = "\\n";
+    public static String DELIMITER = ",";
+    public static String OUTPUT_TAB = "Output";
 
     public static Class guessValueType(String value) {
         try {
