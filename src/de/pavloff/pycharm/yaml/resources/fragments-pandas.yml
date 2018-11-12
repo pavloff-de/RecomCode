@@ -62,7 +62,7 @@ code: $dataframe$.ix[$rowIndex$]
 recType: code
 recID: py.pd.col.001
 group: pandas
-keywords: [drop, remove, delete column]
+keywords: [drop, remove, delete, column]
 textkey:
   - "drop|remove|delete|kill|purge columnName from dataframe"
 code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=1)"
@@ -73,23 +73,10 @@ parameter:
 recType: code
 recID: py.pd.col.002
 group: pandas
-keywords: [drop, remove, delete, multipe, columns]
+keywords: [drop, remove, delete, multiple, columns]
 textkey:
   - "drop|remove|delete|kill|purge multiple columns from dataframe"
 code: $dataframe$.drop([$columnNames$], axis=1)
----
-recType: code
-recID: py.pd.col.003
-group: pandas
-keywords: [change, rearrange, order, columns]
-textkey:
-  - "rearrange|change order of columns in a dataframe"
-code: |
-      columnNamesList = $dataframe$.columns.tolist()
-      # todo: change order of elements in columnNamesList as desired
-      # e.g. swap 1st and last via
-      $END$# columnNamesList = columnNamesList[-1:] + columnNamesList[:-1]
-      $dataframe$ = $dataframe$[columnNamesList]
 ---
 recType: code
 recID: py.pd.col.004
@@ -115,9 +102,9 @@ parameter:
 recType: code
 recID: py.pd.col.006
 group: pandas
-keywords: [select, columns, number, position]
+keywords: [select, column, number, position]
 textkey:
-- "select columnIndex in a dataframe by position|number|integer"
+- "select columnIndex in a dataframe"
 code: $dataframe2$ = $dataframe$[$dataframe$.columns[$columnIndex$]]
 parameter:
 - name: dataframe2
@@ -126,10 +113,10 @@ parameter:
 recType: code
 recID: py.pd.col.007
 group: pandas
-keywords: [select, columns, name]
+keywords: [select, column, columns, name]
 textkey:
-- "select columnName in a dataframe by name"
-code: $dataframe2$ = $dataframe$[["$columnName$"]]
+- "select columns in a dataframe by name"
+code: $dataframe2$ = $dataframe$[[$columnNames$]]
 parameter:
 - name: dataframe2
   expr: "pyUniqueIterableVariable"
