@@ -1,5 +1,6 @@
 package de.pavloff.pycharm.plugin.varviewer;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,17 +26,27 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/** Plugin code which displays pandas dataframe as a table
+ */
 class DataframeTab extends JPanel {
 
+    // the dataframe is created once the tab is open
     private Boolean isOpened = false;
+
     private JBTable tableView;
+
+    private static Logger logger = Logger.getInstance(DataframeTab.class);
 
     DataframeTab() {
         setLayout(new BorderLayout());
     }
 
+    /**
+     *
+     */
     void open(Project openedProject, VirtualFile openedFile, String name) {
         String varName = name.split(" ")[1];
+        logger.debug(String.format("opening tab '%s'..", varName));
 
         if (tableView != null) {
             ServerStub serverStub = ServerStub.getInstance(openedProject);
@@ -61,11 +72,12 @@ class DataframeTab extends JPanel {
             e.printStackTrace();
         }
 
+        logger.debug("reading dataframe..");
         ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
-
         ipnb.execute(openedFile, toCSV, new OutputCell() {
             @Override
             public void onOutput(List<String> fromIpnb) {
+                logger.debug("dataframe read. output evaluating..");
                 isOpened = true;
 
                 String output;
@@ -77,27 +89,32 @@ class DataframeTab extends JPanel {
 
                 String[] outputLines = output.split(BaseUtils.LINE_SEP);
                 if (outputLines.length == 0) {
+                    logger.debug("..empty output");
                     return;
                 }
 
                 String[] header = outputLines[0].split(BaseUtils.DELIMITER);
 
                 if (BaseUtils.hasHeader(outputLines) < 0) {
+                    logger.debug("..dataframe with header");
                     header = new String[header.length];
                     for (int i = 0; i < header.length; i++) {
                         header[i] = "column" + i;
                     }
                 } else {
+                    logger.debug("..dataframe without header");
                     outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
                 }
 
                 int linesToShow = Math.min(outputLines.length, 1000);
+                logger.debug(String.format("..show %s lines", linesToShow));
 
                 String[][] data = new String[linesToShow][header.length];
                 for (int i = 0; i < linesToShow; i++) {
                     data[i] = outputLines[i].split(BaseUtils.DELIMITER);
                 }
 
+                logger.debug("creating table view..");
                 tableView = new JBTable(new NotEditableTableModel(data, header));
                 JTableHeader tableHeader = tableView.getTableHeader();
                 tableHeader.setFont(new Font("Default", Font.BOLD, 16));
@@ -117,6 +134,7 @@ class DataframeTab extends JPanel {
                         tableView));
 
                 show(tableView);
+                logger.debug("table view created");
 
                 ServerStub serverStub = ServerStub.getInstance(openedProject);
                 serverStub.onDataframe(varName, tableView.getModel());
@@ -126,24 +144,40 @@ class DataframeTab extends JPanel {
 
             @Override
             public void onPayload(String payload) {
+                logger.debug("dataframe read. payload as result. ignoring..");
             }
 
             @Override
             public void onError(String eName, String eValue, List<String> traceback) {
+                logger.debug("code executed. error as result. showing error traceback..");
                 show(IpnbErrorPanel.createColoredPanel(traceback));
             }
         });
     }
 
+    /**
+     * puts tab content in a scroll pane
+     */
+    private void show(JComponent panel) {
+        removeAll();
+        add(new JBScrollPane(panel));
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * catches the changes on table,
+     * sends the events to ServerStub and
+     * triggers the update of recommendations in RecomCode panel
+     */
     private static class SelectionListener implements ListSelectionListener {
-        private ServerStub serverStub;
+
         private Project project;
         private JBTable table;
 
         SelectionListener(Project openedProject, JBTable tableView) {
             project = openedProject;
             table = tableView;
-            serverStub = ServerStub.getInstance(project);
         }
 
         @Override
@@ -166,25 +200,23 @@ class DataframeTab extends JPanel {
                 }
             }
 
+            ServerStub serverStub = ServerStub.getInstance(project);
             if (cells.size() == 1) {
                 serverStub.onCell(cells.get(0).first, cells.get(0).second);
             } else {
                 serverStub.onCells(cells);
             }
+
             RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
             recomCodeManager.updateAndDisplayRecommendations();
         }
     }
 
-    private void show(JComponent panel) {
-        removeAll();
-        add(new JBScrollPane(panel));
-        revalidate();
-        repaint();
-    }
-
+    /**
+     * extends the default table model with not editable cells
+     */
     private class NotEditableTableModel extends DefaultTableModel {
-        public NotEditableTableModel(String[][] data, String[] header) {
+        NotEditableTableModel(String[][] data, String[] header) {
             super(data, header);
         }
 

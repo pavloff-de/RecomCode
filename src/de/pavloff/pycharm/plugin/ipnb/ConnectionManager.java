@@ -40,12 +40,20 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.List;
 
+/** Plugin code which simulates the {@link org.jetbrains.plugins.ipnb.configuration.IpnbConnectionManager}
+ * It creates connection to Jupyter Notebook,
+ *      sends python code for executing and
+ *      runs callback on output
+ */
 public class ConnectionManager {
-    private static final Logger LOG = Logger.getInstance(ConnectionManager.class);
 
     private final Map<String, IpnbConnection> kernels = new HashMap<>();
+
     private final Map<String, OutputCell> outputs = new HashMap<>();
+
     private Project openedProject;
+
+    private static Logger logger = Logger.getInstance(ConnectionManager.class);
 
     public ConnectionManager(Project project) {
         openedProject = project;
@@ -55,7 +63,12 @@ public class ConnectionManager {
         return project.getComponent(ConnectionManager.class);
     }
 
+    /**
+     * initializes connection to Jupyter Notebook
+     * opens the configuration popup if Jupyter Notebook not configured
+     */
     public void initConnection(VirtualFile file) {
+        logger.debug("initialize connection to Jupyter Notebook..");
         if (getConfiguration() == null) {
             openConfiguration();
 
@@ -63,50 +76,72 @@ public class ConnectionManager {
             IpnbUtils.runCancellableProcessUnderProgress(openedProject, () -> setupConnection(file),
                     "Connecting to Jupyter Notebook Server");
         }
+        logger.debug("connection to Jupyter Notebook initialized");
     }
 
+    /**
+     * checks connection to Jupyter Notebook than
+     * - reinitializing if connection closed
+     * - code executing if connection alive
+     */
     public void execute(VirtualFile file, String code, OutputCell outputCell) {
         initConnection(file);
 
-        if (kernels.containsKey(file.getPath())) {
-            IpnbConnection conn = kernels.get(file.getPath());
+        String filePath = file.getPath();
+
+        if (kernels.containsKey(filePath)) {
+            IpnbConnection conn = kernels.get(filePath);
 
             if (conn.isAlive()) {
                 String messageId = conn.execute(code);
+                logger.debug(String.format("executing code '%s'..", messageId));
                 outputs.put(messageId, outputCell);
 
             } else {
-                kernels.remove(file.getPath());
+                logger.debug("connection closed. reinitializing..");
+                kernels.remove(filePath);
                 initConnection(file);
             }
+        } else {
+            logger.debug(String.format("file '%s' not found in kernels", filePath));
         }
     }
 
     /**
      * Copy of the method setupConnection from
      * {@link org.jetbrains.plugins.ipnb.configuration.IpnbConnectionManager}
+     *
+     * sets up the connection to Jupyter Notebook
      */
     private boolean setupConnection(VirtualFile file) {
+        logger.debug("setting up connection..");
         try {
             Ref<Boolean> connectionOpened = new Ref<>(false);
             final IpnbConnectionListenerBase listener = new IpnbConnectionListenerBase() {
                 @Override
                 public void onOpen(@NotNull IpnbConnection c) {
+                    logger.debug("connection opened");
                     connectionOpened.set(true);
                 }
 
                 @Override
                 public void onOutput(@NotNull IpnbConnection c, @NotNull String m) {
+                    logger.debug(String.format("code '%s' executed. output as result",
+                            m));
+
                     if (!outputs.containsKey(m)) {
+                        logger.debug(String.format("code '%s' not known", m));
                         return;
                     }
 
                     IpnbOutputCell out = c.getOutput();
                     if (out == null) {
+                        logger.debug(String.format("code '%s' without output", m));
                         return;
                     }
 
                     if (out instanceof IpnbErrorOutputCell) {
+                        logger.debug(String.format("code '%s' with error", m));
                         IpnbErrorOutputCell errOut = (IpnbErrorOutputCell) out;
                         outputs.get(m).onError(errOut.getEname(), errOut.getEvalue(), errOut.getText());
                         return;
@@ -123,11 +158,15 @@ public class ConnectionManager {
 
                 @Override
                 public void onPayload(@Nullable String p, @NotNull String m) {
+                    logger.debug(String.format("code '%s' executed. payload as result",
+                            m));
                     if (!outputs.containsKey(m)) {
+                        logger.debug(String.format("code '%s' not known", m));
                         return;
                     }
 
                     if (p == null) {
+                        logger.debug(String.format("code '%s' without payload", m));
                         return;
                     }
 
@@ -136,7 +175,8 @@ public class ConnectionManager {
                 }
 
                 @Override
-                public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {}
+                public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {
+                    logger.debug(String.format("code '%s' executed", m));}
             };
 
             Pair<String, String> conf = getConfiguration();
@@ -144,7 +184,8 @@ public class ConnectionManager {
                 return false;
             }
 
-            final IpnbConnection connection = new IpnbConnectionV3(conf.getFirst(), listener, conf.getSecond(), openedProject, file.getPath());
+            final IpnbConnection connection = new IpnbConnectionV3(conf.getFirst(),
+                    listener, conf.getSecond(), openedProject, file.getPath());
 
             int countAttempt = 0;
             while (!connectionOpened.get() && countAttempt < 10) {
@@ -153,22 +194,23 @@ public class ConnectionManager {
             }
 
             if (connection.isAlive()) {
+                logger.debug("connection alive. adding to kernels..");
                 kernels.put(file.getPath(), connection);
             }
         }
         catch (URISyntaxException e) {
-            LOG.warn("Jupyter Notebook connection refused: " + e.getMessage());
+            logger.warn("Jupyter Notebook connection refused: " + e.getMessage());
             return false;
         }
         catch (UnsupportedOperationException e) {
-            LOG.warn("Jupyter Notebook connection warning: " + e.getMessage());
+            logger.warn("Jupyter Notebook connection warning: " + e.getMessage());
         }
         catch (UnknownHostException e) {
-            LOG.warn("Jupyter Notebook connection error: " + e.getMessage());
+            logger.warn("Jupyter Notebook connection error: " + e.getMessage());
             return false;
         }
         catch (IOException e) {
-            LOG.warn("Jupyter Notebook login failed: " + e.getMessage());
+            logger.warn("Jupyter Notebook login failed: " + e.getMessage());
             return false;
         }
         return true;
@@ -177,6 +219,8 @@ public class ConnectionManager {
     /**
      * Copy of the method hyperlinkActivated from
      * {@link org.jetbrains.plugins.ipnb.configuration.IpnbConnectionManager.IpnbRunAdapter}
+     *
+     * opens configuration popup
      */
     private void openConfiguration() {
         final List<RunnerAndConfigurationSettings> configurationsList =
@@ -223,6 +267,8 @@ public class ConnectionManager {
     /**
      * Copy of the methods startConnection and getUrlTokenByDescriptor from
      * {@link org.jetbrains.plugins.ipnb.configuration.IpnbConnectionManager}
+     *
+     * finds configuration for Jupyter Notebook
      */
     private Pair<String, String> getConfiguration() {
         Pair<String, String> conn = null;

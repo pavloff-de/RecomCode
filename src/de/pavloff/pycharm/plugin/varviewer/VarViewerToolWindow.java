@@ -32,7 +32,8 @@ import java.util.List;
 /** Plugin code which extends the IntelliJ Platform core functionality, see https://goo.gl/eAgPnz
  * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under <extensions ...></extensions>.
  * It creates GUI panel for variable views.
- * It executes python code with Jupyter Notebook
+ * It executes python code with Jupyter Notebook and display dataframes in tabs, see
+ * {@link DataframeTab}
  */
 public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent {
 
@@ -52,6 +53,7 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
                     VarViewerToolWindow.class));
             return;
         }
+        logger.debug("initializing..");
 
         openedProject = project;
 
@@ -60,12 +62,10 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
         // creates connection to Jupyter Notebook
         VirtualFile openedFile = BaseUtils.getOpenedFile(openedProject);
         if (openedFile != null) {
-            logger.debug("creating connection to Jupyter Notebook..");
             ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
             ipnb.initConnection(openedFile);
-            logger.debug("connection to Jupyter Notebook created");
         } else {
-            logger.debug("connection to Jupyter Notebook skipped");
+            logger.debug("initializing of connection to Jupyter Notebook skipped");
         }
 
         // ServerStub replaces previous usage of CodeFragmentManager
@@ -73,6 +73,7 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
         server.initialize(openedProject);
 
         initialized = true;
+        logger.debug("initialized");
     }
 
     /**
@@ -147,6 +148,7 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
      * executes it with Jupyter Notebook until the line with cursor
      */
     private void executeCode() {
+        logger.debug("code executing..");
         VirtualFile openedFile = BaseUtils.getOpenedFile(openedProject);
 
         if (openedFile == null) {
@@ -192,18 +194,17 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
 
         String code = codeContent.toString();
         ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
-        logger.debug("code executing..");
         ipnb.execute(openedFile, code, new OutputCell() {
             @Override
             public void onOutput(java.util.List<String> output) {
-                logger.debug("code executed. output evaluating..");
+                logger.debug("code executed. output as result");
                 evaluateOutput(output);
             }
 
             @Override
             public void onPayload(String payload) {
                 // ???
-                logger.debug("code executed. payload as result. output evaluating..");
+                logger.debug("code executed. payload as result");
                 evaluateOutput(Collections.singletonList(payload));
             }
 
@@ -224,6 +225,7 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
      * other tabs contains the pandas dataframes, initialized in code
      */
     private void evaluateOutput(List<String> fromIpnb) {
+        logger.debug("evaluating output..");
         String output;
         if (fromIpnb.size() != 1) {
             output = String.join(BaseUtils.LINE_SEP, fromIpnb);
@@ -271,11 +273,9 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
             }
         }
 
-        logger.debug("sending variables to ServerStub..");
         ServerStub serverStub = ServerStub.getInstance(openedProject);
         serverStub.onVariables(varOutput);
 
-        logger.debug("creating tabs..");
         createTabs(mainOutput, dfOutput);
     }
 
@@ -325,6 +325,7 @@ public class VarViewerToolWindow implements ToolWindowFactory, ProjectComponent 
      * creates tabs for output and dataframes
      */
     private void createTabs(StringBuilder mainOutput, LinkedList<String> dfOutput) {
+        logger.debug("creating tabs..");
         int openedTab = tabbedPane.getSelectedIndex();
         if (openedTab < 0) {
             openedTab = 0;
