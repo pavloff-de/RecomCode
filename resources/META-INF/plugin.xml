@@ -22,20 +22,20 @@
   <depends>com.intellij.modules.python</depends>
   <!--<depends>org.jetbrains.plugins.ipnb</depends>-->
 
-    <project-components>
-        <component>
-            <implementation-class>de.pavloff.pycharm.plugin.ipnb.ConnectionManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerToolWindow</implementation-class>
-        </component>
-        <component>
-            <implementation-class>de.pavloff.pycharm.plugin.recomcode.RecomCodeManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>de.pavloff.pycharm.core.CodeFragmentManager</implementation-class>
-        </component>
-    </project-components>
+  <project-components>
+    <component>
+        <implementation-class>de.pavloff.pycharm.plugin.ipnb.ConnectionManager</implementation-class>
+    </component>
+    <component>
+        <implementation-class>de.pavloff.pycharm.plugin.recomcode.RecomCodeManager</implementation-class>
+    </component>
+    <component>
+        <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerManager</implementation-class>
+    </component>
+    <component>
+        <implementation-class>de.pavloff.pycharm.core.CodeFragmentManager</implementation-class>
+    </component>
+  </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
       <toolWindow id="RecomCode" icon="/img/recomcode.png" anchor="bottom" factoryClass="de.pavloff.pycharm.plugin.recomcode.RecomCodeToolWindow"/>

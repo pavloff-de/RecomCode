@@ -6,7 +6,6 @@ import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.components.impl.ComponentManagerImpl;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -17,11 +16,7 @@ import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
 import de.pavloff.pycharm.plugin.server_stub.ServerStub;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
-import org.picocontainer.ComponentAdapter;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoContainer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -31,106 +26,83 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-
-/** Implements the plugin component which manages the recommendations, and contains the main "event handling" for recommendations.
+/** Implements the plugin component which manages the recommendations, and contains the
+ * main "event handling" for recommendations.
  * Implements the ProjectComponent interface, see https://goo.gl/kjpXga
- * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under <project-components>.
+ * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under
+ * <project-components>.
  */
 
 public class RecomCodeManager implements ProjectComponent {
 
-    private JBTextField searchField;
+    private JPanel toolWindow;
+
     private JPanel recomCodePanel;
+
     private Project openedProject;
-    static Logger logger = Logger.getInstance(RecomCodeManager.class);
 
+    private static Logger logger = Logger.getInstance(RecomCodeManager.class);
 
+    public RecomCodeManager(Project project) {
+        openedProject = project;
 
-    public RecomCodeManager (Project inputProject) {
-        openedProject = inputProject;
-    }
+        createRecommenderPanel();
 
-    public static RecomCodeManager createAndRegisterInstance (Project project) {
-        MutablePicoContainer container = (MutablePicoContainer) project.getPicoContainer();
-
-        RecomCodeManager manager = new RecomCodeManager(project);
-        container.registerComponentInstance(manager);
-
-        RecomCodeManager managerFromContainer = project.getComponent(RecomCodeManager.class);
-
-        logger.info("MutablePicoContainer instance is: " + container);
-        logger.info("managerFromContainer  is: " + managerFromContainer);
-        return manager;
-/*
-
-        Iterator var3 = container.getComponentAdapters().iterator();
-        while(var3.hasNext()) {
-            ComponentAdapter componentAdapter = (ComponentAdapter)var3.next();
-            if (componentAdapter instanceof ComponentManagerImpl.ComponentConfigComponentAdapter) {
-                componentAdapter.getComponentInstance(container);
-            }
-        }
-
-*/
-    }
-
-    @Override
-    public void initComponent() {
         ServerStub server = ServerStub.getInstance(openedProject);
         server.initialize(openedProject);
-
-        logger.info("RecomCodeManager initialized");
     }
-
-    @Override
-    public void disposeComponent() {
-        // called when project is disposed
-        logger.debug("RecomCodeManager disposed");
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "RecomCode.RecomCodeManager";
-    }
-
-    @Override
-    public void projectOpened() {
-        // called when project is opened
-    }
-
-    @Override
-    public void projectClosed() {
-        // called when project is being closed
-    }
-
-
-
 
     public static RecomCodeManager getInstance(Project project) {
-        RecomCodeManager manager = project.getComponent(RecomCodeManager.class);
-        return manager;
+        return project.getComponent(RecomCodeManager.class);
     }
 
-    // todo: possibly move this method to RecomCodeToolWindow, as the other class is responsible for the panel (what about instance vars?)
-    Component initView(Project project) {
-        openedProject = project;
+    /**
+     * returns the GUI for ToolWindow
+     */
+    Component getToolWindowComponent() {
+        return toolWindow;
+    }
+
+
+    /**
+     * creates the GUI for ToolWindow
+     *
+     * recommender panel contains
+     * text field for user inputs
+     * pane to display the recommendations
+     */
+    private void createRecommenderPanel() {
+        logger.debug("creating Recommender Panel..");
+
+        JBTextField searchField = new JBTextField();
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                handleDocumentEvent(e);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                handleDocumentEvent(e);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                handleDocumentEvent(e);
+            }
+        });
 
         recomCodePanel = new JPanel();
         recomCodePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        JPanel mainPanel = new JPanel();
-        searchField = new JBTextField();
-
         JBScrollPane recomCodePanelWrapper = new JBScrollPane(
                 recomCodePanel, JBScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        GroupLayout layout = new GroupLayout(mainPanel);
-        mainPanel.setLayout(layout);
+        toolWindow = new JPanel();
+        GroupLayout layout = new GroupLayout(toolWindow);
+        toolWindow.setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
@@ -152,38 +124,28 @@ public class RecomCodeManager implements ProjectComponent {
                                 .addContainerGap())
         );
 
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                handleDocumentEvent(e);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                handleDocumentEvent(e);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                handleDocumentEvent(e);
-            }
-        });
-
-        return mainPanel;
+        logger.debug("Recommender Panel created");
     }
 
+    /**
+     * handles the events of user input
+     */
     private void handleDocumentEvent(DocumentEvent e) {
         // TODO: implement a delay for input
-        ServerStub serverStub = ServerStub.getInstance(openedProject);
         Document doc = e.getDocument();
+        String input;
         try {
             // read always full text
-            String input = doc.getText(0, doc.getLength());
-            serverStub.onInput(input);
-            updateAndDisplayRecommendations();
-        } catch (BadLocationException e1) {
-            e1.printStackTrace();
+            input = doc.getText(0, doc.getLength());
+        } catch (BadLocationException err) {
+            logger.debug(String.format("error occurred while reading user input: '%s'",
+                    err.getMessage()));
+            return;
         }
+
+        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        serverStub.onInput(input);
+        updateAndDisplayRecommendations();
 
     }
 
@@ -191,9 +153,10 @@ public class RecomCodeManager implements ProjectComponent {
      *  It replaces the usage of the CodeFragmentListener
      */
     public void updateAndDisplayRecommendations() {
+        logger.debug("updating recommendations..");
         ServerStub serverStub = ServerStub.getInstance(openedProject);
         LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecommendations();
-        EventQueue.invokeLater(() -> { repaintRecommendations(serverStub, newRecommendations); });
+        EventQueue.invokeLater(() -> repaintRecommendations(serverStub, newRecommendations));
     }
 
     /** Code which repaints recommendations, and adds listener to each recommended fragement for mause click
@@ -201,7 +164,11 @@ public class RecomCodeManager implements ProjectComponent {
      * @param fragments set of current fragments
      */
     private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
-        if (recomCodePanel == null) return;
+        logger.debug("repainting recommendations..");
+        if (recomCodePanel == null) {
+            logger.debug("..recommender panel is not initialized");
+            return;
+        }
 
         recomCodePanel.removeAll();
 
@@ -209,12 +176,15 @@ public class RecomCodeManager implements ProjectComponent {
             return;
         }
 
+        logger.debug("creating recommendations..");
         for (CodeFragment fragment : fragments) {
             RecomBox r = new RecomBox(fragment);
 
             r.addListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    logger.debug(String.format("template for fragment '%s' selected",
+                            fragment.getRecID()));
                     serverStub.onCodeFragment(fragment);
 
                     Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
@@ -233,6 +203,8 @@ public class RecomCodeManager implements ProjectComponent {
     }
 
     private Template newTemplate(CodeFragment fragment) {
+        logger.debug(String.format("creating template for fragment '%s'..", fragment.getRecID()));
+
         TemplateManager templateManager = TemplateManagerImpl.getInstance(openedProject);
         Template t = templateManager.createTemplate(fragment.getRecID(), fragment.getGroup(), fragment.getCode());
         t.setToReformat(false);
@@ -241,6 +213,7 @@ public class RecomCodeManager implements ProjectComponent {
         Map<String, CodeParam> params = fragment.getDefaultParams();
         String[] variables = fragment.getParamsList();
 
+        logger.debug("searching for relevant variables..");
         for (String v : variables) {
             CodeParam p = null;
 
@@ -250,19 +223,23 @@ public class RecomCodeManager implements ProjectComponent {
 
             if (p != null) {
                 if (p.hasExpression()) {
+                    logger.debug("..variable with expression");
                     t.addVariable(p.getName(), p.getExpr(), p.getVars(), true);
                 } else {
                     String[] vars = p.getVars().split("\\|");
 
                     if (vars.length > 1) {
+                        logger.debug("..variable with examples");
                         MacroCallNode macro = new MacroCallNode(new PyVariableMacro(vars));
                         t.addVariable(p.getName(), macro, true);
 
                     } else {
                         if (vars[0].length() == 0) {
+                            logger.debug("..empty variable");
                             t.addVariable(p.getName(), new TextExpression(vars[0]), true);
                         } else {
                             // just put default value and continue
+                            logger.debug("..initialized variable");
                             t.addVariable(p.getName(), new TextExpression(vars[0]), false);
                         }
                     }
@@ -271,5 +248,25 @@ public class RecomCodeManager implements ProjectComponent {
         }
 
         return t;
+    }
+
+    @Override
+    public void projectOpened() {
+        // TODO: ???
+    }
+
+    @Override
+    public void projectClosed() {
+        // TODO: ???
+    }
+
+    @Override
+    public void initComponent() {
+        // TODO: ???
+    }
+
+    @Override
+    public void disposeComponent() {
+        // TODO: ???
     }
 }
