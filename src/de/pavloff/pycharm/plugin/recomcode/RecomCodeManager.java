@@ -17,6 +17,7 @@ import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
 import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
+import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -51,7 +52,7 @@ public class RecomCodeManager implements ProjectComponent {
 
         createRecommenderPanel();
 
-        ServerStub server = ServerStub.getInstance(openedProject);
+        ServerStub server = ServerStubFactory.getInstance();
         server.initialize(openedProject);
     }
 
@@ -143,7 +144,7 @@ public class RecomCodeManager implements ProjectComponent {
             return;
         }
 
-        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        ServerStub serverStub = ServerStubFactory.getInstance();
         serverStub.onInput(input);
         updateAndDisplayRecommendations();
 
@@ -154,7 +155,7 @@ public class RecomCodeManager implements ProjectComponent {
      */
     public void updateAndDisplayRecommendations() {
         logger.debug("updating recommendations..");
-        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        ServerStub serverStub = ServerStubFactory.getInstance();
         LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecommendations();
         EventQueue.invokeLater(() -> repaintRecommendations(serverStub, newRecommendations));
     }

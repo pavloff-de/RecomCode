@@ -14,6 +14,7 @@ import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.serverstub.ServerStub;
+import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.imageio.ImageIO;
@@ -60,7 +61,7 @@ public class VarViewerManager implements ProjectComponent {
         }
 
         // ServerStub replaces previous usage of CodeFragmentManager
-        ServerStub server = ServerStub.getInstance(openedProject);
+        ServerStub server = ServerStubFactory.getInstance();
         server.initialize(openedProject);
     }
 
@@ -272,7 +273,7 @@ public class VarViewerManager implements ProjectComponent {
             }
         }
 
-        ServerStub serverStub = ServerStub.getInstance(openedProject);
+        ServerStub serverStub = ServerStubFactory.getInstance();
         serverStub.onVariables(varOutput);
 
         createTabs(mainOutput, dfOutput);

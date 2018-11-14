@@ -1,5 +1,6 @@
 package de.pavloff.pycharm.plugin.serverstub;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
@@ -14,16 +15,20 @@ import java.util.Map;
  */
 public class ServerStubWithRPC implements ServerStub {
 
-    protected Project project;
+    private Project openedProject;
+
+    private static Logger logger = Logger.getInstance(ServerStubWithRPC.class);
 
 
     @Override
     public void initialize(Project project) {
-        this.project = project;
-    }
+        logger.debug("initializing ServerStub..");
+        openedProject = project;
 
-    // ======================
-    // Methods for the main plugin
+        // todo: initialize / check connection to recommender engine
+
+        logger.debug("ServerStub initialized");
+    }
 
     @Override
     public void onInput(String input) {
@@ -37,10 +42,6 @@ public class ServerStubWithRPC implements ServerStub {
     @Override
     public void onCodeFragment(CodeFragment fragment) {
     }
-
-
-    // ======================
-    // Methods for varviewer
 
     @Override
     public void onDataframe(String tableName, TableModel table) {
@@ -69,6 +70,5 @@ public class ServerStubWithRPC implements ServerStub {
     @Override
     public void onVariables(Map<String, CodeVariable> variables) {
     }
-
 }
 

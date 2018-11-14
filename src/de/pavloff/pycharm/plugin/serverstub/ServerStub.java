@@ -10,39 +10,45 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-// ServerStub is the object handing all interactions with the "engine".
-// It replaces previous usage of CodeFragmentManager.
+/** ServerStub is the object handing all interactions with the "engine".
+ * It replaces previous usage of CodeFragmentManager.
+ */
 public interface ServerStub {
-    // todo: think whether we need a separate instance per project? Not good for RPC, as we have only 1 server process
 
-    // instantiate the alternative class ServerStubWithRPC for RPC
-    ServerStub stub = new ServerStubNoRPC();
-    // static ServerStub stub = new ServerStubWithRPC();
-
-    // Currently, there is only 1 instance for all projects!
-    public static ServerStub getInstance(Project project) {
-        return stub;
-    }
-
+    // can be used for initializing of service
     void initialize(Project project);
 
-    void onInput(String input);
+    // returns recommendations
+    LinkedHashSet<CodeFragment> getRecommendations();
 
+    // ========= callbacks from varviewer panel ========= //
+
+    // dataframe selected
     void onDataframe(String tableName, TableModel table);
 
+    // one cell of a dataframe selected
     void onCell(int row, int column);
 
+    // many cells of a dataframe selected
     void onCells(List<Pair<Integer, Integer>> cells);
 
+    // row of a dataframe selected
     void onRow(int row);
 
+    // column of a dataframe selected
     void onColumn(int column);
 
-    void onSourcecode(String code);
-
+    // variables from source code
     void onVariables(Map<String, CodeVariable> variables);
 
-    void onCodeFragment(CodeFragment fragment);
+    // source code
+    void onSourcecode(String code);
 
-    LinkedHashSet<CodeFragment> getRecommendations();
+    // ========= callbacks from recommender panel ========= //
+
+    // user input
+    void onInput(String input);
+
+    // code fragment selected
+    void onCodeFragment(CodeFragment fragment);
 }

@@ -11,6 +11,7 @@ import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
 import de.pavloff.pycharm.plugin.serverstub.ServerStub;
+import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
@@ -50,7 +51,7 @@ class DataframeTab extends JPanel {
         logger.debug(String.format("opening tab '%s'..", varName));
 
         if (tableView != null) {
-            ServerStub serverStub = ServerStub.getInstance(openedProject);
+            ServerStub serverStub = ServerStubFactory.getInstance();
             serverStub.onDataframe(varName, tableView.getModel());
             RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
             recomCodeManager.updateAndDisplayRecommendations();
@@ -137,7 +138,7 @@ class DataframeTab extends JPanel {
                 show(tableView);
                 logger.debug("table view created");
 
-                ServerStub serverStub = ServerStub.getInstance(openedProject);
+                ServerStub serverStub = ServerStubFactory.getInstance();
                 serverStub.onDataframe(varName, tableView.getModel());
                 RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
                 recomCodeManager.updateAndDisplayRecommendations();
@@ -201,7 +202,7 @@ class DataframeTab extends JPanel {
                 }
             }
 
-            ServerStub serverStub = ServerStub.getInstance(project);
+            ServerStub serverStub = ServerStubFactory.getInstance();
             if (cells.size() == 1) {
                 serverStub.onCell(cells.get(0).first, cells.get(0).second);
             } else {
