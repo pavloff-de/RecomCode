@@ -1,4 +1,4 @@
-package de.pavloff.pycharm.plugin.server_stub;
+package de.pavloff.pycharm.plugin.serverstub;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;

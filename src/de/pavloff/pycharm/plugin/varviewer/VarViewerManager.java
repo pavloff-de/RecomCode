@@ -13,7 +13,7 @@ import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.ipnb.OutputCell;
-import de.pavloff.pycharm.plugin.server_stub.ServerStub;
+import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.imageio.ImageIO;

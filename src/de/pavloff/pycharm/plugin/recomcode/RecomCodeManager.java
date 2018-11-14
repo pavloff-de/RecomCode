@@ -15,7 +15,7 @@ import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
-import de.pavloff.pycharm.plugin.server_stub.ServerStub;
+import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
 
 import javax.swing.*;
