@@ -15,6 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
+/** A macro which extends {@link PyIterableVariableMacro}
+ * It looks for proper visible variables in a context
+ * It removes the duplicates in a list of variables
+ */
 public class PyUniqueIterableVariableMacro extends PyIterableVariableMacro {
 
     @Override
@@ -27,6 +31,10 @@ public class PyUniqueIterableVariableMacro extends PyIterableVariableMacro {
         return "pyUniqueIterableVariable()";
     }
 
+    /**
+     * calculates all possible variables to show the suggestion in a live template
+     * the duplicates are eliminated
+     */
     @NotNull
     protected List<PsiNamedElement> getIterableElements(@NotNull PsiElement element) {
         List<String> elementNames = new LinkedList<>();
@@ -56,6 +64,10 @@ public class PyUniqueIterableVariableMacro extends PyIterableVariableMacro {
         return uniqueComponents;
     }
 
+    /**
+     * looks for all visible variables in a context and
+     * returns it as a list of PsiElements
+     */
     @NotNull
     private static List<PsiNamedElement> getVisibleNamedElements(@NotNull PsiElement anchor) {
         final List<PsiNamedElement> results = new ArrayList<>();

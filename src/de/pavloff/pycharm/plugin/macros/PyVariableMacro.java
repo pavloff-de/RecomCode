@@ -10,7 +10,10 @@ import com.jetbrains.python.psi.impl.PyElementGeneratorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
+/** Simple macro which can be used in live templates as a placeholder with a fixed list
+ * of possible variables
+ * It generates PsiElements from a given list of variables
+ */
 public class PyVariableMacro extends Macro {
 
     private String[] vars;
@@ -21,14 +24,17 @@ public class PyVariableMacro extends Macro {
 
     @Override
     public String getName() {
-        return null;
+        return "PyVariable";
     }
 
     @Override
     public String getPresentableName() {
-        return null;
+        return "PyVariable()";
     }
 
+    /**
+     * returns the first possible variable to preset this in a live template
+     */
     @Nullable
     @Override
     public Result calculateResult(@NotNull Expression[] params, ExpressionContext context) {
@@ -36,6 +42,9 @@ public class PyVariableMacro extends Macro {
         return new PsiElementResult(elements[0]);
     }
 
+    /**
+     * calculates all possible variables to show the suggestion in a live template
+     */
     @Nullable
     @Override
     public LookupElement[] calculateLookupItems(@NotNull Expression[] params, ExpressionContext context) {
@@ -50,6 +59,9 @@ public class PyVariableMacro extends Macro {
         return lookupElements;
     }
 
+    /**
+     * generates PsiElements from the list of variables
+     */
     private PsiElement[] getElements(ExpressionContext context) {
         PsiElement[] elements = new PsiElement[vars.length];
         PyElementGeneratorImpl generator = new PyElementGeneratorImpl(context.getProject());
