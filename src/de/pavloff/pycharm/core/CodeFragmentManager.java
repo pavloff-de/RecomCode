@@ -5,7 +5,7 @@ import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
-import de.pavloff.pycharm.yaml.YamlLoader;
+import de.pavloff.pycharm.plugin.YamlLoader;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;

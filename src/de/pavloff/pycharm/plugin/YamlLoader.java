@@ -1,5 +1,7 @@
-package de.pavloff.pycharm.yaml;
+package de.pavloff.pycharm.plugin;
 
+import com.intellij.openapi.diagnostic.Logger;
+import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeParam;
@@ -12,14 +14,21 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** Parser for Yaml files with code fragments and params
+ * It reads the Yaml files from resources and creates the objects of
+ * {@link CodeFragment} and {@link CodeParam}
+ */
 public class YamlLoader implements CodeFragmentLoader {
 
     private Yaml yamlReader = new Yaml();
 
     private ArrayList<CodeFragment> fragments;
 
+    private static Logger logger = Logger.getInstance(YamlLoader.class);
+
     private void initialize() {
         if (fragments == null) {
+            logger.debug("initializing..");
             fragments = new ArrayList<>();
         }
     }
@@ -36,11 +45,13 @@ public class YamlLoader implements CodeFragmentLoader {
     public void load() {
         initialize();
 
-        URL resources = YamlLoader.class.getResource("resources");
+        logger.debug("loading yaml files..");
+        URL resources = BaseUtils.getResource("/yaml");
         FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
         File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
 
         if (yamlResources == null) {
+            logger.debug(String.format("no resource on '%s' found!", resources.getPath()));
             return;
         }
 
@@ -57,19 +68,21 @@ public class YamlLoader implements CodeFragmentLoader {
     public void loadFrom(File path) throws FileNotFoundException {
         initialize();
 
+        logger.debug(String.format("loading sections from '%s'..", path.getPath()));
         InputStream yamlFile = new FileInputStream(path);
-
-        Iterable<Object> jamlSections = yamlReader.loadAll(yamlFile);
+        Iterable<Object> yamlSections = yamlReader.loadAll(yamlFile);
         Map<String, CodeParam> globalParams = new HashMap<>();
 
-        for (Object yamlSection : jamlSections) {
+        for (Object yamlSection : yamlSections) {
             HashMap record = (HashMap) yamlSection;
 
             if (record == null) {
+                logger.debug("..empty section");
                 continue;
             }
 
             if (record.get("recType").equals("params")) {
+                logger.debug("..param section");
                 CodeParam p = new CodeParam.Builder()
                         .setRecId(castToString(record.get("recID")))
                         .setGroup(castToString(record.get("group")))
@@ -81,6 +94,7 @@ public class YamlLoader implements CodeFragmentLoader {
                 globalParams.put(p.getName(), p);
 
             } else if (record.get("recType").equals("code")) {
+                logger.debug("..code section");
                 String code = castToString(record.get("code"));
                 Map<String, CodeParam> defaultParams = castToParams(record.get("parameter"));
                 String[] paramsList = parseVariables(code);
@@ -103,6 +117,9 @@ public class YamlLoader implements CodeFragmentLoader {
         }
     }
 
+    /**
+     * translates yaml object to a string
+     */
     private String castToString(Object str) {
         try {
             return (String) str;
@@ -111,6 +128,9 @@ public class YamlLoader implements CodeFragmentLoader {
         return "";
     }
 
+    /**
+     * translates yaml object to a list of string
+     */
     private ArrayList<String> castToStrings(Object list) {
         try {
             return (ArrayList<String>) list;
@@ -125,6 +145,9 @@ public class YamlLoader implements CodeFragmentLoader {
         return castedList;
     }
 
+    /**
+     * translates yaml object to code param
+     */
     private Map<String, CodeParam> castToParams(Object list) {
         Map<String, CodeParam> params = new HashMap<>();
 
@@ -161,6 +184,10 @@ public class YamlLoader implements CodeFragmentLoader {
         return params;
     }
 
+    /**
+     * looks for variables in code
+     * a variable should be surrounded with dollar sign like $VAR$
+     */
     private String[] parseVariables(String code) {
         Set<String> visitedVariables = new LinkedHashSet<>();
         Matcher m = Pattern.compile("\\$(.*?)\\$").matcher(code);
@@ -171,6 +198,9 @@ public class YamlLoader implements CodeFragmentLoader {
         return visitedVariables.toArray(new String[0]);
     }
 
+    /**
+     * returns code params proper to the variables from a code fragment
+     */
     private Map<String, CodeParam> filterParams(String[] variables, Map<String, CodeParam> defaultParams, Map<String, CodeParam> globalParams) {
         Map<String, CodeParam> params = new HashMap<>();
 

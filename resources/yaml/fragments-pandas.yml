@@ -1,3 +1,26 @@
+#
+# Important! code params should be defined before a code which is using it
+#
+# mandatory fields for all sections:
+# 'recType' - defines a type of a section
+# 'recID' - defines the unique id of a section
+#           usually defined by progr. language, library name, type, seq. number
+#
+# mandatory fields for params:
+# 'name' - defines a name of a variable which can be set for this param
+# 'type' - defines a python type of the variable
+# optional fields for params:
+# 'group' - used by live template internally
+# 'vars' - defines a fixed list of values which can be set for this param
+# 'expr' - defines an expression which can be used for searching of variables in a context
+#
+# mandatory fields for code
+# 'code' - contains the code fragment with variables. used to generate a live template
+# optional fields for code
+# 'keywords' - used for searching fragments by keywords
+# 'textkey' - defines a text which will be showed in the recommender panel
+# 'parameter' - defines additional/special parameter for this code fragment
+#
 ---
 recType: params
 recID: py.pd.par.001
@@ -76,7 +99,10 @@ group: pandas
 keywords: [drop, remove, delete, multiple, columns]
 textkey:
   - "drop|remove|delete|kill|purge multiple columns from dataframe"
-code: $dataframe$.drop([$columnNames$], axis=1)
+code: $dataframe2$ = $dataframe$.drop([$columnNames$], axis=1)
+parameter:
+  - name: dataframe2
+    expr: "pyUniqueIterableVariable"
 ---
 recType: code
 recID: py.pd.col.004

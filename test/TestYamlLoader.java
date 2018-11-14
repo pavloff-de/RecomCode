@@ -1,5 +1,5 @@
 import de.pavloff.pycharm.core.CodeFragment;
-import de.pavloff.pycharm.yaml.YamlLoader;
+import de.pavloff.pycharm.plugin.YamlLoader;
 import org.junit.Test;
 
 import java.io.File;
