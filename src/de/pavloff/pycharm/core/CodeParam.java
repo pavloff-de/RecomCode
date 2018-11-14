@@ -38,7 +38,7 @@ public class CodeParam {
     }
 
     public Boolean hasExpression() {
-        return !expr.equals("");
+        return expr != null && !expr.equals("");
     }
 
     private CodeParam(Builder builder) {

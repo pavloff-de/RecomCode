@@ -37,36 +37,33 @@ public class PyUniqueIterableVariableMacro extends PyIterableVariableMacro {
      */
     @NotNull
     protected List<PsiNamedElement> getIterableElements(@NotNull PsiElement element) {
-        List<String> elementNames = new LinkedList<>();
-        List<PsiNamedElement> uniqueComponents = new ArrayList<>();
-
-//        final TypeEvalContext typeEvalContext =
-//                TypeEvalContext.userInitiated(element.getProject(), element.getContainingFile());
+        // final TypeEvalContext typeEvalContext =
+        //        TypeEvalContext.userInitiated(element.getProject(),
+        //                element.getContainingFile());
+        final List<PsiNamedElement> components = new ArrayList<>();
+        Set<String> elementNames = new HashSet<>();
 
         for (PsiNamedElement namedElement : getVisibleNamedElements(element)) {
-            if (namedElement instanceof PyTypedElement) {
-                String elementName = namedElement.getName();
+            if (!elementNames.add(namedElement.getName())) {
+                continue;
+            }
 
-                if (elementNames.contains(elementName)) {
-                    continue;
-                }
+            if (namedElement instanceof PyTypedElement) {
 
                 // FIXME: type checking takes a lot of time
-//                PyType type = typeEvalContext.getType((PyTypedElement)namedElement)
-//                if (type != null && PyABCUtil.isSubtype(type, PyNames.ITERABLE,
-//                        typeEvalContext)) {
-                    elementNames.add(elementName);
-                    uniqueComponents.add(namedElement);
-//                }
+                // PyType type = typeEvalContext.getType(element);
+                // if (PyABCUtil.isSubtype(type, PyNames.ITERABLE, typeEvalContext)) {
+                components.add(namedElement);
+                //}
             }
         }
-
-        return uniqueComponents;
+        return components;
     }
 
     /**
      * looks for all visible variables in a context and
      * returns it as a list of PsiElements
+     * overrides the private method of {@link PyIterableVariableMacro}
      */
     @NotNull
     private static List<PsiNamedElement> getVisibleNamedElements(@NotNull PsiElement anchor) {

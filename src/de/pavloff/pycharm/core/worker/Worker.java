@@ -128,7 +128,7 @@ public abstract class Worker {
                 }
                 columnNames.add(selectedDataframe.getColumnName(cell.second));
             }
-            addColumnNamesVariable("\"" + String.join("\", \"", columnNames) + "\"");
+            addColumnNamesVariable("[\"" + String.join("\", \"", columnNames) + "\"]");
         }
 
         cellsprocessing(cells);
