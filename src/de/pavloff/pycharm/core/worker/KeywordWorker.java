@@ -185,12 +185,17 @@ public class KeywordWorker extends Worker {
     private int rate(CodeFragment fragment) {
         int rating = 0;
 
+        String fragmentKeyword = "";
         List<String> fragmentKeywords = fragment.getKeywords();
-        if (fragmentKeywords == null || fragmentKeywords.size() == 0) {
-            return rating;
+        if (fragmentKeywords != null) {
+            fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
         }
 
-        String fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
+        String fragmentTextkey = "";
+        List<String> fragmentTextkeys = fragment.getTextkeys();
+        if (fragmentTextkeys != null) {
+            fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
+        }
 
         for (int i = 0; i < keywords.size(); i++) {
             String keyword = keywords.get(i);
@@ -213,10 +218,13 @@ public class KeywordWorker extends Worker {
             }
         }
 
-        // TODO: search for user inputs in a textkey of a fragment
+        // rank on user input
         for (String keyword : inputs) {
             if (fragmentKeyword.contains(keyword)) {
-                rating++;
+                rating += 3;
+            }
+            if (fragmentTextkey.contains(keyword)) {
+                rating += 3;
             }
         }
 
