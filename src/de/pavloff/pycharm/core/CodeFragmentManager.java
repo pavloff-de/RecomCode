@@ -69,9 +69,11 @@ public class CodeFragmentManager extends Worker {
         CodeFragmentLoader loader = new YamlLoader();
 
         Worker kw = new KeywordWorker(loader);
+        kw.initialize();
         workers.put(kw.workerName(), kw);
 
         Worker aw = new AprioriWorker();
+        aw.initialize();
         workers.put(aw.workerName(), aw);
 
         initialized = true;

@@ -8,25 +8,34 @@ import de.pavloff.pycharm.core.CodeVariable;
 import javax.swing.table.TableModel;
 import java.util.*;
 
+/** Worker using keywords to recommend code fragments
+ * It converts user input and selections in a pandas dataframe to keywords to
+ * search for the keywords and calculate most likely fragments
+ */
 public class KeywordWorker extends Worker {
 
     private CodeFragmentLoader loader;
 
     private LinkedHashSet<CodeFragment> recommendations;
 
+    /**
+     * contains the generated keywords
+     */
     private List<String> keywords;
 
+    /**
+     * contains the user input
+     */
     private List<String> inputs;
 
     public KeywordWorker(CodeFragmentLoader loader) {
         this.loader = loader;
-        keywords = new LinkedList<>();
-        inputs = new LinkedList<>();
     }
 
     @Override
     public void initialize() {
-
+        keywords = new LinkedList<>();
+        inputs = new LinkedList<>();
     }
 
     @Override
@@ -86,14 +95,19 @@ public class KeywordWorker extends Worker {
         addKeyword("cell");
 
         if (numRows == 1) {
+            // many cells in one row
             addKeyword("row");
             addKeyword("columns");
+
         } else if (numRows > numCols) {
             if (numCols == 1) {
+                // many cells in one column
                 addKeyword("column");
             }
+            // more rows as columns
             addKeyword("rows");
         } else {
+            // more columns as rows
             addKeyword("columns");
         }
 
@@ -116,12 +130,10 @@ public class KeywordWorker extends Worker {
 
     @Override
     protected void sourcecodeProcessing(String code) {
-
     }
 
     @Override
     protected void variablesProcessing(Map<String, CodeVariable> variables) {
-
     }
 
     @Override
@@ -144,6 +156,9 @@ public class KeywordWorker extends Worker {
         keywords.add(keyword);
     }
 
+    /**
+     * searches for fragments and rate them
+     */
     private void searchForFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
@@ -160,6 +175,13 @@ public class KeywordWorker extends Worker {
         recommendations = sorter.getSortedFragments();
     }
 
+    /**
+     * rates a fragment on
+     * - number of matches
+     * - exact matches
+     * - match the last keyword
+     * - user input
+     */
     private int rate(CodeFragment fragment) {
         int rating = 0;
 
@@ -191,6 +213,7 @@ public class KeywordWorker extends Worker {
             }
         }
 
+        // TODO: search for user inputs in a textkey of a fragment
         for (String keyword : inputs) {
             if (fragmentKeyword.contains(keyword)) {
                 rating++;

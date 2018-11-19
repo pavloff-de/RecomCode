@@ -7,18 +7,40 @@ import de.pavloff.pycharm.core.CodeVariable;
 import javax.swing.table.TableModel;
 import java.util.*;
 
+/** Main class handling the user inputs and making recommendations
+ */
 public abstract class Worker {
 
+    /**
+     * contains variables from context
+     */
     private Map<String, List<CodeVariable>> myVariables = new HashMap<>();
 
+    /**
+     * history of the selected fragments
+     */
     private List<CodeFragment> selectedCodeFragments = new LinkedList<>();
 
+    /**
+     * currently opened pandas dataframe
+     */
     private TableModel selectedDataframe;
 
+    /**
+     * can be used to initialize the worker or additional objects like server connection
+     */
     public abstract void initialize();
 
+    /**
+     * name of the worker
+     * can be used in a configuration of the plugin
+     */
     public abstract String workerName();
 
+    /**
+     * description of the worker
+*      can be used in a configuration of the plugin
+     */
     public abstract String description();
 
     public Map<String, List<CodeVariable>> getMyVariables() {
@@ -47,8 +69,14 @@ public abstract class Worker {
         return lastFragments;
     }
 
+    /**
+     * returns the list of recommended code fragments
+     */
     public abstract LinkedHashSet<CodeFragment> getRecommendations();
 
+    /**
+     * handles the user input
+     */
     public void onInput(String input) {
         if (input.endsWith(" ")) {
             // FIXME: during typing all prefixes of a variable will be saved
@@ -93,6 +121,9 @@ public abstract class Worker {
         }
     }
 
+    /**
+     * handles the selection of a pandas dataframe
+     */
     public void onDataframe(String tableName, TableModel table) {
         selectedDataframe = table;
         addDataframeVariable(tableName);
@@ -100,6 +131,9 @@ public abstract class Worker {
         dataframeProcessing(tableName, table);
     }
 
+    /**
+     * handles the selection of a cell in a pandas dataframe
+     */
     public void onCell(int row, int column) {
         addRowVariable(row);
         addColumnVariable(column);
@@ -112,6 +146,9 @@ public abstract class Worker {
         cellProcessing(row, column);
     }
 
+    /**
+     * handles the selection of many cells in a pandas dataframe
+     */
     public void onCells(List<Pair<Integer, Integer>> cells) {
         if (cells.size() == 0) {
             return;
@@ -134,12 +171,18 @@ public abstract class Worker {
         cellsprocessing(cells);
     }
 
+    /**
+     * handles the selection of a row in a pandas dataframe
+     */
     public void onRow(int row) {
         addRowVariable(row);
 
         rowProcessing(row);
     }
 
+    /**
+     * handles the selection of a column in a pandas dataframe
+     */
     public void onColumn(int column) {
         addColumnVariable(column);
 
@@ -150,10 +193,16 @@ public abstract class Worker {
         columnProcessing(column);
     }
 
+    /**
+     * handles the source code
+     */
     public void onSourcecode(String code) {
         sourcecodeProcessing(code);
     }
 
+    /**
+     * handles the variables from context
+     */
     public void onVariables(Map<String, CodeVariable> variables) {
         for (CodeVariable var : variables.values()) {
             if (var.getType().equals("module")) {
@@ -164,34 +213,27 @@ public abstract class Worker {
         variablesProcessing(variables);
     }
 
-    public void onCodeFragment(CodeFragment fragment) {
-        selectedCodeFragments.removeIf(k -> k.equals(fragment));
-        selectedCodeFragments.add(0, fragment);
-
-        codeFragmentProcessing(fragment);
-    }
-
-    protected void addDataframeVariable(String tableName) {
+    private void addDataframeVariable(String tableName) {
         addVariable("DataFrame", "dataframe", tableName, null);
     }
 
-    protected void addRowVariable(int row) {
+    private void addRowVariable(int row) {
         addVariable( "int", "rowIndex", String.valueOf(row), null);
     }
 
-    protected void addColumnVariable(int column) {
+    private void addColumnVariable(int column) {
         addVariable( "int", "columnIndex", String.valueOf(column), null);
     }
 
-    protected void addColumnNameVariable(String columnName) {
+    private void addColumnNameVariable(String columnName) {
         addVariable("str", "columnName", columnName, null);
     }
 
-    protected void addColumnNamesVariable(String columnNames) {
+    private void addColumnNamesVariable(String columnNames) {
         addVariable("list", "columnNames", columnNames, null);
     }
 
-    protected void addVariable(String type, String varName, String value, String moduleName) {
+    private void addVariable(String type, String varName, String value, String moduleName) {
         List<CodeVariable> vars;
 
         if (myVariables.containsKey(varName)) {
@@ -211,6 +253,18 @@ public abstract class Worker {
                 .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
     }
 
+    /**
+     * handles the selection of a code fragment
+     */
+    public void onCodeFragment(CodeFragment fragment) {
+        selectedCodeFragments.removeIf(k -> k.equals(fragment));
+        selectedCodeFragments.add(0, fragment);
+
+        codeFragmentProcessing(fragment);
+    }
+
+    // protected methods which can be used to extend the functionality of worker //
+
     protected abstract void inputProcessing(String input);
 
     protected abstract void dataframeProcessing(String tableName, TableModel table);
@@ -228,4 +282,5 @@ public abstract class Worker {
     protected abstract void variablesProcessing(Map<String, CodeVariable> variables);
 
     protected abstract void codeFragmentProcessing(CodeFragment fragment);
+    // end of protected methods which can be used to extend the functionality of worker //
 }

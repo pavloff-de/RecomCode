@@ -10,6 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.table.TableModel;
 import java.util.*;
 
+/** Worker using apriori algorithm to recommend code fragments
+ * It uses user input and selection in a pandas dataframe to calculate most likely
+ * fragments
+ */
 public class AprioriWorker extends Worker {
 
     private LinkedHashSet<CodeFragment> recommendations;
@@ -20,14 +24,10 @@ public class AprioriWorker extends Worker {
 
     private Apriori<MyItem> apriori;
 
-    public AprioriWorker() {
-        apriori = new Apriori.Builder<MyItem>(0.01).generateRules(0.02).ruleCount(100).create();
-        items = new LinkedList<>();
-    }
-
     @Override
     public void initialize() {
-
+        apriori = new Apriori.Builder<MyItem>(0.01).generateRules(0.02).ruleCount(100).create();
+        items = new LinkedList<>();
     }
 
     @Override
@@ -94,12 +94,10 @@ public class AprioriWorker extends Worker {
 
     @Override
     protected void sourcecodeProcessing(String code) {
-
     }
 
     @Override
     protected void variablesProcessing(Map<String, CodeVariable> variables) {
-
     }
 
     @Override
@@ -113,6 +111,9 @@ public class AprioriWorker extends Worker {
         return recommendations;
     }
 
+    /**
+     * returns user input split in transactions
+     */
     private Iterable<Transaction<MyItem>> getLastTransactions() {
         // split items into transactions
         LinkedList<Transaction<MyItem>> transactions = new LinkedList<>();
@@ -140,6 +141,9 @@ public class AprioriWorker extends Worker {
         return transactions;
     }
 
+    /**
+     * generates sub transactions of max size k
+     */
     private List<MyTransaction> subTransactions(ArrayList<MyItem> input, int k) {
         List<MyTransaction> subsets = new LinkedList<>();
 
@@ -167,7 +171,9 @@ public class AprioriWorker extends Worker {
         return subsets;
     }
 
-    // generate actual subset by index sequence
+    /**
+     * generates actual subset by index sequence
+     */
     private MyTransaction getSubset(ArrayList<MyItem> input, int[] subset) {
         MyTransaction result = new MyTransaction();
         for (int aSubset : subset) {
@@ -176,6 +182,9 @@ public class AprioriWorker extends Worker {
         return result;
     }
 
+    /**
+     * runs the apriori algorithm
+     */
     private void searchForFragments() {
         recommendations = new LinkedHashSet<>();
 
@@ -203,6 +212,9 @@ public class AprioriWorker extends Worker {
         }
     }
 
+    /**
+     * filter used to filter out the transactions with code fragment in a head
+     */
     private class RuleFilter implements Operator {
 
         @Override
@@ -213,13 +225,18 @@ public class AprioriWorker extends Worker {
             }
 
             MyItem item = (MyItem) target.first();
-            if (item.isCodeFragment) {
-                return 1;
+            if (!item.isCodeFragment) {
+                return 0;
             }
-            return 0;
+
+            return 1;
         }
     }
 
+    /**
+     * class containing the user transaction / list of actions
+     * the last action should be the selected code fragment
+     */
     private class MyTransaction implements Transaction<MyItem> {
 
         private LinkedList<MyItem> list;
@@ -262,6 +279,10 @@ public class AprioriWorker extends Worker {
         }
     }
 
+    /**
+     * user action
+     * can be the selection of a code fragment or some user input
+     */
     private class MyItem implements Item {
 
         private CodeFragment codeFragment;
