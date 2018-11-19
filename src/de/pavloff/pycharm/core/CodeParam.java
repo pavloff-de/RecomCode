@@ -1,13 +1,53 @@
 package de.pavloff.pycharm.core;
 
+/** Main class for params used in {@link CodeFragment}
+ * It contains the name, var examples, var expression and other additional fields
+ * It can be replaced with {@link CodeVariable}
+ */
 public class CodeParam {
 
+    /**
+     * unique identifier of the param
+     */
     private final String recID;
+
+    /**
+     * name of the group the param belongs to
+     */
     private final String group;
+
+    /**
+     * name of the param used in a code of {@link CodeFragment}
+     * used for replacing with a {@link CodeVariable}
+     */
     private final String name;
+
+    /**
+     * type of the param
+     */
     private final String type;
+
+    /**
+     * possible values which can be used for this param
+     * @see de.pavloff.pycharm.plugin.macros.PyVariableMacro
+     */
     private final String vars;
+
+    /**
+     * expression used to search for variables in a context
+     * @see de.pavloff.pycharm.plugin.macros.PyUniqueIterableVariableMacro
+     */
     private final String expr;
+
+    // creates an object using builder pattern
+    private CodeParam(Builder builder) {
+        this.recID = builder.recID;
+        this.group = builder.group;
+        this.name = builder.name;
+        this.type = builder.type;
+        this.vars = builder.vars;
+        this.expr = builder.expr;
+    }
 
     public String getRecID() {
         return recID;
@@ -30,26 +70,21 @@ public class CodeParam {
     }
 
     public Boolean hasVars() {
-        return !vars.equals("");
+        return vars != null && !vars.equals("");
     }
 
     public String getExpr() {
         return expr;
     }
 
-    public Boolean hasExpression() {
+    public Boolean hasExpr() {
         return expr != null && !expr.equals("");
     }
 
-    private CodeParam(Builder builder) {
-        this.recID = builder.recID;
-        this.group = builder.group;
-        this.name = builder.name;
-        this.type = builder.type;
-        this.vars = builder.vars;
-        this.expr = builder.expr;
-    }
-
+    /**
+     * Main class to create an object of {@link CodeParam} using builder pattern
+     * It contains set methods returning always a Builder instance
+     */
     public static class Builder {
 
         private String recID;
@@ -89,6 +124,9 @@ public class CodeParam {
             return this;
         }
 
+        /**
+         * returns a new object of {@link CodeParam} with set fields
+         */
         public CodeParam build() {
             return new CodeParam(this);
         }

@@ -4,20 +4,69 @@ import com.intellij.openapi.util.Pair;
 
 import java.util.*;
 
+
+/** Main class for recommendations created by {@link CodeFragmentLoader}
+ * It contains the code fragment, params used in the code and other additional fields
+ */
 public class CodeFragment {
 
+    /**
+     * unique identifier of the fragment
+     */
     private final String recID;
+
+    /**
+     * name of the group the fragment belongs to
+     */
     private final String group;
+
+    /**
+     * the parent's recID of the fragment
+     */
     private final String parent;
+
+    /**
+     * list of related fragments
+     */
     private final ArrayList<String> related;
+
+    /**
+     * description of the fragment displayed in a recommendation
+     * can contain synonymous words separated by |
+     */
     private final ArrayList<String> textkeys;
+
+    /**
+     * keyword used to search for the fragment
+     */
     private final ArrayList<String> keywords;
+
+    /**
+     * description or url of the source
+     */
     private final String sources;
+
+    /**
+     * description or url of the documentation
+     */
     private final String documentation;
+
+    /**
+     * the code fragment used to create a live template
+     */
     private final String code;
+
+    /**
+     * list of param names used in code fragment
+     */
     private final String[] paramsList;
+
+    /**
+     * list of params in code fragment
+     */
     private final Map<String, CodeParam> defaultParams;
 
+    // creates an object using builder pattern
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
         this.group = builder.group;
@@ -60,6 +109,10 @@ public class CodeFragment {
         return defaultParams;
     }
 
+    /**
+     * replaces code params with variables from context
+     * creates many fragments if some variable is not unique
+     */
     public List<CodeFragment> getWithVariables(Map<String, List<CodeVariable>> variables) {
         List<CodeFragment> withVariables = new ArrayList<>();
         Map<String, CodeParam> newParams = new HashMap<>();
@@ -77,7 +130,7 @@ public class CodeFragment {
                 int vs = vars.size();
 
                 if (vs > 0) {
-                    // using just the last one
+                    // take the last one
                     // TODO: if code contains many params of same variables
                     //       (e.g. dataframe, dataframe2) take next var and
                     //       make many combinations
@@ -114,6 +167,9 @@ public class CodeFragment {
         return withVariables;
     }
 
+    /**
+     * returns a text to display it in a recommendation
+     */
     public String[] getCleanTextkeys() {
         if (textkeys == null || textkeys.size() == 0) {
             return null;
@@ -126,6 +182,8 @@ public class CodeFragment {
             String[] split = tk.split(splitter);
 
             for (int i = 0; i < split.length; i++) {
+                // take the last one
+                // TODO: take a word depending on user input
                 split[i] = split[i].split("\\|")[0];
             }
 
@@ -135,6 +193,10 @@ public class CodeFragment {
         return cleanTextkeys.toArray(new String[0]);
     }
 
+    /**
+     * Main class to create an object of {@link CodeFragment} using builder pattern
+     * It contains set methods returning always a Builder instance
+     */
     public static class Builder {
 
         private String recID;
@@ -204,11 +266,18 @@ public class CodeFragment {
             return this;
         }
 
+        /**
+         * returns a new object of {@link CodeFragment} with set fields
+         */
         public CodeFragment build() {
             return new CodeFragment(this);
         }
     }
 
+    /**
+     * The sorter of {@link CodeFragment}
+     * It give a possibility to rank a code fragment to sort on it.
+     */
     public static class FragmentSorter {
         Map<CodeFragment, Integer> ratings;
 
@@ -229,17 +298,20 @@ public class CodeFragment {
         }
 
         public void remove(CodeFragment fragment) {
-            if (ratings.containsKey(fragment)) {
-                ratings.remove(fragment);
-            }
+            ratings.remove(fragment);
         }
 
+        /** returns an iterator of sorted list
+         */
         private ListIterator sortFragments() {
             List<Map.Entry<CodeFragment, Integer>> ratedFragments = new ArrayList<>(ratings.entrySet());
             ratedFragments.sort(Map.Entry.comparingByValue());
             return ratedFragments.listIterator(ratedFragments.size());
         }
 
+        /**
+         * returns a set of sorted fragments
+         */
         public LinkedHashSet<CodeFragment> getSortedFragments() {
             ListIterator it = sortFragments();
             LinkedHashSet<CodeFragment> sortedFragments = new LinkedHashSet<>();
@@ -252,6 +324,9 @@ public class CodeFragment {
             return sortedFragments;
         }
 
+        /**
+         * returns a set of sorted fragments and its rating
+         */
         public LinkedHashSet<Pair<Integer, CodeFragment>> getSortedFragmentsWithRating() {
             ListIterator it = sortFragments();
             LinkedHashSet<Pair<Integer, CodeFragment>> sortedFragmentsWithRating = new LinkedHashSet<>();

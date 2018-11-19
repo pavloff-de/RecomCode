@@ -223,7 +223,7 @@ public class RecomCodeManager implements ProjectComponent {
             }
 
             if (p != null) {
-                if (p.hasExpression()) {
+                if (p.hasExpr()) {
                     logger.debug("..variable with expression");
                     t.addVariable(p.getName(), p.getExpr(), p.getVars(), true);
                 } else {
