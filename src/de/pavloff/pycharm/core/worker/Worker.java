@@ -18,6 +18,7 @@ public abstract class Worker {
 
     /**
      * history of the selected fragments
+     * first entry is always the last selected fragment
      */
     private List<CodeFragment> selectedCodeFragments = new LinkedList<>();
 
@@ -168,7 +169,7 @@ public abstract class Worker {
             addColumnNamesVariable("[\"" + String.join("\", \"", columnNames) + "\"]");
         }
 
-        cellsprocessing(cells);
+        cellsProcessing(cells);
     }
 
     /**
@@ -271,7 +272,7 @@ public abstract class Worker {
 
     protected abstract void cellProcessing(int row, int column);
 
-    protected abstract void cellsprocessing(List<Pair<Integer, Integer>> cells);
+    protected abstract void cellsProcessing(List<Pair<Integer, Integer>> cells);
 
     protected abstract void rowProcessing(int row);
 

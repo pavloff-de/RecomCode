@@ -62,7 +62,7 @@ public class AprioriWorker extends Worker {
     }
 
     @Override
-    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
+    protected void cellsProcessing(List<Pair<Integer, Integer>> cells) {
         int s = cells.size();
         if (s == 0) {
             return;

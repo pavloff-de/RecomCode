@@ -71,7 +71,7 @@ public class KeywordWorker extends Worker {
     }
 
     @Override
-    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
+    protected void cellsProcessing(List<Pair<Integer, Integer>> cells) {
         if (cells == null || cells.size() == 0) {
             return;
         }

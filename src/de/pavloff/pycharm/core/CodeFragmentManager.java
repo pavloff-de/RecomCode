@@ -11,6 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.table.TableModel;
 import java.util.*;
 
+/** Main implementation of {@link Worker}
+ * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under
+ * <project-components>.
+ * It combines the recommendations of {@link AprioriWorker}, {@link KeywordWorker}
+ * and kind of HistoryWorker integrated in the main clas {@link Worker}
+ */
 public class CodeFragmentManager extends Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
@@ -19,10 +25,16 @@ public class CodeFragmentManager extends Worker {
         return project.getComponent(CodeFragmentManager.class);
     }
 
+    /**
+     * returns recommendations from all worker
+     * recommendations are ranked on the position in a sorted list of each worker
+     * fragments are sorted by descending order so first fragment gets the highest rank
+     */
     @NotNull
     public LinkedHashSet<CodeFragment> getRecommendations() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
+        // HistoryWorker
         LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
         Iterator<CodeFragment> it = recommendation.iterator();
         int rank = recommendation.size();
@@ -32,6 +44,7 @@ public class CodeFragmentManager extends Worker {
             rank--;
         }
 
+        // other Worker
         for (Worker worker : workers.values()) {
             recommendation = worker.getRecommendations();
             it = recommendation.iterator();
@@ -45,11 +58,13 @@ public class CodeFragmentManager extends Worker {
 
         LinkedHashSet<Pair<Integer, CodeFragment>> ratedRecommendations = sorter.getSortedFragmentsWithRating();
 
+        // put variables into fragments
         for (Pair<Integer, CodeFragment> ratedFragment : ratedRecommendations) {
             List<CodeFragment> fragmentWithVariables = ratedFragment.second.getWithVariables(getMyVariables());
             int numOfVariables = fragmentWithVariables.size();
 
             if (numOfVariables != 0) {
+                // increasing of rank since matched variable
                 for (CodeFragment fragmentWithVariable : fragmentWithVariables) {
                     sorter.add(fragmentWithVariable, ratedFragment.first + numOfVariables);
                 }
@@ -94,7 +109,6 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onInput(input);
         }
-        // returnRecommendations();
     }
 
     @Override
@@ -102,8 +116,6 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onDataframe(tableName, table);
         }
-
-        // returnRecommendations();
     }
 
     @Override
@@ -111,16 +123,13 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onCell(row, column);
         }
-
-        // returnRecommendations();
     }
 
     @Override
-    protected void cellsprocessing(List<Pair<Integer, Integer>> cells) {
+    protected void cellsProcessing(List<Pair<Integer, Integer>> cells) {
         for (Worker worker : workers.values()) {
             worker.onCells(cells);
         }
-        // returnRecommendations();
     }
 
     @Override
@@ -128,11 +137,6 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onRow(row);
         }
-
-        // returnRecommendations();
-        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
-        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
-        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override
@@ -140,11 +144,6 @@ public class CodeFragmentManager extends Worker {
         for (Worker worker : workers.values()) {
             worker.onColumn(column);
         }
-
-        // returnRecommendations();
-        // hint: for each call of rowSelected outside core.*, insert the following afterwards:
-        //            var recomCodeManager = RecomCodeManager.getInstance(openedProject);
-        //            recomCodeManager.updateAndDisplayRecommendations();
     }
 
     @Override

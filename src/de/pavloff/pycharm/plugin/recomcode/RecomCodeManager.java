@@ -151,7 +151,12 @@ public class RecomCodeManager implements ProjectComponent {
     }
 
     /** This method should be called to update the list of recommendations.
+     *  It takes care of getting recommendations from worker
      *  It replaces the usage of the CodeFragmentListener
+     *
+     *  for each user input insert the following afterwards:
+     *         RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
+     *         recomCodeManager.updateAndDisplayRecommendations();
      */
     public void updateAndDisplayRecommendations() {
         logger.debug("updating recommendations..");
