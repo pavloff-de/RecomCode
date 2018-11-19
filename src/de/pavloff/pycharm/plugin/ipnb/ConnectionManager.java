@@ -49,7 +49,7 @@ public class ConnectionManager {
 
     private final Map<String, IpnbConnection> kernels = new HashMap<>();
 
-    private final Map<String, OutputCell> outputs = new HashMap<>();
+    private final Map<String, Output> outputs = new HashMap<>();
 
     private Project openedProject;
 
@@ -84,7 +84,7 @@ public class ConnectionManager {
      * - reinitializing if connection closed
      * - code executing if connection alive
      */
-    public void execute(VirtualFile file, String code, OutputCell outputCell) {
+    public void execute(VirtualFile file, String code, Output output) {
         initConnection(file);
 
         String filePath = file.getPath();
@@ -95,7 +95,7 @@ public class ConnectionManager {
             if (conn.isAlive()) {
                 String messageId = conn.execute(code);
                 logger.debug(String.format("executing code '%s'..", messageId));
-                outputs.put(messageId, outputCell);
+                outputs.put(messageId, output);
 
             } else {
                 logger.debug("connection closed. reinitializing..");
@@ -142,18 +142,12 @@ public class ConnectionManager {
 
                     if (out instanceof IpnbErrorOutputCell) {
                         logger.debug(String.format("code '%s' with error", m));
-                        IpnbErrorOutputCell errOut = (IpnbErrorOutputCell) out;
-                        outputs.get(m).onError(errOut.getEname(), errOut.getEvalue(), errOut.getText());
-                        return;
-                    }
+                        outputs.get(m).setError((IpnbErrorOutputCell) out);
 
-                    List<String> output = out.getText();
-                    if (output == null || output.size() == 0) {
-                        return;
+                    } else {
+                        logger.debug(String.format("code '%s' with output", m));
+                        outputs.get(m).setOutput(out);
                     }
-
-                    outputs.get(m).onOutput(output);
-                    outputs.remove(m);
                 }
 
                 @Override
@@ -165,18 +159,19 @@ public class ConnectionManager {
                         return;
                     }
 
-                    if (p == null) {
-                        logger.debug(String.format("code '%s' without payload", m));
-                        return;
-                    }
-
-                    outputs.get(m).onPayload(p);
-                    outputs.remove(m);
+                    logger.debug(String.format("code '%s' with payload", m));
+                    outputs.get(m).setPayload(p);
                 }
 
                 @Override
                 public void onFinished(@NotNull IpnbConnection c, @NotNull String m) {
-                    logger.debug(String.format("code '%s' executed", m));}
+                    logger.debug(String.format("code '%s' executed", m));
+                    // fixme: some outputs arrive after finish callback
+                    //        happens if output is very big
+                    Output out = outputs.get(m);
+                    out.onFinished(out.getOutput(), out.getError(), out.getPayload());
+                    outputs.remove(m);
+                }
             };
 
             Pair<String, String> conf = getConfiguration();
@@ -292,5 +287,51 @@ public class ConnectionManager {
         }
 
         return conn;
+    }
+
+    /** Class simulates the {@link org.jetbrains.plugins.ipnb.format.cells.IpnbCell}
+     * It combines all possible outputs of the code execution
+     * @see org.jetbrains.plugins.ipnb.protocol.IpnbConnectionListenerBase for more info
+     */
+    public abstract static class Output {
+
+        private List<String> output;
+
+        private List<String> error;
+
+        private List<String> payload;
+
+        List<String> getOutput() {
+            return output;
+        }
+
+        void setOutput(IpnbOutputCell out) {
+            List<String> o = out.getText();
+            if (o != null && o.size() > 0) {
+                output = o;
+            }
+        }
+
+        List<String> getError() {
+            return error;
+        }
+
+        void setError(IpnbErrorOutputCell out) {
+            error = out.getText();
+        }
+
+        List<String> getPayload() {
+            return payload;
+        }
+
+        void setPayload(String out) {
+            if (out != null && out.length() > 0) {
+                payload = Collections.singletonList(out);
+            }
+        }
+
+        public abstract void onFinished(List<String> output,
+                                        List<String> error,
+                                        List<String> payload);
     }
 }

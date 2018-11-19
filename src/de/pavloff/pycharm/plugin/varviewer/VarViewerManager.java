@@ -12,7 +12,6 @@ import com.intellij.ui.components.JBTabbedPane;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeVariable;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
-import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
@@ -194,25 +193,10 @@ public class VarViewerManager implements ProjectComponent {
 
         String code = codeContent.toString();
         ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
-        ipnb.execute(openedFile, code, new OutputCell() {
+        ipnb.execute(openedFile, code, new ConnectionManager.Output() {
             @Override
-            public void onOutput(java.util.List<String> output) {
-                logger.debug("code executed. output as result");
-                evaluateOutput(output);
-            }
-
-            @Override
-            public void onPayload(String payload) {
-                // ???
-                logger.debug("code executed. payload as result");
-                evaluateOutput(Collections.singletonList(payload));
-            }
-
-            @Override
-            public void onError(String eName, String eValue, java.util.List<String> traceback) {
-                logger.debug("code executed. error as result. creating output tab..");
-                tabbedPane.removeAll();
-                tabbedPane.addTab(BaseUtils.OUTPUT_TAB, createTabPanel(IpnbErrorPanel.createColoredPanel(traceback)));
+            public void onFinished(List<String> o, List<String> e, List<String> p) {
+                evaluateOutput(o, e, p);
             }
         });
     }
@@ -224,59 +208,64 @@ public class VarViewerManager implements ProjectComponent {
      * the first tab contains always the output of code
      * other tabs contains the pandas dataframes, initialized in code
      */
-    private void evaluateOutput(List<String> fromIpnb) {
+    private void evaluateOutput(List<String> output, List<String> traceback,
+                                List<String> payload) {
         logger.debug("evaluating output..");
-        String output;
-        if (fromIpnb.size() != 1) {
-            output = String.join(BaseUtils.LINE_SEP, fromIpnb);
-        } else {
-            output = fromIpnb.get(0);
-        }
 
-        String[] outputLines = output.split(BaseUtils.LINE_SEP);
-        StringBuilder mainOutput = new StringBuilder();
+        StringBuilder outputBuilder = new StringBuilder();
         LinkedList<String> dfOutput = new LinkedList<>();
         Map<String, CodeVariable> varOutput = new HashMap<>();
         boolean varViewerOutputFound = false;
 
-        for (String s : outputLines) {
-            if (s.startsWith(BaseUtils.VAR_VIEWER_SEP)) {
-                varViewerOutputFound = true;
+        for (String line : output) {
+            for (String s : line.split(BaseUtils.LINE_SEP)) {
+                if (s.startsWith(BaseUtils.VAR_VIEWER_SEP)) {
+                    varViewerOutputFound = true;
 
-            } else if (varViewerOutputFound) {
-                logger.debug("parsing output..");
+                    if (payload != null) {
+                        for (String pLine : payload) {
+                            for (String p : pLine.split(BaseUtils.LINE_SEP)) {
+                                outputBuilder.append(p).append(BaseUtils.LINE_SEP);
+                            }
+                        }
+                    }
 
-                String[] vars = s.split(" ");
-                String varType = null;
-                String varName = null;
-                String moduleName = null;
+                } else if (varViewerOutputFound) {
+                    logger.debug("parsing output..");
 
-                if (vars.length > 0) {
-                    varType = vars[0];
+                    String[] vars = s.split(" ");
+                    String varType = null;
+                    String varName = null;
+                    String moduleName = null;
+
+                    if (vars.length > 0) {
+                        varType = vars[0];
+                    }
+                    if (vars.length > 1) {
+                        varName = vars[1];
+                    }
+                    if (vars.length > 2) {
+                        moduleName = vars[2];
+                    }
+
+                    varOutput.put(varName, new CodeVariable.Builder()
+                            .setType(varType).setName(varName).setModuleName(moduleName).build());
+
+                    if (varType != null && varType.equals("DataFrame")) {
+                        dfOutput.add(s);
+                    }
+
+                } else {
+                    outputBuilder.append(s).append(BaseUtils.LINE_SEP);
                 }
-                if (vars.length > 1) {
-                    varName = vars[1];
-                }
-                if (vars.length > 2) {
-                    moduleName = vars[2];
-                }
-
-                varOutput.put(varName, new CodeVariable.Builder()
-                        .setType(varType).setName(varName).setModuleName(moduleName).build());
-
-                if (varType != null && varType.equals("DataFrame")) {
-                    dfOutput.add(s);
-                }
-
-            } else {
-                mainOutput.append(s).append(BaseUtils.LINE_SEP);
             }
         }
 
+
+        createTabs(outputBuilder, dfOutput, traceback);
+
         ServerStub serverStub = ServerStubFactory.getInstance();
         serverStub.onVariables(varOutput);
-
-        createTabs(mainOutput, dfOutput);
     }
 
     /**
@@ -307,7 +296,7 @@ public class VarViewerManager implements ProjectComponent {
     /**
      * puts tab content in a scroll pane
      */
-    private JComponent createTabPanel(JComponent panel) {
+    private JBScrollPane createTabPanel(JComponent panel) {
         panel.setLayout(new BorderLayout());
         return new JBScrollPane(panel);
     }
@@ -315,7 +304,7 @@ public class VarViewerManager implements ProjectComponent {
     /**
      * creates tab content from text and puts it in a scroll pane
      */
-    private JComponent createTabPanel(String output) {
+    private JBScrollPane createTabPanel(String output) {
         JTextArea textArea = new JTextArea(output);
         textArea.setEditable(false);
         return createTabPanel(textArea);
@@ -324,7 +313,7 @@ public class VarViewerManager implements ProjectComponent {
     /**
      * creates tabs for output and dataframes
      */
-    private void createTabs(StringBuilder mainOutput, LinkedList<String> dfOutput) {
+    private void createTabs(StringBuilder mainOutput, LinkedList<String> dfOutput, List<String> traceback) {
         logger.debug("creating tabs..");
         int openedTab = tabbedPane.getSelectedIndex();
         if (openedTab < 0) {
@@ -335,7 +324,15 @@ public class VarViewerManager implements ProjectComponent {
         tabbedPane.removeAll();
 
         logger.debug("adding output tab..");
-        tabbedPane.insertTab(BaseUtils.OUTPUT_TAB, null, createTabPanel(mainOutput.toString()), null, 0);
+
+        JBScrollPane outputTab;
+        if (traceback != null) {
+            traceback.add(0, mainOutput.toString());
+            outputTab = createTabPanel(IpnbErrorPanel.createColoredPanel(traceback));
+        } else {
+            outputTab = createTabPanel(mainOutput.toString());
+        }
+        tabbedPane.insertTab(BaseUtils.OUTPUT_TAB, null, outputTab, null, 0);
 
         logger.debug("adding dataframe tabs..");
         for (String s : dfOutput) {

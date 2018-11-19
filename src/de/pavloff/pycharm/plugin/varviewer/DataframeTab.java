@@ -8,7 +8,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
-import de.pavloff.pycharm.plugin.ipnb.OutputCell;
 import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
 import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
@@ -76,85 +75,86 @@ class DataframeTab extends JPanel {
 
         logger.debug("reading dataframe..");
         ConnectionManager ipnb = ConnectionManager.getInstance(openedProject);
-        ipnb.execute(openedFile, toCSV, new OutputCell() {
+        ipnb.execute(openedFile, toCSV, new ConnectionManager.Output() {
             @Override
-            public void onOutput(List<String> fromIpnb) {
-                logger.debug("dataframe read. output evaluating..");
-                isOpened = true;
+            public void onFinished(List<String> output, List<String> error, List<String> payload) {
+                if (payload != null) {
+                    logger.debug("dataframe read. payload as result. ignoring..");
+                }
 
-                String output;
-                if (fromIpnb.size() != 1) {
-                    output = String.join(BaseUtils.LINE_SEP, fromIpnb);
+                if (error != null) {
+                    logger.debug("code executed. error as result. showing error traceback..");
+                    show(IpnbErrorPanel.createColoredPanel(error));
+
                 } else {
-                    output = fromIpnb.get(0);
-                }
+                    logger.debug("dataframe read. output evaluating..");
 
-                String[] outputLines = output.split(BaseUtils.LINE_SEP);
-                if (outputLines.length == 0) {
-                    logger.debug("..empty output");
-                    return;
-                }
+                    if (output == null || output.size() == 0) {
+                        logger.debug("..output is null");
 
-                String[] header = outputLines[0].split(BaseUtils.DELIMITER);
+                    } else {
+                        String combinedOutput;
+                        if (output.size() != 1) {
+                            combinedOutput = String.join(BaseUtils.LINE_SEP, output);
+                        } else {
+                            combinedOutput = output.get(0);
+                        }
 
-                if (BaseUtils.hasHeader(outputLines) < 0) {
-                    logger.debug("..dataframe with header");
-                    header = new String[header.length];
-                    for (int i = 0; i < header.length; i++) {
-                        header[i] = "column" + i;
+                        String[] outputLines = combinedOutput.split(BaseUtils.LINE_SEP);
+
+                        String[] header = outputLines[0].split(BaseUtils.DELIMITER);
+
+                        if (BaseUtils.hasHeader(outputLines) < 0) {
+                            logger.debug("..dataframe with header");
+                            header = new String[header.length];
+                            for (int i = 0; i < header.length; i++) {
+                                header[i] = "column" + i;
+                            }
+                        } else {
+                            logger.debug("..dataframe without header");
+                            outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
+                        }
+
+                        int linesToShow = Math.min(outputLines.length, 1000);
+                        logger.debug(String.format("..show %s lines", linesToShow));
+
+                        String[][] data = new String[linesToShow][header.length];
+                        for (int i = 0; i < linesToShow; i++) {
+                            data[i] = outputLines[i].split(BaseUtils.DELIMITER);
+                        }
+
+                        logger.debug("creating table view..");
+                        tableView = new JBTable(new NotEditableTableModel(data, header));
+                        JTableHeader tableHeader = tableView.getTableHeader();
+                        tableHeader.setFont(new Font("Default", Font.BOLD, 16));
+
+                        tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                        tableView.setCellSelectionEnabled(true);
+                        tableView.setColumnSelectionAllowed(true);
+
+                        ListSelectionModel columnSelectionModel = tableView.getColumnModel().getSelectionModel();
+                        columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+                        columnSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
+                                tableView));
+
+                        ListSelectionModel rowSelectionModel = tableView.getSelectionModel();
+                        rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+                        rowSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
+                                tableView));
+
+                        show(tableView);
+                        logger.debug("table view created");
+
+                        ServerStub serverStub = ServerStubFactory.getInstance();
+                        serverStub.onDataframe(varName, tableView.getModel());
+                        RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
+                        recomCodeManager.updateAndDisplayRecommendations();
                     }
-                } else {
-                    logger.debug("..dataframe without header");
-                    outputLines = Arrays.copyOfRange(outputLines, 1, outputLines.length);
                 }
-
-                int linesToShow = Math.min(outputLines.length, 1000);
-                logger.debug(String.format("..show %s lines", linesToShow));
-
-                String[][] data = new String[linesToShow][header.length];
-                for (int i = 0; i < linesToShow; i++) {
-                    data[i] = outputLines[i].split(BaseUtils.DELIMITER);
-                }
-
-                logger.debug("creating table view..");
-                tableView = new JBTable(new NotEditableTableModel(data, header));
-                JTableHeader tableHeader = tableView.getTableHeader();
-                tableHeader.setFont(new Font("Default", Font.BOLD, 16));
-
-                tableView.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                tableView.setCellSelectionEnabled(true);
-                tableView.setColumnSelectionAllowed(true);
-
-                ListSelectionModel columnSelectionModel = tableView.getColumnModel().getSelectionModel();
-                columnSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-                columnSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
-                        tableView));
-
-                ListSelectionModel rowSelectionModel = tableView.getSelectionModel();
-                rowSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-                rowSelectionModel.addListSelectionListener(new SelectionListener(openedProject,
-                        tableView));
-
-                show(tableView);
-                logger.debug("table view created");
-
-                ServerStub serverStub = ServerStubFactory.getInstance();
-                serverStub.onDataframe(varName, tableView.getModel());
-                RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
-                recomCodeManager.updateAndDisplayRecommendations();
-            }
-
-            @Override
-            public void onPayload(String payload) {
-                logger.debug("dataframe read. payload as result. ignoring..");
-            }
-
-            @Override
-            public void onError(String eName, String eValue, List<String> traceback) {
-                logger.debug("code executed. error as result. showing error traceback..");
-                show(IpnbErrorPanel.createColoredPanel(traceback));
             }
         });
+
+        isOpened = true;
     }
 
     /**
