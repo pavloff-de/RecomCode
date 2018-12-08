@@ -211,6 +211,10 @@ public class VarViewerManager implements ProjectComponent {
     private void evaluateOutput(List<String> output, List<String> traceback,
                                 List<String> payload) {
         logger.debug("evaluating output..");
+        if (output == null) {
+            logger.warn("error: output from Jupyter Notebook is null..");
+            return;
+        }
 
         StringBuilder outputBuilder = new StringBuilder();
         LinkedList<String> dfOutput = new LinkedList<>();

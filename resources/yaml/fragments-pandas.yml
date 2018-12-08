@@ -76,6 +76,30 @@ type: DataFrame
 vars: dataframe|df|frame
 expr: "pyUniqueIterableVariable"
 ---
+recType: params
+recID: py.pd.par.008
+group: pandas
+name: stringValue
+type: str
+vars: str|string
+expr: "pyUniqueIterableVariable"
+---
+recType: params
+recID: py.pd.par.009
+group: pandas
+name: logicalDataframe
+type: str
+vars: regex|regularExpression
+expr: "pyUniqueIterableVariable"
+---
+recType: params
+recID: py.pd.par.010
+group: pandas
+name: logicalDataframe
+type: DataFrame
+vars: logicalDataframe|df|frame
+expr: "pyUniqueIterableVariable"
+---
 recType: code
 recID: py.pd.rw.001
 group: pandas
@@ -90,7 +114,7 @@ recID: py.pd.col.001
 group: pandas
 keywords: [drop, remove, delete, column]
 textkey:
-  - "drop|remove|delete|kill|purge columnName from dataframe"
+  - "drop columnName from dataframe"
 code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=1)"
 ---
 recType: code
@@ -98,7 +122,7 @@ recID: py.pd.col.002
 group: pandas
 keywords: [drop, remove, delete, multiple, columns]
 textkey:
-  - "drop|remove|delete|kill|purge multiple columns from dataframe"
+  - "drop multiple columns from dataframe"
 code: $dataframe2$ = $dataframe$.drop($columnNames$, axis=1)
 ---
 recType: code
@@ -136,7 +160,7 @@ group: pandas
 keywords: [select, column, columns, name]
 textkey:
 - "select columns in a dataframe by name"
-code: $dataframe2$ = $dataframe$[$columnNames$]
+code: "$dataframe$[$columnNames$]"
 ---
 recType: code
 group: pandas
@@ -172,8 +196,8 @@ group: pandas
 recID: py.pd.df.004
 keywords: [dataframe, dot, product, matrix, multiplication]
 textkey:
-- "dot product with other dataframe|series object"
-- "matrix multiplication with dataframe|Series objects"
+- "dot product with other dataframe object"
+- "matrix multiplication with dataframe object"
 code: "$dataframe$.dot($dataframe2$)"
 ---
 recType: code
@@ -182,7 +206,7 @@ recID: py.pd.df.005
 keywords: [dataframe, transpose, matrix, diagonal]
 textkey:
 - "transpose index and columns of a dataframe"
-- "flip|reflect a matrix over its diagonal"
+- "flip a matrix over its diagonal"
 code: "$dataframe$.transpose()"
 ---
 recType: code
@@ -190,14 +214,45 @@ group: pandas
 recID: py.pd.df.006
 keywords: [read, dataframe, csv, load]
 textkey:
-- "read dataframe from csv|tsv"
-code: "$dataframe$ = $module$.read_csv(\"$path$\", delimiter=\"$sep$\", header=$header$)$END$"
+- "read dataframe from csv"
+code: "$module$.read_csv($path$, delimiter=\"$sep$\", header=$header$)$END$"
 parameter:
 - name: path
-  vars: ""
+  vars: "filepath|fullPath"
 - name: sep
   vars: ",|;"
 - name: header
-  vars: "0|None"
+  vars: "'infer'|None"
 - name: module
-  vars: "pandas|pd"
+  vars: "pd|pandas"
+---
+recType: code
+group: pandas
+recID: py.pd.df.007
+keywords: [dataframe, filter, rows, condition]
+textkey:
+  - "filter rows by condition"
+code: "$dataframe$[$dataframe$[\"$columnName$\"] == 'condition']"
+---
+recType: code
+group: pandas
+recID: py.pd.df.008
+keywords: [dataframe, find, select, rows, string]
+textkey:
+  - "get logical index of rows containing a string value in a column"
+code: "$dataframe$.$columnName$.str.contains(\"$regex$\")"
+parameter:
+- name: regex
+  vars: "string|regex|^.$"
+---
+recType: code
+group: pandas
+recID: py.pd.df.009
+keywords: [dataframe, group, groupby, aggregate]
+textkey:
+  - "group by a column and compute an aggregate"
+code: "$dataframe$.groupby(\"$columnName$\").$aggFunction$()"
+parameter:
+  - name: aggFunction
+    vars: "count|min|max|sum|prod|mean|median|std|var|size"
+---
