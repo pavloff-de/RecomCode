@@ -56,10 +56,11 @@ public class CodeFragmentManager extends Worker {
             }
         }
 
-        LinkedHashSet<Pair<Integer, CodeFragment>> ratedRecommendations = sorter.getSortedFragmentsWithRating();
+        LinkedHashSet<Pair<Double, CodeFragment>> ratedRecommendations =
+                sorter.getSortedFragmentsWithRating();
 
         // put variables into fragments
-        for (Pair<Integer, CodeFragment> ratedFragment : ratedRecommendations) {
+        for (Pair<Double, CodeFragment> ratedFragment : ratedRecommendations) {
             List<CodeFragment> fragmentWithVariables = ratedFragment.second.getWithVariables(getMyVariables());
             int numOfVariables = fragmentWithVariables.size();
 

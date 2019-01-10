@@ -279,17 +279,17 @@ public class CodeFragment {
      * It give a possibility to rank a code fragment to sort on it.
      */
     public static class FragmentSorter {
-        Map<CodeFragment, Integer> ratings;
+        Map<CodeFragment, Double> ratings;
 
         public FragmentSorter() {
             ratings = new HashMap<>();
         }
 
         public void add(CodeFragment fragment) {
-            add(fragment, 1);
+            add(fragment, 1.0);
         }
 
-        public void add(CodeFragment fragment, int rating) {
+        public void add(CodeFragment fragment, double rating) {
             if (!ratings.containsKey(fragment)) {
                 ratings.put(fragment, rating);
             } else {
@@ -304,7 +304,8 @@ public class CodeFragment {
         /** returns an iterator of sorted list
          */
         private ListIterator sortFragments() {
-            List<Map.Entry<CodeFragment, Integer>> ratedFragments = new ArrayList<>(ratings.entrySet());
+            List<Map.Entry<CodeFragment, Double>> ratedFragments =
+                    new ArrayList<>(ratings.entrySet());
             ratedFragments.sort(Map.Entry.comparingByValue());
             return ratedFragments.listIterator(ratedFragments.size());
         }
@@ -327,13 +328,14 @@ public class CodeFragment {
         /**
          * returns a set of sorted fragments and its rating
          */
-        public LinkedHashSet<Pair<Integer, CodeFragment>> getSortedFragmentsWithRating() {
+        public LinkedHashSet<Pair<Double, CodeFragment>> getSortedFragmentsWithRating() {
             ListIterator it = sortFragments();
-            LinkedHashSet<Pair<Integer, CodeFragment>> sortedFragmentsWithRating = new LinkedHashSet<>();
+            LinkedHashSet<Pair<Double, CodeFragment>> sortedFragmentsWithRating =
+                    new LinkedHashSet<>();
 
             while(it.hasPrevious()) {
                 Map.Entry bestRec = (Map.Entry) it.previous();
-                sortedFragmentsWithRating.add(new Pair<>((Integer) bestRec.getValue(),
+                sortedFragmentsWithRating.add(new Pair<>((Double) bestRec.getValue(),
                         (CodeFragment) bestRec.getKey()));
             }
 
