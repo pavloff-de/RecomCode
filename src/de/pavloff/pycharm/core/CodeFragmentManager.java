@@ -35,25 +35,11 @@ public class CodeFragmentManager extends Worker {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         // HistoryWorker
-        LinkedHashSet<CodeFragment> recommendation = getSelectedCodeFragments();
-        Iterator<CodeFragment> it = recommendation.iterator();
-        int rank = recommendation.size();
-
-        while (it.hasNext()) {
-            sorter.add(it.next(), rank);
-            rank--;
-        }
+        rankAndSort(sorter, getSelectedCodeFragments());
 
         // other Worker
         for (Worker worker : workers.values()) {
-            recommendation = worker.getRecommendations();
-            it = recommendation.iterator();
-            rank = recommendation.size();
-
-            while (it.hasNext()) {
-                sorter.add(it.next(), rank);
-                rank--;
-            }
+            rankAndSort(sorter, worker.getRecommendations());
         }
 
         LinkedHashSet<Pair<Double, CodeFragment>> ratedRecommendations =
@@ -74,6 +60,14 @@ public class CodeFragmentManager extends Worker {
         }
 
         return sorter.getSortedFragments();
+    }
+
+    private void rankAndSort(CodeFragment.FragmentSorter sorter, LinkedHashSet<CodeFragment> fragments) {
+        int rank = fragments.size();
+        for (CodeFragment fragment : fragments) {
+            sorter.add(fragment, rank);
+            rank--;
+        }
     }
 
     private Boolean initialized = false;
