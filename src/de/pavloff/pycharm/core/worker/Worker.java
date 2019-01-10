@@ -53,21 +53,17 @@ public abstract class Worker {
     }
 
     public LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
-        return getSelectedCodeFragments(5);
-    }
+        CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
+        ListIterator<CodeFragment> listIit =
+                selectedCodeFragments.listIterator(selectedCodeFragments.size());
 
-    public LinkedHashSet<CodeFragment> getSelectedCodeFragments(int numOfFragments) {
-        LinkedHashSet<CodeFragment> lastFragments = new LinkedHashSet<>();
-
-        if (selectedCodeFragments.size() != 0) {
-            // find last numOfFragments fragments
-            ListIterator<CodeFragment> it = selectedCodeFragments.listIterator(Math.max(selectedCodeFragments.size() - numOfFragments, 1) - 1);
-            while (it.hasNext()) {
-                lastFragments.add(it.next());
-            }
+        double rank = 1;
+        while (listIit.hasPrevious()) {
+            sorter.add(listIit.previous(), rank);
+            rank /= 2;
         }
 
-        return lastFragments;
+        return sorter.getSortedFragments();
     }
 
     /**
@@ -258,7 +254,6 @@ public abstract class Worker {
      * handles the selection of a code fragment
      */
     public void onCodeFragment(CodeFragment fragment) {
-        selectedCodeFragments.removeIf(k -> k.equals(fragment));
         selectedCodeFragments.add(0, fragment);
 
         codeFragmentProcessing(fragment);
