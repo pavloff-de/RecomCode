@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
@@ -30,7 +31,8 @@ import java.awt.event.MouseEvent;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-/** Implements the plugin component which manages the recommendations, and contains the
+/**
+ * Implements the plugin component which manages the recommendations, and contains the
  * main "event handling" for recommendations.
  * Implements the ProjectComponent interface, see https://goo.gl/kjpXga
  * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under
@@ -42,6 +44,8 @@ public class RecomCodeManager implements ProjectComponent {
     private JPanel toolWindow;
 
     private JPanel recomCodePanel;
+
+    private JBTextField searchField;
 
     private Project openedProject;
 
@@ -70,7 +74,7 @@ public class RecomCodeManager implements ProjectComponent {
 
     /**
      * creates the GUI for ToolWindow
-     *
+     * <p>
      * recommender panel contains
      * text field for user inputs
      * pane to display the recommendations
@@ -78,7 +82,7 @@ public class RecomCodeManager implements ProjectComponent {
     private void createRecommenderPanel() {
         logger.debug("creating Recommender Panel..");
 
-        JBTextField searchField = new JBTextField();
+        searchField = new JBTextField();
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -129,6 +133,13 @@ public class RecomCodeManager implements ProjectComponent {
     }
 
     /**
+     * puts focus ito search field
+     */
+    public void focusIn() {
+        searchField.requestFocus();
+    }
+
+    /**
      * handles the events of user input
      */
     private void handleDocumentEvent(DocumentEvent e) {
@@ -150,13 +161,14 @@ public class RecomCodeManager implements ProjectComponent {
 
     }
 
-    /** This method should be called to update the list of recommendations.
-     *  It takes care of getting recommendations from worker
-     *  It replaces the usage of the CodeFragmentListener
-     *
-     *  for each user input insert the following afterwards:
-     *         RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
-     *         recomCodeManager.updateAndDisplayRecommendations();
+    /**
+     * This method should be called to update the list of recommendations.
+     * It takes care of getting recommendations from worker
+     * It replaces the usage of the CodeFragmentListener
+     * <p>
+     * for each user input insert the following afterwards:
+     * RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);
+     * recomCodeManager.updateAndDisplayRecommendations();
      */
     public void updateAndDisplayRecommendations() {
         logger.debug("updating recommendations..");
@@ -165,9 +177,11 @@ public class RecomCodeManager implements ProjectComponent {
         EventQueue.invokeLater(() -> repaintRecommendations(serverStub, newRecommendations));
     }
 
-    /** Code which repaints recommendations, and adds listener to each recommended fragement for mause click
+    /**
+     * Code which repaints recommendations, and adds listener to each recommended fragement for mause click
+     *
      * @param serverStub current CodeFragmentManager
-     * @param fragments set of current fragments
+     * @param fragments  set of current fragments
      */
     private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
         logger.debug("repainting recommendations..");

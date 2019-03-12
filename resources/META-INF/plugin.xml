@@ -48,10 +48,15 @@
       <group id="RecomCode.Toolbar">
         <action id="RecomCode.Toolbar.run"
                 class="de.pavloff.pycharm.plugin.action.RunAction" text="Run"
-                description="Run ">
+                description="Execute code">
           <keyboard-shortcut keymap="$default" first-keystroke="ctrl y"/>
         </action>
       </group>
+    <action id="RecomCode.Input.focus"
+            class="de.pavloff.pycharm.plugin.action.GoToInputAction" text="go to input"
+            description="Set focus to input field">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift y"/>
+    </action>
   </actions>
 
 </idea-plugin>

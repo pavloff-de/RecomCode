@@ -4,10 +4,10 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
-import de.pavloff.pycharm.plugin.varviewer.VarViewerManager;
+import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
 import org.jetbrains.annotations.NotNull;
 
-public class RunAction extends AnAction {
+public class GoToInputAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -16,6 +16,6 @@ public class RunAction extends AnAction {
             return;
         }
 
-        ToolWindowManager.getInstance(openedProject).getToolWindow("VarViewer").show(() -> VarViewerManager.getInstance(openedProject).executeCode());
+        ToolWindowManager.getInstance(openedProject).getToolWindow("RecomCode").show(() -> RecomCodeManager.getInstance(openedProject).focusIn());
     }
 }
