@@ -46,6 +46,11 @@
 
   <actions>
       <group id="RecomCode.Toolbar">
+        <action id="RecomCode.Toolbar.run"
+                class="de.pavloff.pycharm.plugin.action.RunAction" text="Run"
+                description="Run ">
+          <keyboard-shortcut keymap="$default" first-keystroke="ctrl y"/>
+        </action>
       </group>
   </actions>
 

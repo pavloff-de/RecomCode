@@ -146,7 +146,7 @@ public class VarViewerManager implements ProjectComponent {
      * gets python code from currently open editor and
      * executes it with Jupyter Notebook until the line with cursor
      */
-    private void executeCode() {
+    public void executeCode() {
         logger.debug("code executing..");
         VirtualFile openedFile = BaseUtils.getOpenedFile(openedProject);
 
