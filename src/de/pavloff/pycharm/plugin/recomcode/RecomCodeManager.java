@@ -10,15 +10,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import de.pavloff.pycharm.core.CodeFragment;
+import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.core.CodeParam;
 import de.pavloff.pycharm.plugin.macros.PyVariableMacro;
-import de.pavloff.pycharm.plugin.serverstub.ServerStub;
 import com.intellij.openapi.diagnostic.Logger;      // output in In ${idea.system.path}/log/idea.log
-import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -55,9 +53,6 @@ public class RecomCodeManager implements ProjectComponent {
         openedProject = project;
 
         createRecommenderPanel();
-
-        ServerStub server = ServerStubFactory.getInstance();
-        server.initialize(openedProject);
     }
 
     public static RecomCodeManager getInstance(Project project) {
@@ -155,8 +150,8 @@ public class RecomCodeManager implements ProjectComponent {
             return;
         }
 
-        ServerStub serverStub = ServerStubFactory.getInstance();
-        serverStub.onInput(input);
+        CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(openedProject);
+        fragmentManager.onInput(input);
         updateAndDisplayRecommendations();
 
     }
@@ -172,18 +167,19 @@ public class RecomCodeManager implements ProjectComponent {
      */
     public void updateAndDisplayRecommendations() {
         logger.debug("updating recommendations..");
-        ServerStub serverStub = ServerStubFactory.getInstance();
-        LinkedHashSet<CodeFragment> newRecommendations = serverStub.getRecommendations();
-        EventQueue.invokeLater(() -> repaintRecommendations(serverStub, newRecommendations));
+        CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(openedProject);
+        LinkedHashSet<CodeFragment> newRecommendations = fragmentManager.getRecommendations();
+        EventQueue.invokeLater(() -> repaintRecommendations(fragmentManager, newRecommendations));
     }
 
     /**
      * Code which repaints recommendations, and adds listener to each recommended fragement for mause click
      *
-     * @param serverStub current CodeFragmentManager
+     * @param fragmentManager current CodeFragmentManager
      * @param fragments  set of current fragments
      */
-    private void repaintRecommendations(ServerStub serverStub, LinkedHashSet<CodeFragment> fragments) {
+    private void repaintRecommendations(CodeFragmentManager fragmentManager,
+                                        LinkedHashSet<CodeFragment> fragments) {
         logger.debug("repainting recommendations..");
         if (recomCodePanel == null) {
             logger.debug("..recommender panel is not initialized");
@@ -205,7 +201,7 @@ public class RecomCodeManager implements ProjectComponent {
                 public void mouseClicked(MouseEvent e) {
                     logger.debug(String.format("template for fragment '%s' selected",
                             fragment.getRecID()));
-                    serverStub.onCodeFragment(fragment);
+                    fragmentManager.onCodeFragment(fragment);
 
                     Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
 

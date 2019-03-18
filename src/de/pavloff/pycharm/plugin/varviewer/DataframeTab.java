@@ -7,10 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import de.pavloff.pycharm.BaseUtils;
+import de.pavloff.pycharm.core.CodeFragmentManager;
 import de.pavloff.pycharm.plugin.ipnb.ConnectionManager;
 import de.pavloff.pycharm.plugin.recomcode.RecomCodeManager;
-import de.pavloff.pycharm.plugin.serverstub.ServerStub;
-import de.pavloff.pycharm.plugin.serverstub.ServerStubFactory;
 import org.jetbrains.plugins.ipnb.editor.panels.code.IpnbErrorPanel;
 
 import javax.swing.*;
@@ -50,8 +49,8 @@ class DataframeTab extends JPanel {
         logger.debug(String.format("opening tab '%s'..", varName));
 
         if (tableView != null) {
-            ServerStub serverStub = ServerStubFactory.getInstance();
-            serverStub.onDataframe(varName, tableView.getModel());
+            CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(openedProject);
+            fragmentManager.onDataframe(varName, tableView.getModel());
             RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
             recomCodeManager.updateAndDisplayRecommendations();
         }
@@ -145,8 +144,9 @@ class DataframeTab extends JPanel {
                         show(tableView);
                         logger.debug("table view created");
 
-                        ServerStub serverStub = ServerStubFactory.getInstance();
-                        serverStub.onDataframe(varName, tableView.getModel());
+                        CodeFragmentManager fragmentManager =
+                                CodeFragmentManager.getInstance(openedProject);
+                        fragmentManager.onDataframe(varName, tableView.getModel());
                         RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(openedProject);
                         recomCodeManager.updateAndDisplayRecommendations();
                     }
@@ -169,7 +169,7 @@ class DataframeTab extends JPanel {
 
     /**
      * catches the changes on table,
-     * sends the events to ServerStub and
+     * sends the events to {@link CodeFragmentManager} and
      * triggers the update of recommendations in RecomCode panel
      */
     private static class SelectionListener implements ListSelectionListener {
@@ -202,11 +202,11 @@ class DataframeTab extends JPanel {
                 }
             }
 
-            ServerStub serverStub = ServerStubFactory.getInstance();
+            CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(project);
             if (cells.size() == 1) {
-                serverStub.onCell(cells.get(0).first, cells.get(0).second);
+                fragmentManager.onCell(cells.get(0).first, cells.get(0).second);
             } else {
-                serverStub.onCells(cells);
+                fragmentManager.onCells(cells);
             }
 
             RecomCodeManager recomCodeManager = RecomCodeManager.getInstance(project);

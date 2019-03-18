@@ -15,11 +15,15 @@ import java.util.*;
  * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under
  * <project-components>.
  * It combines the recommendations of {@link AprioriWorker}, {@link KeywordWorker}
- * and kind of HistoryWorker integrated in the main clas {@link Worker}
+ * and kind of HistoryWorker integrated in the main class {@link Worker}
  */
 public class CodeFragmentManager extends Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
+
+    public CodeFragmentManager() {
+        initialize();
+    }
 
     public static CodeFragmentManager getInstance(Project project) {
         return project.getComponent(CodeFragmentManager.class);
@@ -75,6 +79,7 @@ public class CodeFragmentManager extends Worker {
     @Override
     public void initialize() {
         if (initialized) return;
+        initialized = true;
 
         CodeFragmentLoader loader = new YamlLoader();
 
@@ -85,8 +90,6 @@ public class CodeFragmentManager extends Worker {
         Worker aw = new AprioriWorker();
         aw.initialize();
         workers.put(aw.workerName(), aw);
-
-        initialized = true;
     }
 
     @Override
