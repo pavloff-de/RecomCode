@@ -1,5 +1,6 @@
 package de.pavloff.pycharm.core.worker;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeVariable;
@@ -29,8 +30,9 @@ public abstract class Worker {
 
     /**
      * can be used to initialize the worker or additional objects like server connection
+     * @param project opened Project
      */
-    public abstract void initialize();
+    public abstract void initialize(Project project);
 
     /**
      * name of the worker
@@ -44,7 +46,7 @@ public abstract class Worker {
      */
     public abstract String description();
 
-    public Map<String, List<CodeVariable>> getMyVariables() {
+    protected Map<String, List<CodeVariable>> getMyVariables() {
         return myVariables;
     }
 
@@ -52,7 +54,7 @@ public abstract class Worker {
         return selectedDataframe;
     }
 
-    public LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
+    protected LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
         ListIterator<CodeFragment> listIit =
                 selectedCodeFragments.listIterator(selectedCodeFragments.size());
@@ -85,7 +87,7 @@ public abstract class Worker {
         inputProcessing(input);
     }
 
-    protected void parseVariablesFromInput(String input) {
+    private void parseVariablesFromInput(String input) {
         String[] inputs = input.split(" ");
         int l = inputs.length;
 

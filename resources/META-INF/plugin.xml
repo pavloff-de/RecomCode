@@ -33,6 +33,9 @@
         <implementation-class>de.pavloff.pycharm.plugin.varviewer.VarViewerManager</implementation-class>
     </component>
     <component>
+      <implementation-class>de.pavloff.pycharm.plugin.YamlLoader</implementation-class>
+    </component>
+    <component>
         <implementation-class>de.pavloff.pycharm.core.CodeFragmentManager</implementation-class>
     </component>
   </project-components>

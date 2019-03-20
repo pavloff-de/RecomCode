@@ -1,5 +1,6 @@
 package de.pavloff.pycharm.core.worker;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.mrapp.apriori.*;
 import de.mrapp.apriori.metrics.Confidence;
@@ -25,7 +26,7 @@ public class AprioriWorker extends Worker {
     private Apriori<MyItem> apriori;
 
     @Override
-    public void initialize() {
+    public void initialize(Project project) {
         apriori = new Apriori.Builder<MyItem>(0.01).generateRules(0.02).ruleCount(100).create();
         items = new LinkedList<>();
     }

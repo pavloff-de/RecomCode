@@ -1,6 +1,9 @@
 package de.pavloff.pycharm.plugin;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
@@ -26,26 +29,30 @@ public class YamlLoader implements CodeFragmentLoader {
 
     private static Logger logger = Logger.getInstance(YamlLoader.class);
 
-    private void initialize() {
-        if (fragments == null) {
-            logger.debug("initializing..");
-            fragments = new ArrayList<>();
-        }
+    public YamlLoader() {
+        logger.debug("initializing..");
+        loadDefault();
+    }
+
+    public static YamlLoader getInstance(Project project) {
+        return project.getComponent(YamlLoader.class);
     }
 
     @Override
     public List<CodeFragment> getCodeFragments() {
-        if (fragments == null) {
-            load();
-        }
         return fragments;
     }
 
     @Override
-    public void load() {
-        initialize();
+    public void clearCodeFragments() {
+        fragments = new ArrayList<>();
+    }
 
+    @Override
+    public void loadDefault() {
         logger.debug("loading yaml files..");
+        clearCodeFragments();
+
         URL resources = BaseUtils.getResource("/yaml");
         FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
         File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
@@ -66,8 +73,6 @@ public class YamlLoader implements CodeFragmentLoader {
 
     @Override
     public void loadFrom(File path) throws FileNotFoundException {
-        initialize();
-
         logger.debug(String.format("loading sections from '%s'..", path.getPath()));
         InputStream yamlFile = new FileInputStream(path);
         Iterable<Object> yamlSections = yamlReader.loadAll(yamlFile);

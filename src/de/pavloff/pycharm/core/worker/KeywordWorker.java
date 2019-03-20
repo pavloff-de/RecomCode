@@ -1,9 +1,11 @@
 package de.pavloff.pycharm.core.worker;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeVariable;
+import de.pavloff.pycharm.plugin.YamlLoader;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -14,7 +16,7 @@ import java.util.*;
  */
 public class KeywordWorker extends Worker {
 
-    private CodeFragmentLoader loader;
+    private Project openedProject;
 
     private LinkedHashSet<CodeFragment> recommendations;
 
@@ -28,12 +30,9 @@ public class KeywordWorker extends Worker {
      */
     private List<String> inputs;
 
-    public KeywordWorker(CodeFragmentLoader loader) {
-        this.loader = loader;
-    }
-
     @Override
-    public void initialize() {
+    public void initialize(Project project) {
+        openedProject = project;
         keywords = new LinkedList<>();
         inputs = new LinkedList<>();
     }
@@ -161,6 +160,7 @@ public class KeywordWorker extends Worker {
      */
     private void searchForFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
+        CodeFragmentLoader loader = YamlLoader.getInstance(openedProject);
 
         for (CodeFragment fragment : loader.getCodeFragments()) {
             int rating = rate(fragment);

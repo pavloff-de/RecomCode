@@ -5,7 +5,6 @@ import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
-import de.pavloff.pycharm.plugin.YamlLoader;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableModel;
@@ -21,8 +20,8 @@ public class CodeFragmentManager extends Worker {
 
     private Map<String, Worker> workers = new HashMap<>();
 
-    public CodeFragmentManager() {
-        initialize();
+    public CodeFragmentManager(Project project) {
+        initialize(project);
     }
 
     public static CodeFragmentManager getInstance(Project project) {
@@ -77,18 +76,16 @@ public class CodeFragmentManager extends Worker {
     private Boolean initialized = false;
 
     @Override
-    public void initialize() {
+    public void initialize(Project project) {
         if (initialized) return;
         initialized = true;
 
-        CodeFragmentLoader loader = new YamlLoader();
-
-        Worker kw = new KeywordWorker(loader);
-        kw.initialize();
+        Worker kw = new KeywordWorker();
+        kw.initialize(project);
         workers.put(kw.workerName(), kw);
 
         Worker aw = new AprioriWorker();
-        aw.initialize();
+        aw.initialize(project);
         workers.put(aw.workerName(), aw);
     }
 

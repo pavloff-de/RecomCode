@@ -9,10 +9,13 @@ import java.util.List;
 public interface CodeFragmentLoader {
 
     // loads code fragments and params from default yaml files
-    void load();
+    void loadDefault();
 
     // loads code fragments and params from specific yaml files
     void loadFrom(File file) throws FileNotFoundException;
+
+    // removes fragments e.g. before load from new one
+    void clearCodeFragments();
 
     // returns the list of code fragments
     // code fragments contains already all needed code params
