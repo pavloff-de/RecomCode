@@ -1,13 +1,16 @@
 package de.pavloff.pycharm.plugin;
 
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import de.pavloff.pycharm.BaseUtils;
 import de.pavloff.pycharm.core.CodeFragment;
 import de.pavloff.pycharm.core.CodeFragmentLoader;
 import de.pavloff.pycharm.core.CodeParam;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -21,9 +24,13 @@ import java.util.regex.Pattern;
  * It reads the Yaml files from resources and creates the objects of
  * {@link CodeFragment} and {@link CodeParam}
  */
-public class YamlLoader implements CodeFragmentLoader {
+@State(name = "YamlLoader", storages = {@Storage("codeFragments.xml")})
+public class YamlLoader implements CodeFragmentLoader,
+        PersistentStateComponent<YamlLoader.State> {
 
     private Yaml yamlReader = new Yaml();
+
+    private String[] loadedFiles = new String[0];
 
     private ArrayList<CodeFragment> fragments;
 
@@ -38,16 +45,25 @@ public class YamlLoader implements CodeFragmentLoader {
         return project.getComponent(YamlLoader.class);
     }
 
+    /**
+     * returns a list of loaded CodeFragments
+     */
     @Override
     public List<CodeFragment> getCodeFragments() {
         return fragments;
     }
 
+    /**
+     * clears list of CodeFragments to load new one
+     */
     @Override
     public void clearCodeFragments() {
         fragments = new ArrayList<>();
     }
 
+    /**
+     * loads default CodeFragments
+     */
     @Override
     public void loadDefault() {
         logger.debug("loading yaml files..");
@@ -62,6 +78,11 @@ public class YamlLoader implements CodeFragmentLoader {
             return;
         }
 
+        loadedFiles = new String[yamlResources.length];
+        for (int i = 0; i < yamlResources.length; i++) {
+            loadedFiles[i] = yamlResources[i].getPath();
+        }
+
         for (File file : yamlResources) {
             try {
                 loadFrom(file);
@@ -71,6 +92,9 @@ public class YamlLoader implements CodeFragmentLoader {
         }
     }
 
+    /**
+     * loads CodeFragments from specific path
+     */
     @Override
     public void loadFrom(File path) throws FileNotFoundException {
         logger.debug(String.format("loading sections from '%s'..", path.getPath()));
@@ -218,5 +242,39 @@ public class YamlLoader implements CodeFragmentLoader {
             }
         }
         return params;
+    }
+
+    @Nullable
+    @Override
+    public State getState() {
+        return new State(loadedFiles);
+    }
+
+    @Override
+    public void loadState(@NotNull State state) {
+        loadedFiles = state.loadedFiles;
+        for (String loadedFile : loadedFiles) {
+            try {
+                loadFrom(new File(loadedFile));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /** State for Yaml loader
+     * It persists the Yaml files to load CodeFragments after restart
+     */
+    static final class State {
+
+        String[] loadedFiles;
+
+        State() {
+            loadedFiles = new String[0];
+        }
+
+        State(String[] toPersist) {
+            loadedFiles = toPersist;
+        }
     }
 }
