@@ -50,11 +50,11 @@ public abstract class Worker {
         return myVariables;
     }
 
-    public TableModel getSelectedDataframe() {
-        return selectedDataframe;
+    protected List<CodeFragment> getSelectedCodeFragments() {
+        return selectedCodeFragments;
     }
 
-    protected LinkedHashSet<CodeFragment> getSelectedCodeFragments() {
+    protected LinkedHashSet<CodeFragment> getUniqueSelectedCodeFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
         ListIterator<CodeFragment> listIit =
                 selectedCodeFragments.listIterator(selectedCodeFragments.size());
@@ -195,7 +195,7 @@ public abstract class Worker {
     /**
      * handles the source code
      */
-    public void onSourcecode(String code) {
+    public void onSourceCode(String code) {
         sourcecodeProcessing(code);
     }
 
@@ -252,12 +252,15 @@ public abstract class Worker {
                 .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
     }
 
+    protected void addCodeFragmentToHistory(CodeFragment fragment) {
+        selectedCodeFragments.add(0, fragment);
+    }
+
     /**
      * handles the selection of a code fragment
      */
     public void onCodeFragment(CodeFragment fragment) {
-        selectedCodeFragments.add(0, fragment);
-
+        addCodeFragmentToHistory(fragment);
         codeFragmentProcessing(fragment);
     }
 

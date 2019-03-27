@@ -58,7 +58,7 @@ public class AprioriWorker extends Worker {
 
     @Override
     protected void cellProcessing(int row, int column) {
-        items.add(new MyItem("Cell_" + String.valueOf(row) + "_" + String.valueOf(column)));
+        items.add(new MyItem("Cell_" + row + "_" + column));
         searchForFragments();
     }
 
@@ -76,20 +76,20 @@ public class AprioriWorker extends Worker {
         }
 
         Pair last = cells.get(s - 1);
-        items.add(new MyItem("Cell_" + String.valueOf(first.first) + "_" + String.valueOf(first.second)));
-        items.add(new MyItem("Cell_" + String.valueOf(last.first) + "_" + String.valueOf(last.second)));
+        items.add(new MyItem("Cell_" + first.first + "_" + first.second));
+        items.add(new MyItem("Cell_" + last.first + "_" + last.second));
         searchForFragments();
     }
 
     @Override
     protected void rowProcessing(int row) {
-        items.add(new MyItem("Row_" + String.valueOf(row)));
+        items.add(new MyItem("Row_" + row));
         searchForFragments();
     }
 
     @Override
     protected void columnProcessing(int column) {
-        items.add(new MyItem("Column_" + String.valueOf(column)));
+        items.add(new MyItem("Column_" + column));
         searchForFragments();
     }
 

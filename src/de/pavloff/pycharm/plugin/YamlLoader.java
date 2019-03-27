@@ -54,6 +54,18 @@ public class YamlLoader implements CodeFragmentLoader,
     }
 
     /**
+     * returns a map of loaded CodeFragments on their ids
+     */
+    @Override
+    public Map<String, CodeFragment> getCodeFragmentsWithID() {
+        Map<String, CodeFragment> fragmentMap = new HashMap<>();
+        for (CodeFragment fragment : fragments) {
+            fragmentMap.put(fragment.getRecID(), fragment);
+        }
+        return fragmentMap;
+    }
+
+    /**
      * clears list of CodeFragments to load new one
      */
     @Override
@@ -265,15 +277,15 @@ public class YamlLoader implements CodeFragmentLoader,
     /** State for Yaml loader
      * It persists the Yaml files to load CodeFragments after restart
      */
-    static final class State {
+    public static final class State {
 
-        String[] loadedFiles;
+        public String[] loadedFiles;
 
-        State() {
+        public State() {
             loadedFiles = new String[0];
         }
 
-        State(String[] toPersist) {
+        public State(String[] toPersist) {
             loadedFiles = toPersist;
         }
     }

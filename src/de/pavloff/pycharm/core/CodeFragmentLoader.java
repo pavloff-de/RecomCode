@@ -3,6 +3,7 @@ package de.pavloff.pycharm.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 /** Main interface for a code fragments and params loader
  */
@@ -20,4 +21,8 @@ public interface CodeFragmentLoader {
     // returns the list of code fragments
     // code fragments contains already all needed code params
     List<CodeFragment> getCodeFragments();
+
+    // returns the code fragments as a map
+    // fragmentID -> fragment
+    Map<String, CodeFragment> getCodeFragmentsWithID();
 }

@@ -1,11 +1,16 @@
 package de.pavloff.pycharm.core;
 
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import de.pavloff.pycharm.core.worker.AprioriWorker;
 import de.pavloff.pycharm.core.worker.KeywordWorker;
 import de.pavloff.pycharm.core.worker.Worker;
+import de.pavloff.pycharm.plugin.YamlLoader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -16,7 +21,10 @@ import java.util.*;
  * It combines the recommendations of {@link AprioriWorker}, {@link KeywordWorker}
  * and kind of HistoryWorker integrated in the main class {@link Worker}
  */
-public class CodeFragmentManager extends Worker {
+@State(name = "CodeFragmentManager", storages = {@Storage("selectedCodeFragments.xml")})
+public class CodeFragmentManager extends Worker implements PersistentStateComponent<CodeFragmentManager.State> {
+
+    private Project openedProject;
 
     private Map<String, Worker> workers = new HashMap<>();
 
@@ -38,7 +46,7 @@ public class CodeFragmentManager extends Worker {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         // HistoryWorker
-        rankAndSort(sorter, getSelectedCodeFragments());
+        rankAndSort(sorter, getUniqueSelectedCodeFragments());
 
         // other Worker
         for (Worker worker : workers.values()) {
@@ -87,6 +95,8 @@ public class CodeFragmentManager extends Worker {
         Worker aw = new AprioriWorker();
         aw.initialize(project);
         workers.put(aw.workerName(), aw);
+
+        openedProject = project;
     }
 
     @Override
@@ -144,7 +154,7 @@ public class CodeFragmentManager extends Worker {
     @Override
     protected void sourcecodeProcessing(String code) {
         for (Worker worker : workers.values()) {
-            worker.onSourcecode(code);
+            worker.onSourceCode(code);
         }
     }
 
@@ -159,6 +169,50 @@ public class CodeFragmentManager extends Worker {
     protected void codeFragmentProcessing(CodeFragment fragment) {
         for (Worker worker : workers.values()) {
             worker.onCodeFragment(fragment);
+        }
+    }
+    @Nullable
+    @Override
+    public State getState() {
+
+        // save history
+        List<String> fragmentIds = new ArrayList<>();
+        for (CodeFragment selectedCodeFragment : getSelectedCodeFragments()) {
+            fragmentIds.add(0, selectedCodeFragment.getRecID());
+        }
+        return new State(fragmentIds.toArray(new String[0]));
+    }
+
+    @Override
+    public void loadState(@NotNull State state) {
+        String[] fragmentIds = state.historyWorkerState;
+        if (fragmentIds == null || fragmentIds.length == 0) {
+            return;
+        }
+        YamlLoader loader = YamlLoader.getInstance(openedProject);
+        Map<String, CodeFragment> fragments = loader.getCodeFragmentsWithID();
+
+        for (String fragmentId : fragmentIds) {
+            CodeFragment fragment = fragments.get(fragmentId);
+            if (fragment != null) {
+                addCodeFragmentToHistory(fragment);
+            }
+        }
+    }
+
+    /** State for Worker
+     * It persists the history of user input between restarts
+     */
+    public static final class State {
+
+        public String[] historyWorkerState;
+
+        public State() {
+            historyWorkerState = new String[0];
+        }
+
+        public State(String[] toPersist) {
+            historyWorkerState = toPersist;
         }
     }
 }
