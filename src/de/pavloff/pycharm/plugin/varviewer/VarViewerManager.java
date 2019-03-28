@@ -206,60 +206,58 @@ public class VarViewerManager implements ProjectComponent {
     private void evaluateOutput(List<String> output, List<String> traceback,
                                 List<String> payload) {
         logger.debug("evaluating output..");
-        if (output == null) {
-            logger.warn("error: output from Jupyter Notebook is null..");
-            return;
-        }
 
         StringBuilder outputBuilder = new StringBuilder();
         LinkedList<String> dfOutput = new LinkedList<>();
         Map<String, CodeVariable> varOutput = new HashMap<>();
         boolean varViewerOutputFound = false;
 
-        for (String line : output) {
-            for (String s : line.split(BaseUtils.LINE_SEP)) {
-                if (s.startsWith(BaseUtils.VAR_VIEWER_SEP)) {
-                    varViewerOutputFound = true;
+        if (output != null) {
+            for (String line : output) {
+                for (String s : line.split(BaseUtils.LINE_SEP)) {
+                    if (s.startsWith(BaseUtils.VAR_VIEWER_SEP)) {
+                        varViewerOutputFound = true;
 
-                    if (payload != null) {
-                        for (String pLine : payload) {
-                            for (String p : pLine.split(BaseUtils.LINE_SEP)) {
-                                outputBuilder.append(p).append(BaseUtils.LINE_SEP);
+                        if (payload != null) {
+                            for (String pLine : payload) {
+                                for (String p : pLine.split(BaseUtils.LINE_SEP)) {
+                                    outputBuilder.append(p).append(BaseUtils.LINE_SEP);
+                                }
                             }
                         }
+
+                    } else if (varViewerOutputFound) {
+                        logger.debug("parsing output..");
+
+                        String[] vars = s.split(" ");
+                        String varType = null;
+                        String varName = null;
+                        String moduleName = null;
+
+                        if (vars.length > 0) {
+                            varType = vars[0];
+                        }
+                        if (vars.length > 1) {
+                            varName = vars[1];
+                        }
+                        if (vars.length > 2) {
+                            moduleName = vars[2];
+                        }
+
+                        varOutput.put(varName, new CodeVariable.Builder()
+                                .setType(varType).setName(varName).setModuleName(moduleName).build());
+
+                        if (varType != null && varType.equals("DataFrame")) {
+                            dfOutput.add(s);
+                        }
+
+                    } else {
+                        outputBuilder.append(s).append(BaseUtils.LINE_SEP);
                     }
-
-                } else if (varViewerOutputFound) {
-                    logger.debug("parsing output..");
-
-                    String[] vars = s.split(" ");
-                    String varType = null;
-                    String varName = null;
-                    String moduleName = null;
-
-                    if (vars.length > 0) {
-                        varType = vars[0];
-                    }
-                    if (vars.length > 1) {
-                        varName = vars[1];
-                    }
-                    if (vars.length > 2) {
-                        moduleName = vars[2];
-                    }
-
-                    varOutput.put(varName, new CodeVariable.Builder()
-                            .setType(varType).setName(varName).setModuleName(moduleName).build());
-
-                    if (varType != null && varType.equals("DataFrame")) {
-                        dfOutput.add(s);
-                    }
-
-                } else {
-                    outputBuilder.append(s).append(BaseUtils.LINE_SEP);
                 }
             }
-        }
 
+        }
 
         createTabs(outputBuilder, dfOutput, traceback);
 
