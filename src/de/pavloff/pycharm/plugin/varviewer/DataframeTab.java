@@ -44,8 +44,7 @@ class DataframeTab extends JPanel {
      * displays the content of selected tab
      * reads the dataframe if opened first time
      */
-    void open(Project openedProject, VirtualFile openedFile, String name) {
-        String varName = name.split(" ")[1];
+    void open(Project openedProject, VirtualFile openedFile, String varName) {
         logger.debug(String.format("opening tab '%s'..", varName));
 
         if (tableView != null) {

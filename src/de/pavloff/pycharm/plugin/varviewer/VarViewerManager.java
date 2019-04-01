@@ -248,7 +248,7 @@ public class VarViewerManager implements ProjectComponent {
                                 .setType(varType).setName(varName).setModuleName(moduleName).build());
 
                         if (varType != null && varType.equals("DataFrame")) {
-                            dfOutput.add(s);
+                            dfOutput.add(varName);
                         }
 
                     } else {
