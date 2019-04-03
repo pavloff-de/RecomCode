@@ -37,11 +37,11 @@ class RecomBox extends JPanel {
         fragmentName.setHorizontalAlignment(SwingConstants.CENTER);
         fragmentName.setVerticalAlignment(SwingConstants.CENTER);
 
-        String[] textkeys = fragment.getCleanTextkeys();
-        String textkey = fragment.getCode(); // no text ?
+        String textkey = fragment.getCleanTextkey();
 
-        if (textkeys != null && textkeys.length != 0) {
-            textkey = textkeys[0];
+        if (textkey == null || textkey.length() == 0) {
+            // no text ?
+            textkey = fragment.getCode();
         }
 
         // fragmentName.setText("<html><font size=6><div style='text-align: center;font-size:2ex;'>" + textkey + "</font></div></html>");

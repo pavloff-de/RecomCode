@@ -110,6 +110,13 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
     }
 
     @Override
+    public void onCodeFragment(CodeFragment fragment) {
+        // do not save fragment generated with variables
+        Map<String, CodeFragment> fragments = YamlLoader.getInstance(openedProject).getCodeFragmentsWithID();
+        super.onCodeFragment(fragments.get(fragment.getRecID()));
+    }
+
+    @Override
     protected void inputProcessing(String input) {
         for (Worker worker : workers.values()) {
             worker.onInput(input);

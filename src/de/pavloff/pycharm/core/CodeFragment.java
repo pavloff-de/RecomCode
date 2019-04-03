@@ -37,6 +37,12 @@ public class CodeFragment {
     private final ArrayList<String> textkeys;
 
     /**
+     * description of the fragment displayed in a recommendation
+     * dynamically build, can contain variable names
+     */
+    private final String textkey;
+
+    /**
      * keyword used to search for the fragment
      */
     private final ArrayList<String> keywords;
@@ -73,6 +79,7 @@ public class CodeFragment {
         this.parent = builder.parent;
         this.related = builder.related;
         this.textkeys = builder.textkeys;
+        this.textkey = builder.textkey;
         this.keywords = builder.keywords;
         this.sources = builder.sources;
         this.documentation = builder.documentation;
@@ -150,16 +157,13 @@ public class CodeFragment {
 
         if (newParams.size() != 0) {
             Builder builder = new Builder().setRecId(recID).setGroup(group)
-                    .setKeywords(keywords).setSources(sources).setCode(code).setParamsList(paramsList);
+                    .setTextkey(newTextKey).setTextkeys(textkeys)
+                    .setKeywords(keywords).setSources(sources)
+                    .setCode(code).setParamsList(paramsList);
 
             Map<String, CodeParam> updatedParams = new HashMap<>(defaultParams);
             updatedParams.putAll(newParams);
             builder.setDefaultParams(updatedParams);
-
-            //TODO: replace text with varNames
-            ArrayList<String> newTextKeys = new ArrayList<>();
-            newTextKeys.add(newTextKey);
-            builder.setTextkeys(newTextKeys);
 
             withVariables.add(builder.build());
         }
@@ -170,27 +174,42 @@ public class CodeFragment {
     /**
      * returns a text to display it in a recommendation
      */
-    public String[] getCleanTextkeys() {
-        if (textkeys == null || textkeys.size() == 0) {
+    public String getCleanTextkey() {
+        String cleanTextkey;
+        if (textkey != null) {
+            cleanTextkey = textkey;
+        } else if (textkeys == null || textkeys.size() == 0) {
             return null;
+        } else {
+            cleanTextkey = textkeys.get(0);
         }
 
-        List<String> cleanTextkeys = new ArrayList<>();
         String splitter = " ";
+        String[] split = cleanTextkey.split(splitter);
 
-        for (String tk : textkeys) {
-            String[] split = tk.split(splitter);
-
-            for (int i = 0; i < split.length; i++) {
-                // take the last one
-                // TODO: take a word depending on user input
-                split[i] = split[i].split("\\|")[0];
-            }
-
-            cleanTextkeys.add(String.join(splitter, split));
+        for (int i = 0; i < split.length; i++) {
+            // take the first one
+            // TODO: take a word depending on user input
+            split[i] = split[i].split("\\|")[0];
         }
 
-        return cleanTextkeys.toArray(new String[0]);
+        return String.join(splitter, split);
+    }
+
+    @Override
+    public final int hashCode() {
+        return (recID + getCleanTextkey()).hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return this.hashCode() == obj.hashCode();
     }
 
     /**
@@ -204,6 +223,7 @@ public class CodeFragment {
         private String parent;
         private ArrayList<String> related;
         private ArrayList<String> textkeys;
+        private String textkey;
         private ArrayList<String> keywords;
         private String sources;
         private String documentation;
@@ -233,6 +253,11 @@ public class CodeFragment {
 
         public Builder setTextkeys(ArrayList<String> textkeys) {
             this.textkeys = textkeys;
+            return this;
+        }
+
+        public Builder setTextkey(String textkey) {
+            this.textkey = textkey;
             return this;
         }
 
