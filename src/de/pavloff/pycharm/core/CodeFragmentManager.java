@@ -28,6 +28,8 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
 
     private Map<String, Worker> workers = new HashMap<>();
 
+    private HashMap<String, Boolean> fragmentFilter = new HashMap<>();
+
     public CodeFragmentManager(Project project) {
         initialize(project);
     }
@@ -46,11 +48,11 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
 
         // HistoryWorker
-        rankAndSort(sorter, getUniqueSelectedCodeFragments());
+        rankAndSort(sorter, filterFragments(getUniqueSelectedCodeFragments()));
 
         // other Worker
         for (Worker worker : workers.values()) {
-            rankAndSort(sorter, worker.getRecommendations());
+            rankAndSort(sorter, filterFragments(worker.getRecommendations()));
         }
 
         LinkedHashSet<Pair<Double, CodeFragment>> ratedRecommendations =
@@ -71,6 +73,40 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
         }
 
         return sorter.getSortedFragments();
+    }
+
+    /**
+     * returns a group filter for fragments
+     */
+    public HashMap<String, Boolean> getFragmentFilter() {
+        return fragmentFilter;
+    }
+
+    /**
+     * changes a group filter for fragments
+     */
+    public void putFragmentFilter(String group, Boolean enabled) {
+        fragmentFilter.put(group, enabled);
+    }
+
+    /**
+     * applies a group filter on fragments
+     */
+    private LinkedHashSet<CodeFragment> filterFragments(LinkedHashSet<CodeFragment> fragments) {
+        if (fragmentFilter == null || fragmentFilter.size() == 0) {
+            return fragments;
+        }
+
+        LinkedHashSet<CodeFragment> filteredFragments = new LinkedHashSet<>();
+
+        for (CodeFragment fragment : fragments) {
+            String fragmentGroup = fragment.getGroup();
+            if (fragmentFilter.containsKey(fragmentGroup) && fragmentFilter.get(fragmentGroup)) {
+                filteredFragments.add(fragment);
+            }
+        }
+
+        return filteredFragments;
     }
 
     private void rankAndSort(CodeFragment.FragmentSorter sorter, LinkedHashSet<CodeFragment> fragments) {
@@ -97,6 +133,11 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
         workers.put(aw.workerName(), aw);
 
         openedProject = project;
+
+        CodeFragmentLoader loader = YamlLoader.getInstance(openedProject);
+        for (CodeFragment codeFragment : loader.getCodeFragments()) {
+            putFragmentFilter(codeFragment.getGroup(), true);
+        }
     }
 
     @Override
@@ -187,7 +228,7 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
         for (CodeFragment selectedCodeFragment : getSelectedCodeFragments()) {
             fragmentIds.add(0, selectedCodeFragment.getRecID());
         }
-        return new State(fragmentIds.toArray(new String[0]));
+        return new State(fragmentIds.toArray(new String[0]), fragmentFilter);
     }
 
     @Override
@@ -205,6 +246,8 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
                 addCodeFragmentToHistory(fragment);
             }
         }
+
+        fragmentFilter.putAll(state.filterEnabled);
     }
 
     /** State for Worker
@@ -214,12 +257,16 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
 
         public String[] historyWorkerState;
 
+        public HashMap<String, Boolean> filterEnabled;
+
         public State() {
             historyWorkerState = new String[0];
+            filterEnabled = new HashMap<>();
         }
 
-        public State(String[] toPersist) {
+        public State(String[] toPersist, HashMap<String, Boolean> filterToPersis) {
             historyWorkerState = toPersist;
+            filterEnabled = filterToPersis;
         }
     }
 }

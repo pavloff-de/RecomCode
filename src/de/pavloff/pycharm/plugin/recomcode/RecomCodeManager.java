@@ -24,10 +24,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements the plugin component which manages the recommendations, and contains the
@@ -36,7 +36,6 @@ import java.util.Map;
  * It is instantiated directly by IDEA/PyCharm, since listed in plugin.xml under
  * <project-components>.
  */
-
 public class RecomCodeManager implements ProjectComponent {
 
     private JPanel toolWindow;
@@ -44,6 +43,9 @@ public class RecomCodeManager implements ProjectComponent {
     private JPanel recomCodePanel;
 
     private JBTextField searchField;
+
+
+    private JPanel filterPanel = new JPanel();
 
     private Project openedProject;
 
@@ -100,6 +102,23 @@ public class RecomCodeManager implements ProjectComponent {
         JBScrollPane recomCodePanelWrapper = new JBScrollPane(
                 recomCodePanel, JBScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(openedProject);
+        Map<String, Boolean> fragmentFilter = fragmentManager.getFragmentFilter();
+        TreeSet<String> groups = new TreeSet<>(fragmentFilter.keySet());
+        for (String group : groups) {
+            Checkbox filterEnabled = new Checkbox();
+            filterEnabled.addItemListener(e -> {
+                fragmentManager.putFragmentFilter(e.getItem().toString(),
+                        e.getStateChange() == ItemEvent.SELECTED);
+                handleDocumentEvent(searchField.getText());
+            });
+            filterEnabled.setLabel(group);
+            filterEnabled.setState(fragmentFilter.get(group));
+            filterPanel.add(filterEnabled);
+        }
+
         toolWindow = new JPanel();
         GroupLayout layout = new GroupLayout(toolWindow);
         toolWindow.setLayout(layout);
@@ -110,17 +129,20 @@ public class RecomCodeManager implements ProjectComponent {
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(recomCodePanelWrapper)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(searchField, 200, 400, 600)
-                                                .addGap(100)))
+                                                .addComponent(searchField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(filterPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(filterPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(recomCodePanelWrapper, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(recomCodePanelWrapper, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
                                 .addContainerGap())
         );
 
@@ -135,7 +157,7 @@ public class RecomCodeManager implements ProjectComponent {
     }
 
     /**
-     * handles the events of user input
+     * gets the user input from document events
      */
     private void handleDocumentEvent(DocumentEvent e) {
         // TODO: implement a delay for input
@@ -150,6 +172,16 @@ public class RecomCodeManager implements ProjectComponent {
             return;
         }
 
+        handleDocumentEvent(input);
+    }
+
+    /**
+     * handles the events of user input
+     */
+    private void handleDocumentEvent(String input) {
+        if (input == null) {
+            return;
+        }
         CodeFragmentManager fragmentManager = CodeFragmentManager.getInstance(openedProject);
         fragmentManager.onInput(input);
         updateAndDisplayRecommendations();
