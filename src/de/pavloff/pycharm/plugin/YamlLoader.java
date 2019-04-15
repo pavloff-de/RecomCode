@@ -143,6 +143,7 @@ public class YamlLoader implements CodeFragmentLoader,
                 CodeFragment c = new CodeFragment.Builder()
                         .setRecId(castToString(record.get("recID")))
                         .setGroup(castToString(record.get("group")))
+                        .setSubgroup(castToStrings(record.get("subgroup")))
                         .setParent(castToString(record.get("parent")))
                         .setRelated(castToStrings(record.get("related")))
                         .setTextkeys(castToStrings(record.get("textkey")))

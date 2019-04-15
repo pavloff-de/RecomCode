@@ -11,6 +11,7 @@
 # 'type' - defines a python type of the variable
 # optional fields for params:
 # 'group' - used by live template internally
+# 'subgroup' - used to filter code fragments
 # 'vars' - defines a fixed list of values which can be set for this param
 # 'expr' - defines an expression which can be used for searching of variables in a context
 #
@@ -103,45 +104,50 @@ expr: "pyUniqueIterableVariable"
 recType: code
 recID: py.pd.rw.001
 group: pandas
+subgroup: [clean, transform, mining]
 keywords: [select, row, position, number]
 textkey:
   - "select|get single rowIndex by position|integer|number"
   - "retrieve row in dataframe"
-code: $dataframe$.ix[$rowIndex$]
+code: "$dataframe$.ix[$rowIndex$]"
 ---
 recType: code
 recID: py.pd.col.001
 group: pandas
+subgroup: [clean, transform]
 keywords: [drop, remove, delete, column]
 textkey:
   - "drop columnName from dataframe"
-code: "$dataframe2$ = $dataframe$.drop(\"$columnName$\", axis=1)"
+code: "$dataframe$.drop(\"$columnName$\", axis=1)"
 ---
 recType: code
 recID: py.pd.col.002
 group: pandas
+subgroup: [clean, transform]
 keywords: [drop, remove, delete, multiple, columns]
 textkey:
   - "drop multiple columns from dataframe"
-code: $dataframe2$ = $dataframe$.drop($columnNames$, axis=1)
+code: "$dataframe$.drop($columnNames$, axis=1)"
 ---
 recType: code
 recID: py.pd.col.004
 group: pandas
+subgroup: [clean, transform]
 keywords: [rename, columns, list]
 textkey:
  - "rename columns in a dataframe via list"
-code: $dataframe$.columns = $columnNames$
+code: "$dataframe$.columns = $columnNames$"
 ---
 recType: code
 recID: py.pd.col.005
 parent: py.pd.004
 group: pandas
+subgroup: [clean, transform]
 keywords: [rename, columns, dictionary]
 textkey:
  - "rename columns in a dataframe via dictionary"
 code: |
-    $dataframe$ = $dataframe$.rename(columns=$dictionaryOfColumnNames$)
+    "$dataframe$.rename(columns=$dictionaryOfColumnNames$)"
 parameter:
   - name: dictionaryOfColumnNames
     vars: "{'oldName1': 'newName1', 'oldName2': 'newName2'}"
@@ -149,14 +155,16 @@ parameter:
 recType: code
 recID: py.pd.col.006
 group: pandas
+subgroup: [clean, transform, mining]
 keywords: [select, column, number, position]
 textkey:
 - "select columnIndex in a dataframe"
-code: $dataframe2$ = $dataframe$[$dataframe$.columns[$columnIndex$]]
+code: "$dataframe$[$dataframe$.columns[$columnIndex$]]"
 ---
 recType: code
 recID: py.pd.col.007
 group: pandas
+subgroup: [clean, transform, mining]
 keywords: [select, column, columns, name]
 textkey:
 - "select columns in a dataframe by name"
@@ -164,6 +172,7 @@ code: "$dataframe$[$columnNames$]"
 ---
 recType: code
 group: pandas
+subgroup: [transform, mining]
 recID: py.pd.df.001
 keywords: [iterator, columns, iterate]
 textkey:
@@ -172,6 +181,7 @@ code: "for $i$ in $dataframe$.iteritems():\n    $END$"
 ---
 recType: code
 group: pandas
+subgroup: [transform, mining]
 recID: py.pd.df.002
 keywords: [iterator, rows, iterate]
 textkey:
@@ -180,6 +190,7 @@ code: "for $i$ in $dataframe$.iterrows():\n    $END$"
 ---
 recType: code
 group: pandas
+subgroup: [transform, mining]
 recID: py.pd.df.003
 keywords: [iterator, rows, tuples, namedtuples, iterate]
 textkey:
@@ -193,6 +204,7 @@ parameter:
 ---
 recType: code
 group: pandas
+subgroup: [transform, mining]
 recID: py.pd.df.004
 keywords: [dataframe, dot, product, matrix, multiplication]
 textkey:
@@ -202,6 +214,7 @@ code: "$dataframe$.dot($dataframe2$)"
 ---
 recType: code
 group: pandas
+subgroup: [transform]
 recID: py.pd.df.005
 keywords: [dataframe, transpose, matrix, diagonal]
 textkey:
@@ -211,6 +224,7 @@ code: "$dataframe$.transpose()"
 ---
 recType: code
 group: pandas
+subgroup: [transform, clean]
 recID: py.pd.df.006
 keywords: [read, dataframe, csv, load]
 textkey:
@@ -228,6 +242,7 @@ parameter:
 ---
 recType: code
 group: pandas
+subgroup: [transform, clean]
 recID: py.pd.df.007
 keywords: [dataframe, filter, rows, condition]
 textkey:
@@ -236,6 +251,7 @@ code: "$dataframe$[$dataframe$[\"$columnName$\"] == 'condition']"
 ---
 recType: code
 group: pandas
+subgroup: [clean, transform, mining]
 recID: py.pd.df.008
 keywords: [dataframe, find, select, rows, string]
 textkey:
@@ -247,6 +263,7 @@ parameter:
 ---
 recType: code
 group: pandas
+subgroup: [transform, mining]
 recID: py.pd.df.009
 keywords: [dataframe, group, groupby, aggregate]
 textkey:

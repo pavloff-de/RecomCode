@@ -98,11 +98,16 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
         }
 
         LinkedHashSet<CodeFragment> filteredFragments = new LinkedHashSet<>();
+        if (fragments == null) {
+            return filteredFragments;
+        }
 
         for (CodeFragment fragment : fragments) {
-            String fragmentGroup = fragment.getGroup();
-            if (fragmentFilter.containsKey(fragmentGroup) && fragmentFilter.get(fragmentGroup)) {
-                filteredFragments.add(fragment);
+            for (String subgroup : fragment.getSubgroup()) {
+                if (fragmentFilter.containsKey(subgroup) && fragmentFilter.get(subgroup)) {
+                    filteredFragments.add(fragment);
+                    break;
+                }
             }
         }
 
@@ -136,7 +141,9 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
 
         CodeFragmentLoader loader = YamlLoader.getInstance(openedProject);
         for (CodeFragment codeFragment : loader.getCodeFragments()) {
-            putFragmentFilter(codeFragment.getGroup(), true);
+            for (String subgroup : codeFragment.getSubgroup()) {
+                putFragmentFilter(subgroup, true);
+            }
         }
     }
 

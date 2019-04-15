@@ -21,6 +21,11 @@ public class CodeFragment {
     private final String group;
 
     /**
+     * list of the subgroups the fragment belongs to
+     */
+    private final ArrayList<String> subgroup;
+
+    /**
      * the parent's recID of the fragment
      */
     private final String parent;
@@ -76,6 +81,7 @@ public class CodeFragment {
     private CodeFragment(Builder builder) {
         this.recID = builder.recID;
         this.group = builder.group;
+        this.subgroup = builder.subgroup;
         this.parent = builder.parent;
         this.related = builder.related;
         this.textkeys = builder.textkeys;
@@ -94,6 +100,10 @@ public class CodeFragment {
 
     public String getGroup() {
         return group;
+    }
+
+    public ArrayList<String> getSubgroup() {
+        return subgroup;
     }
 
     public ArrayList<String> getTextkeys() {
@@ -220,6 +230,7 @@ public class CodeFragment {
 
         private String recID;
         private String group;
+        private ArrayList<String> subgroup;
         private String parent;
         private ArrayList<String> related;
         private ArrayList<String> textkeys;
@@ -238,6 +249,11 @@ public class CodeFragment {
 
         public Builder setGroup(String group) {
             this.group = group;
+            return this;
+        }
+
+        public Builder setSubgroup(ArrayList<String> subgroup) {
+            this.subgroup = subgroup;
             return this;
         }
 
