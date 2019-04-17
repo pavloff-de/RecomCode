@@ -28,6 +28,9 @@ public class BaseUtils {
     // name of tab containing output from code
     public static String OUTPUT_TAB = "Output";
 
+    // name of tab containing output from code
+    public static String RUN_TAB = "Run";
+
     /**
      * guesses the type behind a value by parsing value to Integer Float or Boolean
      */

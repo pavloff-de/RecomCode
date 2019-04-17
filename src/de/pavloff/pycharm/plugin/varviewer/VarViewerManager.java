@@ -80,27 +80,18 @@ public class VarViewerManager implements ProjectComponent {
     private void createViewerPanel() {
         logger.debug("creating VarViewer Panel..");
 
-        JButton executeButton = new JButton();
-        executeButton.setAction(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                executeCode();
-            }
-        });
-        try {
-            Image img = ImageIO.read(BaseUtils.getResource("/img/play.png"));
-            executeButton.setIcon(new ImageIcon(img));
-        } catch (Exception ex) {
-            executeButton.setText("Run");
-        }
-
         tabbedPane = new JBTabbedPane();
         tabbedPane.addChangeListener(e -> onTabOpen());
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
+                int tabIdx = tabbedPane.indexAtLocation(evt.getX(), evt.getY());
+
+                if (tabbedPane.getTitleAt(tabIdx).equals(BaseUtils.RUN_TAB)) {
+                    executeCode();
+                }
+
                 if (evt.getClickCount() == 2) {
-                    int tabIdx = tabbedPane.indexAtLocation(evt.getX(), evt.getY());
                     Component comp = tabbedPane.getComponentAt(tabIdx);
 
                     if (comp instanceof DataframeTab) {
@@ -117,22 +108,18 @@ public class VarViewerManager implements ProjectComponent {
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(tabbedPane)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(executeButton, 40, 40, 40)
-                                                .addGap(0, 100, Short.MAX_VALUE)))
+                                .addComponent(tabbedPane)
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(executeButton, 40, 40, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tabbedPane, 230, 230, Short.MAX_VALUE)
                                 .addContainerGap())
         );
+
+        createTabs(null, null, null);
 
         logger.debug("VarViewer Panel created");
     }
@@ -277,9 +264,6 @@ public class VarViewerManager implements ProjectComponent {
 
         String tabName = tabbedPane.getTitleAt(tabIdx);
         logger.debug(String.format("..tab name '%s'", tabName));
-        if (tabName.equals(BaseUtils.OUTPUT_TAB)) {
-            return;
-        }
 
         Component comp = tabbedPane.getComponentAt(tabIdx);
         if (comp instanceof DataframeTab) {
@@ -312,16 +296,29 @@ public class VarViewerManager implements ProjectComponent {
      */
     private void createTabs(StringBuilder mainOutput, LinkedList<String> dfOutput, List<String> traceback) {
         logger.debug("creating tabs..");
+        final int DEFAULT_TAB = 1;
         int openedTab = tabbedPane.getSelectedIndex();
-        if (openedTab < 0) {
-            openedTab = 0;
+        if (openedTab < DEFAULT_TAB) {
+            openedTab = DEFAULT_TAB;
         }
         logger.debug(String.format("previously selected tab was %s..", openedTab));
 
         tabbedPane.removeAll();
 
-        logger.debug("adding output tab..");
+        logger.debug("adding run tab..");
+        Image img;
+        try {
+            img = ImageIO.read(BaseUtils.getResource("/img/play.png"));
+            tabbedPane.addTab(BaseUtils.RUN_TAB, new ImageIcon(img), new JPanel());
+        } catch (IOException e) {
+            e.printStackTrace();
+            tabbedPane.add(BaseUtils.RUN_TAB, new JPanel());
+        }
 
+        logger.debug("adding output tab..");
+        if (mainOutput == null) {
+            mainOutput = new StringBuilder();
+        }
         JBScrollPane outputTab;
         if (traceback != null) {
             traceback.add(0, mainOutput.toString());
@@ -329,11 +326,13 @@ public class VarViewerManager implements ProjectComponent {
         } else {
             outputTab = createTabPanel(mainOutput.toString());
         }
-        tabbedPane.insertTab(BaseUtils.OUTPUT_TAB, null, outputTab, null, 0);
+        tabbedPane.add(BaseUtils.OUTPUT_TAB, outputTab);
 
         logger.debug("adding dataframe tabs..");
-        for (String s : dfOutput) {
-            tabbedPane.addTab(s, new DataframeTab());
+        if (dfOutput != null) {
+            for (String s : dfOutput) {
+                tabbedPane.addTab(s, new DataframeTab());
+            }
         }
 
         logger.debug(String.format("selecting tab %s..", openedTab));
@@ -341,7 +340,7 @@ public class VarViewerManager implements ProjectComponent {
             tabbedPane.setSelectedIndex(openedTab);
         } catch (IndexOutOfBoundsException err) {
             logger.debug(String.format("%s. selecting tab 0..", err.getMessage()));
-            tabbedPane.setSelectedIndex(0);
+            tabbedPane.setSelectedIndex(DEFAULT_TAB);
         }
 
         tabbedPane.getParent().revalidate();
