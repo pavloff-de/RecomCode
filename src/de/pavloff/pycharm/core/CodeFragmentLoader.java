@@ -1,7 +1,6 @@
 package de.pavloff.pycharm.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ public interface CodeFragmentLoader {
     void loadDefault();
 
     // loads code fragments and params from specific yaml files
-    void loadFrom(File file) throws FileNotFoundException;
+    void loadFrom(InputStream yamlFile);
 
     // removes fragments e.g. before load from new one
     void clearCodeFragments();

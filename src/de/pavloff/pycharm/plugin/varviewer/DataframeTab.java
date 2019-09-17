@@ -18,9 +18,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,9 +57,9 @@ class DataframeTab extends JPanel {
         }
 
         String toCSV = "";
-        URL resources = BaseUtils.getResource("/python/df_to_csv.py");
         try {
-            FilterInputStream in = (FilterInputStream) resources.getContent();
+            InputStream in = (InputStream) BaseUtils.getResource(
+                    "/python/df_to_csv.py").getContent();
             int bytesRead;
             byte[] bytes = new byte[128];
             while ((bytesRead = in.read(bytes)) != -1) {

@@ -19,9 +19,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
@@ -158,10 +157,10 @@ public class VarViewerManager implements ProjectComponent {
         codeContent.append(BaseUtils.LINE_SEP);
         codeContent.append(String.format("print('%s')", BaseUtils.VAR_VIEWER_SEP)).append(BaseUtils.LINE_SEP);
 
-        URL resources = BaseUtils.getResource("/python/var_viewer.py");
         StringBuilder content = new StringBuilder();
         try {
-            FilterInputStream in = (FilterInputStream) resources.getContent();
+            InputStream in = (InputStream) BaseUtils.getResource(
+                    "/python/var_viewer.py").getContent();
             int bytesRead;
             byte[] bytes = new byte[256];
             while((bytesRead = in.read(bytes)) != -1) {
@@ -306,9 +305,8 @@ public class VarViewerManager implements ProjectComponent {
         tabbedPane.removeAll();
 
         logger.debug("adding run tab..");
-        Image img;
         try {
-            img = ImageIO.read(BaseUtils.getResource("/img/play.png"));
+            Image img = ImageIO.read(BaseUtils.getResource("/img/play.png"));
             tabbedPane.addTab(BaseUtils.RUN_TAB, new ImageIcon(img), new JPanel());
         } catch (IOException e) {
             e.printStackTrace();

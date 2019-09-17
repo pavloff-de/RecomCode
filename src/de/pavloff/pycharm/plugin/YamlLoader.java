@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -78,39 +77,22 @@ public class YamlLoader implements CodeFragmentLoader,
      */
     @Override
     public void loadDefault() {
-        logger.debug("loading yaml files..");
+        logger.debug("loading default yaml files..");
         clearCodeFragments();
 
-        URL resources = BaseUtils.getResource("/yaml");
-        FilenameFilter yamlFiles = (dir, name) -> name.endsWith(".yml");
-        File[] yamlResources = new File(resources.getPath()).listFiles(yamlFiles);
-
-        if (yamlResources == null) {
-            logger.debug(String.format("no resource on '%s' found!", resources.getPath()));
-            return;
-        }
-
-        loadedFiles = new String[yamlResources.length];
-        for (int i = 0; i < yamlResources.length; i++) {
-            loadedFiles[i] = yamlResources[i].getPath();
-        }
-
-        for (File file : yamlResources) {
-            try {
-                loadFrom(file);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+        try {
+            loadFrom((InputStream) BaseUtils.getResource(
+                    "/yaml/fragments-pandas.yml").getContent());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     /**
-     * loads CodeFragments from specific path
+     * loads CodeFragments from input stream
      */
     @Override
-    public void loadFrom(File path) throws FileNotFoundException {
-        logger.debug(String.format("loading sections from '%s'..", path.getPath()));
-        InputStream yamlFile = new FileInputStream(path);
+    public void loadFrom(InputStream yamlFile) {
         Iterable<Object> yamlSections = yamlReader.loadAll(yamlFile);
         Map<String, CodeParam> globalParams = new HashMap<>();
 
@@ -266,11 +248,17 @@ public class YamlLoader implements CodeFragmentLoader,
     @Override
     public void loadState(@NotNull State state) {
         loadedFiles = state.loadedFiles;
-        for (String loadedFile : loadedFiles) {
-            try {
-                loadFrom(new File(loadedFile));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+
+        if (loadedFiles.length == 0) {
+            loadDefault();
+
+        } else {
+            for (String loadedFile : loadedFiles) {
+                try {
+                    loadFrom(new FileInputStream(new File(loadedFile)));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
