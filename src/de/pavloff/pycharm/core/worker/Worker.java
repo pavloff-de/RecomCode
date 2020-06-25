@@ -15,7 +15,7 @@ public abstract class Worker {
     /**
      * contains variables from context
      */
-    private Map<String, List<CodeVariable>> myVariables = new HashMap<>();
+    private Map<String, CodeVariable> myVariables = new HashMap<>();
 
     /**
      * history of the selected fragments
@@ -46,7 +46,7 @@ public abstract class Worker {
      */
     public abstract String description();
 
-    protected Map<String, List<CodeVariable>> getMyVariables() {
+    protected Map<String, CodeVariable> getMyVariables() {
         return myVariables;
     }
 
@@ -77,13 +77,7 @@ public abstract class Worker {
      * handles the user input
      */
     public void onInput(String input) {
-        if (input.endsWith(" ")) {
-            // FIXME: during typing all prefixes of a variable will be saved
-            // m, my, myV, myVa, myVar
-            // implement delay OR save just the last one
-            parseVariablesFromInput(input);
-        }
-
+        parseVariablesFromInput(input);
         inputProcessing(input);
     }
 
@@ -233,22 +227,7 @@ public abstract class Worker {
     }
 
     private void addVariable(String type, String varName, String value, String moduleName) {
-        List<CodeVariable> vars;
-
-        if (myVariables.containsKey(varName)) {
-            vars = myVariables.get(varName);
-            int s = vars.size();
-            if (s > 4) {
-                vars = vars.subList(s - 5, s - 1);
-            }
-
-        } else {
-            vars = new LinkedList<>();
-        }
-
-        myVariables.put(varName, vars);
-
-        vars.add(new CodeVariable.Builder()
+        myVariables.put(varName, new CodeVariable.Builder()
                 .setType(type).setName(varName).setValue(value).setModuleName(moduleName).build());
     }
 

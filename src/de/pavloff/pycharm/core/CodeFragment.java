@@ -130,7 +130,7 @@ public class CodeFragment {
      * replaces code params with variables from context
      * creates many fragments if some variable is not unique
      */
-    public List<CodeFragment> getWithVariables(Map<String, List<CodeVariable>> variables) {
+    public List<CodeFragment> getWithVariables(Map<String, CodeVariable> variables) {
         List<CodeFragment> withVariables = new ArrayList<>();
         Map<String, CodeParam> newParams = new HashMap<>();
 
@@ -139,28 +139,18 @@ public class CodeFragment {
             newTextKey = textkeys.get(0);
         }
 
-        for (Map.Entry<String, List<CodeVariable>> varEntry : variables.entrySet()) {
+        for (Map.Entry<String, CodeVariable> varEntry : variables.entrySet()) {
             String parName = varEntry.getKey();
 
             if (defaultParams.containsKey(parName)) {
-                List<CodeVariable> vars = varEntry.getValue();
-                int vs = vars.size();
+                CodeVariable lastVar = varEntry.getValue();
+                newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
+                        .setExpr("").setName(lastVar.getName()).setVars(lastVar.getValue()).build());
 
-                if (vs > 0) {
-                    // take the last one
-                    // TODO: if code contains many params of same variables
-                    //       (e.g. dataframe, dataframe2) take next var and
-                    //       make many combinations
-                    CodeVariable lastVar = vars.get(vars.size() - 1);
-                    newParams.put(parName, new CodeParam.Builder().setRecId(recID).setGroup(group)
-                            .setExpr("").setName(lastVar.getName()).setVars(lastVar.getValue()).build());
-
-                    if (newTextKey.contains(parName)) {
-                        String varName = String.format("%s \"%s\"", parName,
-                                lastVar.getValue());
-                        newTextKey = newTextKey.replace(parName, varName);
-                    }
-
+                if (newTextKey.contains(parName)) {
+                    String varName = String.format("%s \"%s\"", parName,
+                            lastVar.getValue());
+                    newTextKey = newTextKey.replace(parName, varName);
                 }
             }
         }
