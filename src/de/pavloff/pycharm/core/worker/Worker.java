@@ -57,11 +57,11 @@ public abstract class Worker {
     protected LinkedHashSet<CodeFragment> getUniqueSelectedCodeFragments() {
         CodeFragment.FragmentSorter sorter = new CodeFragment.FragmentSorter();
         ListIterator<CodeFragment> listIit =
-                selectedCodeFragments.listIterator(selectedCodeFragments.size());
+                selectedCodeFragments.listIterator();
 
         double rank = 1;
-        while (listIit.hasPrevious()) {
-            sorter.add(listIit.previous(), rank);
+        while (listIit.hasNext()) {
+            sorter.add(listIit.next(), rank);
             rank /= 2;
         }
 
