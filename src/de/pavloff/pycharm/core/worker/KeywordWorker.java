@@ -194,7 +194,7 @@ public class KeywordWorker extends Worker {
         String fragmentTextkey = "";
         List<String> fragmentTextkeys = fragment.getTextkeys();
         if (fragmentTextkeys != null) {
-            fragmentKeyword = String.join("", fragmentKeywords).toLowerCase();
+            fragmentKeyword = String.join("", fragmentTextkeys).toLowerCase();
         }
 
         for (int i = 0; i < keywords.size(); i++) {
@@ -210,21 +210,21 @@ public class KeywordWorker extends Worker {
             }
 
             if (fragmentKeyword.equals(keyword)) {
-                rating += 2; // more weight for exact keys
+                rating += 3; // more weight for exact keys
 
                 if (rateIdx == keywords.size()) {
-                    rating += 2; // more weight for last keys
+                    rating += 3; // more weight for last keys
                 }
             }
         }
 
-        // rank on user input
+        // rank on user input more than on keywords
         for (String keyword : inputs) {
             if (fragmentKeyword.contains(keyword)) {
-                rating += 3;
+                rating += 5;
             }
             if (fragmentTextkey.contains(keyword)) {
-                rating += 3;
+                rating += 5;
             }
         }
 
