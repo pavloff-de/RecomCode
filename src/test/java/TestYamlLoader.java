@@ -13,8 +13,9 @@ public class TestYamlLoader {
 
     @Test
     public void testLoad() throws FileNotFoundException {
+        yamlReader.clearCodeFragments();
         yamlReader.loadFrom(new FileInputStream(new File(
-                "test/ressources/test-fragments.yml")));
+                "src/test/resources/test-fragments.yml")));
         List<CodeFragment> fragments = yamlReader.getCodeFragments();
 
         assert fragments.size() == 3;
@@ -22,10 +23,11 @@ public class TestYamlLoader {
 
     @Test
     public void testLoadDF() throws FileNotFoundException {
+        yamlReader.clearCodeFragments();
         yamlReader.loadFrom(new FileInputStream(new File(
-                "src/de/pavloff/pycharm/yaml/resources/fragments-pandas.yml")));
+                "src/main//resources/yaml/fragments-pandas.yml")));
         List<CodeFragment> fragments = yamlReader.getCodeFragments();
 
-        assert fragments.size() == 12;
+        assert fragments.size() == 16;
     }
 }

@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.21'
+}
+
+group '1.0.0'
+version '1.0-SNAPSHOT'
+
+intellij {
+    version '2018.3.6'
+    type 'IU'
+    plugins 'PythonCore:2018.3.183.5912.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('com.github.michael-rapp:apriori:1.3.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
+}
