@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>de.pavloff.intellij.plugin.recomcode</id>
   <name>RecomCode</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="oleg@pavloff.de" url="http://www.pavloff.de">pavloff</vendor>
 
   <description><![CDATA[

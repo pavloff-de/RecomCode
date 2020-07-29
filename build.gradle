@@ -2,8 +2,8 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.21'
 }
 
-group '1.0.0'
-version '1.0-SNAPSHOT'
+group '1.1.0'
+version '1.1-SNAPSHOT'
 
 intellij {
     version '2018.3.6'
