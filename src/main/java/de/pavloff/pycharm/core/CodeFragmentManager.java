@@ -72,7 +72,7 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
             }
         }
 
-        return sorter.getSortedFragments();
+        return sorter.getSortedFragments(0);
     }
 
     /**
@@ -115,7 +115,7 @@ public class CodeFragmentManager extends Worker implements PersistentStateCompon
     }
 
     private void rankAndSort(CodeFragment.FragmentSorter sorter, LinkedHashSet<CodeFragment> fragments) {
-        int rank = fragments.size();
+        int rank = Math.max(5, fragments.size());
         for (CodeFragment fragment : fragments) {
             sorter.add(fragment, rank);
             rank--;

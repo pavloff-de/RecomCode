@@ -342,15 +342,20 @@ public class CodeFragment {
         }
 
         /**
-         * returns a set of sorted fragments
+         * returns a set of numOfFragments sorted fragments
+         * numOfFragments = 0 - unlimited
          */
-        public LinkedHashSet<CodeFragment> getSortedFragments() {
+        public LinkedHashSet<CodeFragment> getSortedFragments(int numOfFragments) {
             ListIterator it = sortFragments();
             LinkedHashSet<CodeFragment> sortedFragments = new LinkedHashSet<>();
 
             while(it.hasPrevious()) {
                 Map.Entry bestRec = (Map.Entry) it.previous();
                 sortedFragments.add((CodeFragment) bestRec.getKey());
+
+                if (sortedFragments.size() == numOfFragments) {
+                    return sortedFragments;
+                }
             }
 
             return sortedFragments;

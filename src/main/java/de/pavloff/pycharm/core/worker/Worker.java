@@ -65,7 +65,7 @@ public abstract class Worker {
             rank /= 2;
         }
 
-        return sorter.getSortedFragments();
+        return sorter.getSortedFragments(5);
     }
 
     /**

@@ -172,7 +172,7 @@ public class KeywordWorker extends Worker {
             sorter.add(fragment, rating);
         }
 
-        recommendations = sorter.getSortedFragments();
+        recommendations = sorter.getSortedFragments(5);
     }
 
     /**
