@@ -24,9 +24,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.*;
 
 /**
@@ -99,6 +97,12 @@ public class RecomCodeManager implements ProjectComponent {
 
         recomCodePanel = new JPanel();
         recomCodePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        recomCodePanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeRecomCodePanel();
+            }
+        });
         JBScrollPane recomCodePanelWrapper = new JBScrollPane(
                 recomCodePanel, JBScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -231,8 +235,7 @@ public class RecomCodeManager implements ProjectComponent {
             r.addListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    logger.debug(String.format("template for fragment '%s' selected",
-                            fragment.getRecID()));
+                    logger.debug(String.format("template for fragment '%s' selected", fragment.getRecID()));
                     fragmentManager.onCodeFragment(fragment);
 
                     Editor editor = FileEditorManager.getInstance(openedProject).getSelectedTextEditor();
@@ -248,6 +251,14 @@ public class RecomCodeManager implements ProjectComponent {
             recomCodePanel.add(r);
         }
         recomCodePanel.repaint();
+
+        EventQueue.invokeLater(() -> resizeRecomCodePanel());
+    }
+
+    private void resizeRecomCodePanel() {
+        Component lastComponent = recomCodePanel.getComponent(recomCodePanel.getComponentCount() - 1);
+        int height = lastComponent.getY() + lastComponent.getHeight() + 5;
+        recomCodePanel.setPreferredSize(new Dimension(recomCodePanel.getWidth(), height));
     }
 
     private Template newTemplate(CodeFragment fragment) {
